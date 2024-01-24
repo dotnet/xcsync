@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcsync", "xcsync\xcsync.csproj", "{4DAFECB3-7244-45CB-8AB9-AA02A3E1B773}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcsync.tests", "xcsync.tests\xcsync.tests.csproj", "{79589277-6D1A-462E-85A1-47DAA58012DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DAFECB3-7244-45CB-8AB9-AA02A3E1B773}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DAFECB3-7244-45CB-8AB9-AA02A3E1B773}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DAFECB3-7244-45CB-8AB9-AA02A3E1B773}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DAFECB3-7244-45CB-8AB9-AA02A3E1B773}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79589277-6D1A-462E-85A1-47DAA58012DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79589277-6D1A-462E-85A1-47DAA58012DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79589277-6D1A-462E-85A1-47DAA58012DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79589277-6D1A-462E-85A1-47DAA58012DD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
