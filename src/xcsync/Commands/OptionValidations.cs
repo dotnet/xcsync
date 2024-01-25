@@ -4,50 +4,44 @@ using System.Xml.Linq;
 
 namespace xcsync.Commands;
 
-public delegate string? OptionValidation (DirectoryInfo path);
+public delegate string? OptionValidation (string path);
 
 public static class OptionValidations {
-	public static string? PathNameValid (DirectoryInfo path) =>
-		string.IsNullOrWhiteSpace (path.Name)
-			? "Path cannot be empty"
+	public static string? PathNameValid (string path) =>
+		string.IsNullOrWhiteSpace (path)
+			? "Path name is empty"
 			: null;
 
-	public static string? PathExists (DirectoryInfo path) =>
-		!path.Exists
-			? "Path does not exist"
+	public static string? PathExists (string path) =>
+		!Path.Exists (path)
+			? $"Path '{path}' does not exist"
 			: null;
 
-	public static string? PathIsEmpty (DirectoryInfo path) =>
-		path.EnumerateFiles ()
+	public static string? PathIsEmpty (string path) =>
+		Directory.EnumerateFiles (path)
 			.Any ()
-			? "Path is not empty"
+			? $"Path '{path}' is not empty"
 			: null;
 
-	public static string? PathCleaned (DirectoryInfo path)
+	public static string? PathCleaned (string path)
 	{
-		path.Delete (true);
-		path.Create ();
+		Directory.Delete (path, true);
+		Directory.CreateDirectory (path);
 		return null;
 	}
 
 	private static readonly string ValidFrameworks =
 		@"^net[7-9]\.\d+-(macos|ios|maccatalyst|tvos)$";
 
-	public static string? PathContainsValidTfm (DirectoryInfo path)
+	public static string? PathContainsValidTfm (string path)
 	{
-		if (!TryGetCsProj (path, out string? csproj))
-			return "Path does not contain a C# project";
+		if (!path.IsCsprojValid ())
+			return $"Path '{path}' does not contain a C# project";
 
-		if (!TryGetTfm (csproj, out string? tfm))
-			return "Missing target framework in csproj";
+		if (!TryGetTfm (path, out string? tfm))
+			return $"Missing target framework in '{path}'";
 
-		return IsTfmValid (tfm);
-	}
-
-	private static bool TryGetCsProj (DirectoryInfo path, [NotNullWhen (true)] out string? csproj)
-	{
-		csproj = path.EnumerateFiles ("*.csproj").FirstOrDefault ()?.FullName;
-		return csproj is not null;
+		return tfm.IsValid ();
 	}
 
 	private static bool TryGetTfm (string csproj, [NotNullWhen (true)] out string? tfm)
@@ -61,11 +55,13 @@ public static class OptionValidations {
 			tfm = null;
 			return false;
 		}
-
 	}
 
-	public static string? IsTfmValid (string tfm) =>
+	public static bool IsCsprojValid (this string csproj) =>
+		Path.GetExtension (csproj).Equals (".csproj", StringComparison.OrdinalIgnoreCase);
+
+	public static string? IsValid (this string tfm) =>
 		Regex.IsMatch (tfm, ValidFrameworks)
 			? null
-			: "Invalid target framework in csproj";
+			: $"Invalid target framework '{tfm}' in csproj";
 }

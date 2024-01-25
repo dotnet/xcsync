@@ -8,53 +8,56 @@ public class OptionValidationTests {
 
 	[Fact]
 	public void EmptyPathName () =>
-		Assert.Equal ("Path cannot be empty", OptionValidations.PathNameValid (new DirectoryInfo ("  ")));
+		Assert.Equal ("Path name is empty", OptionValidations.PathNameValid ("  "));
 
 	[Fact]
-	public void PathDoesNotExist ()
+	public void FileDoesNotExist ()
 	{
-		DirectoryInfo path = new (Path.Combine (Path.GetTempPath (), "file-should-not-exist"));
-		File.Delete (path.FullName);
-		Assert.Equal ("Path does not exist",
+		string path = Path.Combine (Path.GetTempPath (), "file-should-not-exist");
+		File.Delete (path);
+		Assert.Equal ($"Path '{path}' does not exist",
 			OptionValidations.PathExists (path));
 	}
 
 	[Fact]
-	public void PathExists () =>
-		Assert.Null (OptionValidations.PathExists (new DirectoryInfo (Path.GetTempPath ())));
+	public void DirectoryPathExists () =>
+		Assert.Null (OptionValidations.PathExists (Path.GetTempPath ()));
 
 	[Fact]
-	public void PathIsNotEmpty () =>
-		Assert.Equal ("Path is not empty", OptionValidations.PathIsEmpty (new DirectoryInfo (Path.GetTempPath ())));
+	public void DirectoryPathIsNotEmpty () =>
+		Assert.Equal ($"Path '{Path.GetTempPath ()}' is not empty", OptionValidations.PathIsEmpty (Path.GetTempPath ()));
 
 	[Fact]
 	public void PathIsEmpty ()
 	{
-		var path = Directory.CreateDirectory (Directory.GetCurrentDirectory ());
-		Directory.CreateDirectory (path.FullName);
+		string tempDirectoryPath = Path.Combine (Path.GetTempPath (), "testing-path-is-empty");
+		Directory.CreateDirectory (tempDirectoryPath);
+		File.Create (Path.Combine (tempDirectoryPath, "file-should-not-exist"));
 
-		Assert.NotNull (OptionValidations.PathIsEmpty (path));
-		Assert.Null (OptionValidations.PathCleaned (path));
-		Assert.Null (OptionValidations.PathIsEmpty (path));
+		Assert.NotNull (OptionValidations.PathIsEmpty (tempDirectoryPath));
+		Assert.Null (OptionValidations.PathCleaned (tempDirectoryPath));
+		Assert.Null (OptionValidations.PathIsEmpty (tempDirectoryPath));
+
+		Directory.Delete (tempDirectoryPath, true);
 	}
 
 	[Fact]
 	public void PathContainsInvalidTfm () =>
-		Assert.Equal ("Invalid target framework in csproj", OptionValidations.PathContainsValidTfm (new DirectoryInfo (pwd)));
+		Assert.Equal ("Invalid target framework 'net8.0' in csproj", OptionValidations.PathContainsValidTfm (Path.Combine (pwd, "xcsync.tests.csproj")));
 
 	[Fact]
 	public void PathContainsInvalidTfm2 () =>
-		Assert.Equal ("Path does not contain a C# project", OptionValidations.PathContainsValidTfm (new DirectoryInfo (Path.GetTempPath ())));
+		Assert.Equal ($"Path '{Path.GetTempPath ()}' does not contain a C# project", OptionValidations.PathContainsValidTfm (Path.GetTempPath ()));
 
 	[Fact]
 	public void PathContainsValidTfm () =>
-		Assert.Null (OptionValidations.PathContainsValidTfm (new DirectoryInfo (Path.Combine (pwd, "Resources"))));
+		Assert.Null (OptionValidations.PathContainsValidTfm (Path.Combine (pwd, "Resources", "Valid.csproj")));
 
 	[Theory]
 	[InlineData ("net8.0-macos", null)]
-	[InlineData ("net7.0", "Invalid target framework in csproj")]
+	[InlineData ("net7.0", "Invalid target framework 'net7.0' in csproj")]
 	[InlineData ("net7.0-maccatalyst", null)]
-	[InlineData ("net6.0-ios", "Invalid target framework in csproj")]
+	[InlineData ("net6.0-ios", "Invalid target framework 'net6.0-ios' in csproj")]
 	public void IsTfmValid (string tfm, string? error) =>
-		Assert.Equal (error, OptionValidations.IsTfmValid (tfm));
+		Assert.Equal (error, tfm.IsValid ());
 }

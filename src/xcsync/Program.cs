@@ -1,5 +1,7 @@
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using xcsync.Commands;
+using InvalidOperationException = System.InvalidOperationException;
 
 namespace xcsync;
 
@@ -12,22 +14,28 @@ public static class Program {
 			description: "Force the generation",
 			getDefaultValue: () => false);
 
-		var project = new Option<DirectoryInfo> (
+		var project = new Option<string> (
 			new [] { "--project", "--p" },
 			description: "Path to the project",
-			getDefaultValue: () => new DirectoryInfo (Directory.GetCurrentDirectory ()));
+			getDefaultValue: () => string.Empty);
 
 		project.AddValidator (result => {
-			result.ErrorMessage = ValidateCSharpProject (result.GetValueForOption (project)!);
+			var value = result.GetValueForOption (project);
+			var path = string.IsNullOrEmpty (value) ? GetCsprojPath () : value!;
+			var error = ValidateCSharpProject (path);
+			result.ErrorMessage = error is null ? null : $"Invalid option 'project' provided: {error}";
 		});
 
-		var target = new Option<DirectoryInfo> (
+		var target = new Option<string> (
 			new [] { "--target", "--t" },
 			description: "Path to the target",
-			getDefaultValue: () => new DirectoryInfo (Path.Combine (Directory.GetCurrentDirectory (), "obj", "xcode")));
+			getDefaultValue: () => string.Empty);
 
 		target.AddValidator (result => {
-			result.ErrorMessage = ValidateXcodeProject (result.GetValueForOption (target)!, result.GetValueForOption (force));
+			var value = result.GetValueForOption (target);
+			var path = string.IsNullOrEmpty (value) ? GetXcodePath () : value!;
+			var error = ValidateXcodeProject (path, result.GetValueForOption (force));
+			result.ErrorMessage = error is null ? null : $"Invalid option 'target' provided: {error}";
 		});
 
 		var open = new Option<bool> (
@@ -92,12 +100,27 @@ public static class Program {
 		OptionValidations.PathNameValid,
 	};
 
-	public static string? ValidateXcodeProject (DirectoryInfo path, bool force)
+	private static string? ValidateXcodeProject (string path, bool force)
 	{
 		List<OptionValidation> validations = force ? XcodeForceValidations : XcodeValidations;
 		return validations.Select (validation => validation (path)).FirstOrDefault (error => error is not null);
 	}
 
-	public static string? ValidateCSharpProject (DirectoryInfo path) =>
+	private static string? ValidateCSharpProject (string path) =>
 		CSharpValidations.Select (validation => validation (path)).FirstOrDefault (error => error is not null);
+
+	private static string GetCsprojPath ()
+	{
+		var csprojFiles = Directory.GetFiles (Directory.GetCurrentDirectory (), "*.csproj");
+		return csprojFiles.Length switch {
+			0 => throw new FileNotFoundException ("Could not find a .csproj file"),
+			1 => csprojFiles.First (),
+			_ => throw new InvalidOperationException (
+				"Multiple .csproj files found in current directory. Specify which project to use.")
+		};
+	}
+
+	private static string GetXcodePath () =>
+		Path.Combine (Directory.GetCurrentDirectory (), "obj", "xcode");
+
 }
