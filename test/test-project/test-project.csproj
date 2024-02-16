@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0-macos</TargetFramework>
+        <RootNamespace>test_project</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+        <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
+    </PropertyGroup>
+</Project>
