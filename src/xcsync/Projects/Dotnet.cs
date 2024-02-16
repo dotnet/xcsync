@@ -1,3 +1,4 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
