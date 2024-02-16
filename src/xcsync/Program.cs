@@ -1,5 +1,4 @@
 using System.CommandLine;
-using System.CommandLine.Parsing;
 using xcsync.Commands;
 using InvalidOperationException = System.InvalidOperationException;
 

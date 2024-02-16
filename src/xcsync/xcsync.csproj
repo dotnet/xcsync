@@ -10,6 +10,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Per https://learn.microsoft.com/en-us/visualstudio/msbuild/find-and-use-msbuild-versions?view=vs-2022,
+        need to ensure the build output is clean and doesn't include any MSBuild assemblies.
+        To prevent issues like:
+        System.InvalidOperationException : Microsoft.Build.Locator.MSBuildLocator.RegisterInstance was called, 
+        but MSBuild assemblies were already loaded. Ensure that RegisterInstance is called before any method 
+        that directly references types in the Microsoft.Build namespace has been called. This dependency arises 
+        from when a method is just-in-time compiled, so it breaks even if the reference to a Microsoft.Build type 
+        has not been executed.-->
+    <PackageReference Include="Microsoft.Build" Version="17.9.5" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.9.5" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.9.5" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.0-3.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.0-3.final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.9.0-3.final" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
