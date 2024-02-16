@@ -1,3 +1,4 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.CommandLine;
 using xcsync.Commands;
 using InvalidOperationException = System.InvalidOperationException;
