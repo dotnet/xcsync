@@ -31,7 +31,7 @@ public static class OptionValidations {
 		return null;
 	}
 
-	private static readonly string ValidFrameworks =
+	static readonly string ValidFrameworks =
 		@"^net[7-9]\.\d+-(macos|ios|maccatalyst|tvos)$";
 
 	public static string? PathContainsValidTfm (string path)
@@ -45,10 +45,10 @@ public static class OptionValidations {
 		return tfm.IsValid ();
 	}
 
-	private static bool TryGetTfm (string csproj, [NotNullWhen (true)] out string? tfm)
+	static bool TryGetTfm (string csproj, [NotNullWhen (true)] out string? tfm)
 	{
 		try {
-			XDocument csprojDocument = XDocument.Load (csproj);
+			var csprojDocument = XDocument.Load (csproj);
 			tfm = csprojDocument.Descendants ("TargetFramework").FirstOrDefault ()?.Value;
 			return tfm is not null;
 		} catch {

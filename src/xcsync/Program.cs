@@ -81,35 +81,35 @@ public static class Program {
 		root.Invoke (args);
 	}
 
-	private static readonly List<OptionValidation> XcodeValidations = new () {
+	static readonly List<OptionValidation> XcodeValidations = new () {
 		OptionValidations.PathExists,
 		OptionValidations.PathNameValid,
 		OptionValidations.PathIsEmpty,
 	};
 
-	private static readonly List<OptionValidation> XcodeForceValidations = new () {
+	static readonly List<OptionValidation> XcodeForceValidations = new () {
 		OptionValidations.PathExists,
 		OptionValidations.PathNameValid,
 		OptionValidations.PathCleaned,
 		OptionValidations.PathIsEmpty,
 	};
 
-	private static readonly List<OptionValidation> CSharpValidations = new () {
+	static readonly List<OptionValidation> CSharpValidations = new () {
 		OptionValidations.PathExists,
 		OptionValidations.PathContainsValidTfm,
 		OptionValidations.PathNameValid,
 	};
 
-	private static string? ValidateXcodeProject (string path, bool force)
+	static string? ValidateXcodeProject (string path, bool force)
 	{
 		List<OptionValidation> validations = force ? XcodeForceValidations : XcodeValidations;
 		return validations.Select (validation => validation (path)).FirstOrDefault (error => error is not null);
 	}
 
-	private static string? ValidateCSharpProject (string path) =>
+	static string? ValidateCSharpProject (string path) =>
 		CSharpValidations.Select (validation => validation (path)).FirstOrDefault (error => error is not null);
 
-	private static string GetCsprojPath ()
+	static string GetCsprojPath ()
 	{
 		var csprojFiles = Directory.GetFiles (Directory.GetCurrentDirectory (), "*.csproj");
 		return csprojFiles.Length switch {
@@ -120,7 +120,7 @@ public static class Program {
 		};
 	}
 
-	private static string GetXcodePath () =>
+	static string GetXcodePath () =>
 		Path.Combine (Directory.GetCurrentDirectory (), "obj", "xcode");
 
 }
