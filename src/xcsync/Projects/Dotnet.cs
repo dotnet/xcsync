@@ -20,7 +20,7 @@ public class Dotnet (string project) {
 	public async IAsyncEnumerable<INamedTypeSymbol> GetTypes (Project project)
 	{
 		var compilation = await project.GetCompilationAsync ().ConfigureAwait (false) ??
-		                  throw new InvalidOperationException ("Could not get compilation for project '{project}'");
+						  throw new InvalidOperationException ("Could not get compilation for project '{project}'");
 
 		// limit scope of namespaces to project, do not include referenced assemblies, etc.
 		var namespaces = compilation.GlobalNamespace.GetNamespaceMembers ()
@@ -32,9 +32,29 @@ public class Dotnet (string project) {
 			yield break;
 
 		foreach (var ns in namespaces) {
-			foreach (var type in ns.GetTypeMembers ()) {
-				yield return type;
+			foreach (var type in ns.GetTypeMembers ().Where (type => type.IsNsoDerived ())) {
+
+				var regAttr = type.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == "RegisterAttribute");
+				var skip = regAttr?.NamedArguments.FirstOrDefault (x => x.Key == "SkipRegistration").Value.Value as bool?;
+
+				if (skip != true)
+					yield return type;
 			}
 		}
+	}
+}
+
+public static class DotnetExtensions {
+	public static bool IsNsoDerived (this INamedTypeSymbol? type)
+	{
+		while (type is not null) {
+			if (type.Name.Equals ("NSObject", StringComparison.Ordinal) &&
+				type.ContainingNamespace.Name.Equals ("Foundation", StringComparison.Ordinal))
+				return true;
+
+			type = type.BaseType;
+		}
+
+		return false;
 	}
 }
