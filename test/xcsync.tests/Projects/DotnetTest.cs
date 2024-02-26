@@ -10,10 +10,16 @@ public class DotnetTest {
 	[Fact]
 	public async Task GetTypes ()
 	{
-		List<string> expectedTypes = new List<string> {"AppDelegate", "ViewController"};
+		var expectedTypes = new List<string> {
+			"AlsoNoSkip",
+			"AppDelegate",
+			"NoRegisterButStillValid",
+			"NoSkip",
+			"ViewController",
+		};
 		var dotnet = new Dotnet (TestProjectPath);
 		var project = await dotnet.OpenProject ().ConfigureAwait (false);
 		List<INamedTypeSymbol> types = await dotnet.GetTypes (project).ToListAsync ().ConfigureAwait (false);
-		Assert.Equal (expectedTypes, types.Select (x => x.Name).ToList ());
+		Assert.Equal (expectedTypes, types.Select (x => x.Name).OrderBy (x => x).ToList ());
 	}
 }
