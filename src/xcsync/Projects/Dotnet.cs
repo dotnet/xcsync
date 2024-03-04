@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
@@ -12,12 +13,13 @@ public class Dotnet (string project) {
 		// we care about the project interactions
 		// the workspace is simply a means of accessing the project
 		Console.WriteLine ($"Creating workspace for '{project}'");
-		MSBuildLocator.RegisterDefaults ();
+		if (!MSBuildLocator.IsRegistered)
+			MSBuildLocator.RegisterDefaults ();
 		using var workspace = MSBuildWorkspace.Create ();
 		return await workspace.OpenProjectAsync (project).ConfigureAwait (false);
 	}
 
-	public async IAsyncEnumerable<INamedTypeSymbol> GetTypes (Project project)
+	public async IAsyncEnumerable<INamedTypeSymbol> GetNsoTypes (Project project)
 	{
 		var compilation = await project.GetCompilationAsync ().ConfigureAwait (false) ??
 						  throw new InvalidOperationException ("Could not get compilation for project '{project}'");

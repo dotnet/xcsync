@@ -1,11 +1,8 @@
 using Microsoft.CodeAnalysis;
-using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
 
-public class DotnetTest {
-
-	const string TestProjectPath = "../../../../test-project/test-project.csproj";
+public class DotnetTest : Base {
 
 	[Fact]
 	public async Task GetTypes ()
@@ -13,13 +10,16 @@ public class DotnetTest {
 		var expectedTypes = new List<string> {
 			"AlsoNoSkip",
 			"AppDelegate",
+			"ModelVariety",
 			"NoRegisterButStillValid",
 			"NoSkip",
+			"ProtocolModelVariety",
+			"ProtocolVariety",
 			"ViewController",
 		};
-		var dotnet = new Dotnet (TestProjectPath);
-		var project = await dotnet.OpenProject ().ConfigureAwait (false);
-		List<INamedTypeSymbol> types = await dotnet.GetTypes (project).ToListAsync ().ConfigureAwait (false);
+
+		var project = await DotnetProject.OpenProject ().ConfigureAwait (false);
+		List<INamedTypeSymbol> types = await DotnetProject.GetNsoTypes (project).ToListAsync ().ConfigureAwait (false);
 		Assert.Equal (expectedTypes, types.Select (x => x.Name).OrderBy (x => x).ToList ());
 	}
 }
