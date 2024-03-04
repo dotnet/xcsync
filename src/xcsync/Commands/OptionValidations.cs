@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
