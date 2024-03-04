@@ -16,5 +16,20 @@ public class NoSkip : NSObject {
 public class AlsoNoSkip : NSObject {
 }
 
-public class NoRegisterButStillValid : NSObject {
+public class NoRegisterButStillValid : ModelVariety {
 }
+
+[Protocol]
+public class ProtocolVariety : NSObject {
+}
+
+[Protocol]
+[Model]
+public class ProtocolModelVariety : NSObject {
+}
+
+[Model]
+[Register ("ObjectiveCModelVariety")]
+public class ModelVariety : NSObject {
+}
+
