@@ -19,7 +19,7 @@ public class NSProject (Dotnet project) {
 				yield return nsType;
 		}
 	}
-	public NSObject? ConvertToNSObject (INamedTypeSymbol type)
+	public NSObject? ConvertToNSObject (ITypeSymbol type)
 	{
 		// NSObjectType bridges the gap between the .net + objc worlds
 		// extracts the necessary info from the roslyn detected type for objc .h and .m file generation
@@ -50,29 +50,76 @@ public class NSProject (Dotnet project) {
 				break;
 			case "RegisterAttribute":
 				objCName = a.ConstructorArguments.Length > 0
-					? a.ConstructorArguments [0].Value!.ToString ()!
+					? a.GetName () ?? objCName
 					: objCName;
 				break;
 			}
 		}
 
-		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, type.InDesigner (objCName));
+		List<IBOutlet> outlets = new ();
+		List<IBAction> actions = new ();
+
+		if (!isModel) {
+
+			outlets.AddRange (from property in type.GetMembers ().OfType<IPropertySymbol> ()
+							  let outletAttribute = property.GetAttribute ("OutletAttribute")
+							  where outletAttribute is not null
+							  let objcName = outletAttribute.GetName () ?? property.Name
+							  let cliType = property.Type.MetadataName
+							  let isCollection = property.Type.TypeKind == TypeKind.Array
+							  let objcType = property.Type.GetObjCType (this)
+							  select new IBOutlet (property.Name, objcName, cliType, objcType, isCollection));
+
+			actions.AddRange (from method in type.GetMembers ().OfType<IMethodSymbol> ()
+							  let actionAttribute = method.GetAttribute ("ActionAttribute")
+							  where actionAttribute is not null
+							  let actionName = actionAttribute.GetName ()
+							  let info = method.GetInfo (actionName)
+							  let objcName = info.objcName
+
+							  let parameters = method.Parameters
+								  .Select ((p, i) => new IBActionParameter (p.Name, info.@params? [i].Length == 0 ? null : info.@params? [i], p.Type.MetadataName, p.Type.GetObjCType (this)))
+								  .ToList ()
+
+							  select new IBAction (method.Name, objcName, parameters));
+		}
+
+		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, type.InDesigner (objCName), outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions);
+
 		cliTypes.Add (nsObject.CliType, nsObject);
 		objCTypes.Add (nsObject.ObjCType, nsObject);
-		if (!isModel) {
-			//todo: get methods => actions
-			//todo: get properties => outlets	
-		}
+
 		return nsObject;
 	}
 }
 
 public static class Extensions {
-	public static bool InDesigner (this INamedTypeSymbol type, string objCName)
+	public static bool InDesigner (this ITypeSymbol type, string objCName)
 	{
 		var source = type.Locations.FirstOrDefault ()?.SourceTree;
 		var sourceDir = Path.GetDirectoryName (source?.FilePath) ?? string.Empty;
 		return File.Exists (Path.Combine (sourceDir, $"{objCName}.designer.cs"));
+	}
+
+	public static AttributeData? GetAttribute (this ISymbol symbol, string attributeName) =>
+		symbol.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == attributeName);
+
+	public static string? GetName (this AttributeData attribute) =>
+		attribute.ConstructorArguments.FirstOrDefault ().Value?.ToString ();
+
+	public static string? GetObjCType (this ITypeSymbol symbol, NSProject nsProject)
+	{
+		nsProject.cliTypes.TryGetValue (symbol.MetadataName, out var nsType);
+		return nsType?.ObjCType ?? nsProject.ConvertToNSObject (symbol)?.ObjCType;
+	}
+
+	public static (string objcName, string []? @params) GetInfo (this IMethodSymbol method, string? actionAttributeName)
+	{
+		if (actionAttributeName is null)
+			return (method.Name, null);
+		var split = actionAttributeName.Split (":", StringSplitOptions.TrimEntries);
+		return split.Length > 1 ? (split [0], split [1..]) : (split [0], null);
+
 	}
 }
 

@@ -37,4 +37,65 @@ public class NSProjectTest : Base {
 		Assert.Equal (objcBaseName, nsType?.BaseType?.ObjCType);
 		Assert.Equal (baseIsModel, nsType?.BaseType?.IsModel);
 	}
+
+	[Fact]
+	public async Task ViewControllerOutlets ()
+	{
+		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
+
+		Assert.NotNull (nsType);
+		var outlets = nsType.Outlets;
+
+		Assert.NotNull (outlets);
+		Assert.Single (outlets);
+		Assert.Equal ("FileLabel", outlets [0].CliName);
+		Assert.Equal ("FileLabel", outlets [0].ObjCName);
+		Assert.Equal ("NSTextField", outlets [0].CliType);
+		Assert.Equal ("NSTextField", outlets [0].ObjCType);
+	}
+
+	[Fact]
+	public async Task ViewControllerActions ()
+	{
+		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
+
+		Assert.NotNull (nsType);
+		var actions = nsType.Actions;
+
+		Assert.NotNull (actions);
+		Assert.Single (actions);
+		Assert.Equal ("UploadButton", actions [0].CliName);
+		Assert.Equal ("UploadButton", actions [0].ObjCName);
+		Assert.Single (actions [0].Parameters);
+
+		Assert.Equal ("sender", actions [0].Parameters [0].CliName);
+		Assert.Null (actions [0].Parameters [0].ObjCName);
+
+		Assert.Equal ("NSObject", actions [0].Parameters [0].CliType);
+		Assert.Equal ("NSObject", actions [0].Parameters [0].ObjCType);
+	}
+
+	[Fact]
+	public async Task NoOutletActionAttribute ()
+	{
+		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "AppDelegate");
+
+		Assert.NotNull (nsType);
+		Assert.Null (nsType.Outlets);
+		Assert.Null (nsType.Actions);
+	}
+
+	[Fact]
+	public async Task ModelOutletAndAction ()
+	{
+		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ModelVariety");
+
+		Assert.NotNull (nsType);
+		Assert.Null (nsType.Outlets);
+		Assert.Null (nsType.Actions);
+	}
 }

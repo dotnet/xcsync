@@ -9,7 +9,17 @@ namespace test_project;
 
 [Register ("ViewController")]
 partial class ViewController {
+	[Outlet]
+	AppKit.NSTextField FileLabel { get; set; }
+	
+	[Action ("UploadButton:")]
+	partial void UploadButton (Foundation.NSObject sender);
+	
 	void ReleaseDesignerOutlets ()
 	{
+		if (FileLabel != null) {
+			FileLabel.Dispose ();
+			FileLabel = null;
+		}
 	}
 }
