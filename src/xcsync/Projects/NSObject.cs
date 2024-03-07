@@ -2,10 +2,10 @@
 
 namespace xcsync.Projects;
 
-public class NSObject (string cliName, string objcName, NSObject? baseType, bool isModel, bool inDesigner, List<IBOutlet>? outlets, List<IBAction>? actions) {
+public class NSObject (string cliType, string objcType, NSObject? baseType, bool isModel, bool inDesigner, List<IBOutlet>? outlets, List<IBAction>? actions) {
 
-	public string CliType { get; set; } = cliName;
-	public string ObjCType { get; set; } = objcName;
+	public string CliType { get; set; } = cliType;
+	public string ObjCType { get; set; } = objcType;
 	public NSObject? BaseType { get; set; } = baseType;
 	public bool IsModel { get; set; } = isModel;
 	public bool InDesigner { get; set; } = inDesigner;
