@@ -7,11 +7,11 @@ using xcsync.Projects.Xcode;
 namespace xcsync.tests.Projects;
 
 public class XcodeProjectTest {
-    [Fact]
-    public void Deserialize_RootObject_FromJson_Succeeds ()
-    {
-        // Arrange
-        string json = @"
+	[Fact]
+	public void Deserialize_RootObject_FromJson_Succeeds ()
+	{
+		// Arrange
+		string json = @"
         {
             ""classes"": {},
             ""objectVersion"": ""50"",
@@ -21,23 +21,23 @@ public class XcodeProjectTest {
 
         }";
 
-        // Act
-        XcodeProject project = JsonSerializer.Deserialize<XcodeProject> (json);
+		// Act
+		XcodeProject? project = JsonSerializer.Deserialize<XcodeProject> (json);
 
-        // Assert
-        Assert.NotNull (project);
-        Assert.NotNull (project.Classes);
-        Assert.Equal ("50", project.ObjectVersion);
-        Assert.Equal ("1", project.ArchiveVersion);
-        Assert.NotNull (project.Objects);
-        Assert.Equal ("898C72000000000000000000", project.RootObject);
-    }
+		// Assert
+		Assert.NotNull (project);
+		Assert.NotNull (project.Classes);
+		Assert.Equal ("50", project.ObjectVersion);
+		Assert.Equal ("1", project.ArchiveVersion);
+		Assert.NotNull (project.Objects);
+		Assert.Equal ("898C72000000000000000000", project.RootObject);
+	}
 
-    [Fact]
-    public void Deserialize_PbxProject_FromJson_Succeeds ()
-    {
-        // Arrange
-        string json = @"
+	[Fact]
+	public void Deserialize_PbxProject_FromJson_Succeeds ()
+	{
+		// Arrange
+		string json = @"
         {
             ""classes"": {},
             ""objectVersion"": ""50"",
@@ -68,40 +68,43 @@ public class XcodeProjectTest {
 
         }";
 
-        // Act
-        XcodeProject project = JsonSerializer.Deserialize<XcodeProject> (json);
+		// Act
+		XcodeProject? project = JsonSerializer.Deserialize<XcodeProject> (json);
 
-        // Assert
-        Assert.NotNull (project);
-        Assert.NotNull (project.Classes);
-        Assert.Equal ("50", project.ObjectVersion);
-        Assert.Equal ("1", project.ArchiveVersion);
-        Assert.NotNull (project.Objects);
-        Assert.Single (project.Objects);
-        Assert.Equal ("898C72000000000000000000", project.RootObject);
+		// Assert
+		Assert.NotNull (project);
+		Assert.NotNull (project.Classes);
+		Assert.Equal ("50", project.ObjectVersion);
+		Assert.Equal ("1", project.ArchiveVersion);
+		Assert.NotNull (project.Objects);
+		Assert.Single (project.Objects);
+		Assert.Equal ("898C72000000000000000000", project.RootObject);
 
-        Assert.Equal ("PBXProject", project.Objects ["898C72000000000000000000"].Isa);
-        Assert.Equal ("PBXProject", project.Objects ["898C72000000000000000000"].GetType ().Name);
-        Assert.Equal ("898C72000000000000000000", project.Objects ["898C72000000000000000000"].Token);
+		Assert.Equal ("PBXProject", project.Objects ["898C72000000000000000000"].Isa);
+		Assert.Equal ("PBXProject", project.Objects ["898C72000000000000000000"].GetType ().Name);
+		Assert.Equal ("898C72000000000000000000", project.Objects ["898C72000000000000000000"].Token);
 
-        var pbxProject = project.Objects ["898C72000000000000000000"] as PBXProject;
-        Assert.Equal ("Xcode 9.3", pbxProject.CompatibilityVersion);
-        Assert.Equal ("en", pbxProject.DevelopmentRegion);
-        Assert.Equal ("0", pbxProject.HasScannedForEncodings);
-        Assert.Equal ("DBB6E1000000000000000000", pbxProject.MainGroup);
-        Assert.Equal ("1ABC8F300000000000000000", pbxProject.ProductRefGroup);
-        Assert.Equal ("", pbxProject.ProjectDirPath);
-        Assert.Equal ("", pbxProject.ProjectRoot);
-        Assert.Equal ("1520", pbxProject.Attributes ["LastUpgradeCheck"]);
-        Assert.Single (pbxProject.KnownRegions);
-        Assert.Equal ("en", pbxProject.KnownRegions [0]);
-    }
+		var pbxProject = project.Objects ["898C72000000000000000000"] as PBXProject;
+		Assert.NotNull (pbxProject);
+		Assert.Equal ("Xcode 9.3", pbxProject.CompatibilityVersion);
+		Assert.Equal ("en", pbxProject.DevelopmentRegion);
+		Assert.Equal ("0", pbxProject.HasScannedForEncodings);
+		Assert.Equal ("DBB6E1000000000000000000", pbxProject.MainGroup);
+		Assert.Equal ("1ABC8F300000000000000000", pbxProject.ProductRefGroup);
+		Assert.Equal ("", pbxProject.ProjectDirPath);
+		Assert.Equal ("", pbxProject.ProjectRoot);
+		Assert.NotNull (pbxProject.Attributes);
+		Assert.Equal ("1520", pbxProject.Attributes ["LastUpgradeCheck"]);
+		Assert.NotNull (pbxProject.KnownRegions);
+		Assert.Single (pbxProject.KnownRegions);
+		Assert.Equal ("en", pbxProject.KnownRegions [0]);
+	}
 
-    [Fact]
-    public void Deserialize_PbxFileReference_FromJson_Succeeds ()
-    {
-        // Arrange
-        string json = @"
+	[Fact]
+	public void Deserialize_PbxFileReference_FromJson_Succeeds ()
+	{
+		// Arrange
+		string json = @"
         {
             ""classes"": {},
             ""objectVersion"": ""50"",
@@ -119,34 +122,35 @@ public class XcodeProjectTest {
 
         }";
 
-        // Act
-        XcodeProject project = JsonSerializer.Deserialize<XcodeProject> (json);
+		// Act
+		XcodeProject? project = JsonSerializer.Deserialize<XcodeProject> (json);
 
-        // Assert
-        Assert.NotNull (project);
-        Assert.NotNull (project.Classes);
-        Assert.Equal ("50", project.ObjectVersion);
-        Assert.Equal ("1", project.ArchiveVersion);
-        Assert.NotNull (project.Objects);
-        Assert.Single (project.Objects);
-        Assert.Equal ("898C72000000000000000000", project.RootObject);
+		// Assert
+		Assert.NotNull (project);
+		Assert.NotNull (project.Classes);
+		Assert.Equal ("50", project.ObjectVersion);
+		Assert.Equal ("1", project.ArchiveVersion);
+		Assert.NotNull (project.Objects);
+		Assert.Single (project.Objects);
+		Assert.Equal ("898C72000000000000000000", project.RootObject);
 
-        Assert.Equal ("PBXFileReference", project.Objects ["3D58D9400000000000000000"].Isa);
-        Assert.Equal ("PBXFileReference", project.Objects ["3D58D9400000000000000000"].GetType ().Name);
-        Assert.Equal ("3D58D9400000000000000000", project.Objects ["3D58D9400000000000000000"].Token);
+		Assert.Equal ("PBXFileReference", project.Objects ["3D58D9400000000000000000"].Isa);
+		Assert.Equal ("PBXFileReference", project.Objects ["3D58D9400000000000000000"].GetType ().Name);
+		Assert.Equal ("3D58D9400000000000000000", project.Objects ["3D58D9400000000000000000"].Token);
 
-        var pbxFileReference = project.Objects ["3D58D9400000000000000000"] as PBXFileReference;
-        Assert.Equal ("ViewController.m", pbxFileReference.Path);
-        Assert.Equal ("ViewController.m", pbxFileReference.Name);
-        Assert.Equal ("sourcecode.c.objc", pbxFileReference.LastKnownFileType);
-        Assert.Equal ("<group>", pbxFileReference.SourceTree);
-    }
+		var pbxFileReference = project.Objects ["3D58D9400000000000000000"] as PBXFileReference;
+		Assert.NotNull (pbxFileReference);
+		Assert.Equal ("ViewController.m", pbxFileReference.Path);
+		Assert.Equal ("ViewController.m", pbxFileReference.Name);
+		Assert.Equal ("sourcecode.c.objc", pbxFileReference.LastKnownFileType);
+		Assert.Equal ("<group>", pbxFileReference.SourceTree);
+	}
 
-    [Fact]
-    public void Deserialize_XCBuildConfiguration_FromJson_Succeeds ()
-    {
-        // Arrange
-        string json = @"
+	[Fact]
+	public void Deserialize_XCBuildConfiguration_FromJson_Succeeds ()
+	{
+		// Arrange
+		string json = @"
         {
             ""classes"": {},
             ""objectVersion"": ""50"",
@@ -219,98 +223,101 @@ public class XcodeProjectTest {
 			WriteIndented = true
 		};
 
-        // Act
-        XcodeProject project = JsonSerializer.Deserialize<XcodeProject> (json, options);
+		// Act
+		XcodeProject? project = JsonSerializer.Deserialize<XcodeProject> (json, options);
 
-        // Assert
-        Assert.NotNull (project);
-        Assert.NotNull (project.Classes);
-        Assert.Equal ("50", project.ObjectVersion);
-        Assert.Equal ("1", project.ArchiveVersion);
-        Assert.NotNull (project.Objects);
-        Assert.Single (project.Objects);
-        Assert.Equal ("898C72000000000000000000", project.RootObject);
+		// Assert
+		Assert.NotNull (project);
+		Assert.NotNull (project.Classes);
+		Assert.Equal ("50", project.ObjectVersion);
+		Assert.Equal ("1", project.ArchiveVersion);
+		Assert.NotNull (project.Objects);
+		Assert.Single (project.Objects);
+		Assert.Equal ("898C72000000000000000000", project.RootObject);
 
-        Assert.Equal ("XCBuildConfiguration", project.Objects ["385704800000000000000000"].Isa);
-        Assert.Equal ("XCBuildConfiguration", project.Objects ["385704800000000000000000"].GetType ().Name);
-        Assert.Equal ("385704800000000000000000", project.Objects ["385704800000000000000000"].Token);
+		Assert.Equal ("XCBuildConfiguration", project.Objects ["385704800000000000000000"].Isa);
+		Assert.Equal ("XCBuildConfiguration", project.Objects ["385704800000000000000000"].GetType ().Name);
+		Assert.Equal ("385704800000000000000000", project.Objects ["385704800000000000000000"].Token);
 
-        var xcBuildConfiguration = project.Objects ["385704800000000000000000"] as XCBuildConfiguration;
-        Assert.Equal ("Debug", xcBuildConfiguration.Name);
-        Assert.Equal ("YES_AGGRESSIVE", xcBuildConfiguration.BuildSettings ["CLANG_WARN_UNGUARDED_AVAILABILITY"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_SUSPICIOUS_MOVE"].FirstOrDefault());
-        Assert.Equal ("YES_ERROR", xcBuildConfiguration.BuildSettings ["CLANG_WARN_DIRECT_OBJC_ISA_USAGE"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ENABLE_OBJC_ARC"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ENABLE_OBJC_WEAK"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN__DUPLICATE_METHOD_MATCH"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNDECLARED_SELECTOR"].FirstOrDefault());
-        Assert.Equal ("16.4", xcBuildConfiguration.BuildSettings ["IPHONEOS_DEPLOYMENT_TARGET"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_INFINITE_RECURSION"].FirstOrDefault());
-        Assert.Equal ("dwarf", xcBuildConfiguration.BuildSettings ["DEBUG_INFORMATION_FORMAT"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF"].FirstOrDefault());
-        Assert.Equal ("YES_AGGRESSIVE", xcBuildConfiguration.BuildSettings ["CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("iphoneos", xcBuildConfiguration.BuildSettings ["SDKROOT"].FirstOrDefault());
-        Assert.Equal ("gnu++17", xcBuildConfiguration.BuildSettings ["CLANG_CXX_LANGUAGE_STANDARD"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["ENABLE_TESTABILITY"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_BOOL_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_UNREACHABLE_CODE"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["ENABLE_STRICT_OBJC_MSGSEND"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ANALYZER_NONNULL"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_STRICT_PROTOTYPES"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_ENUM_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_64_TO_32_BIT_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_EMPTY_BODY"].FirstOrDefault());
-        Assert.Equal ("YES_AGGRESSIVE", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNINITIALIZED_AUTOS"].FirstOrDefault());
-        Assert.Equal ("YES_ERROR", xcBuildConfiguration.BuildSettings ["GCC_WARN_ABOUT_RETURN_TYPE"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_COMMA"].FirstOrDefault());
-        Assert.Equal ("NO", xcBuildConfiguration.BuildSettings ["GCC_DYNAMIC_NO_PIC"].FirstOrDefault());
-        Assert.Equal ("gnu11", xcBuildConfiguration.BuildSettings ["GCC_C_LANGUAGE_STANDARD"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNUSED_VARIABLE"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_RANGE_LOOP_ANALYSIS"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ENABLE_MODULES"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_INT_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("NO", xcBuildConfiguration.BuildSettings ["ALWAYS_SEARCH_USER_PATHS"].FirstOrDefault());
-        Assert.Equal ("YES_ERROR", xcBuildConfiguration.BuildSettings ["CLANG_WARN_OBJC_ROOT_CLASS"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS"].FirstOrDefault());
-        Assert.Equal ("NO", xcBuildConfiguration.BuildSettings ["COPY_PHASE_STRIP"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_CONSTANT_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_NO_COMMON_BLOCKS"].FirstOrDefault());
-        Assert.Equal ("0", xcBuildConfiguration.BuildSettings ["GCC_OPTIMIZATION_LEVEL"].FirstOrDefault());
-        Assert.Equal ("INCLUDE_SOURCE", xcBuildConfiguration.BuildSettings ["MTL_ENABLE_DEBUG_INFO"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["ONLY_ACTIVE_ARCH"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_NON_LITERAL_NULL_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["MTL_FAST_MATH"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNUSED_FUNCTION"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_OBJC_LITERAL_CONVERSION"].FirstOrDefault());
-        Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_DOCUMENTATION_COMMENTS"].FirstOrDefault());
-        Assert.Equal ("libc++", xcBuildConfiguration.BuildSettings ["CLANG_CXX_LIBRARY"].FirstOrDefault());
+		var xcBuildConfiguration = project.Objects ["385704800000000000000000"] as XCBuildConfiguration;
+		Assert.NotNull (xcBuildConfiguration);
 
-        Assert.Equal (2, xcBuildConfiguration.BuildSettings ["GCC_PREPROCESSOR_DEFINITIONS"].Count);
-        Assert.Equal ("DEBUG=1", xcBuildConfiguration.BuildSettings ["GCC_PREPROCESSOR_DEFINITIONS"] [0]);
-        Assert.Equal ("$(inherited)", xcBuildConfiguration.BuildSettings ["GCC_PREPROCESSOR_DEFINITIONS"] [1]);
+		Assert.Equal ("Debug", xcBuildConfiguration.Name);
+		Assert.NotNull (xcBuildConfiguration.BuildSettings);
+		Assert.Equal ("YES_AGGRESSIVE", xcBuildConfiguration.BuildSettings ["CLANG_WARN_UNGUARDED_AVAILABILITY"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_SUSPICIOUS_MOVE"].FirstOrDefault ());
+		Assert.Equal ("YES_ERROR", xcBuildConfiguration.BuildSettings ["CLANG_WARN_DIRECT_OBJC_ISA_USAGE"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ENABLE_OBJC_ARC"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ENABLE_OBJC_WEAK"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN__DUPLICATE_METHOD_MATCH"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNDECLARED_SELECTOR"].FirstOrDefault ());
+		Assert.Equal ("16.4", xcBuildConfiguration.BuildSettings ["IPHONEOS_DEPLOYMENT_TARGET"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_INFINITE_RECURSION"].FirstOrDefault ());
+		Assert.Equal ("dwarf", xcBuildConfiguration.BuildSettings ["DEBUG_INFORMATION_FORMAT"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF"].FirstOrDefault ());
+		Assert.Equal ("YES_AGGRESSIVE", xcBuildConfiguration.BuildSettings ["CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("iphoneos", xcBuildConfiguration.BuildSettings ["SDKROOT"].FirstOrDefault ());
+		Assert.Equal ("gnu++17", xcBuildConfiguration.BuildSettings ["CLANG_CXX_LANGUAGE_STANDARD"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["ENABLE_TESTABILITY"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_BOOL_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_UNREACHABLE_CODE"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["ENABLE_STRICT_OBJC_MSGSEND"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ANALYZER_NONNULL"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_STRICT_PROTOTYPES"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_ENUM_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_64_TO_32_BIT_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_EMPTY_BODY"].FirstOrDefault ());
+		Assert.Equal ("YES_AGGRESSIVE", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNINITIALIZED_AUTOS"].FirstOrDefault ());
+		Assert.Equal ("YES_ERROR", xcBuildConfiguration.BuildSettings ["GCC_WARN_ABOUT_RETURN_TYPE"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_COMMA"].FirstOrDefault ());
+		Assert.Equal ("NO", xcBuildConfiguration.BuildSettings ["GCC_DYNAMIC_NO_PIC"].FirstOrDefault ());
+		Assert.Equal ("gnu11", xcBuildConfiguration.BuildSettings ["GCC_C_LANGUAGE_STANDARD"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNUSED_VARIABLE"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_RANGE_LOOP_ANALYSIS"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_ENABLE_MODULES"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_INT_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("NO", xcBuildConfiguration.BuildSettings ["ALWAYS_SEARCH_USER_PATHS"].FirstOrDefault ());
+		Assert.Equal ("YES_ERROR", xcBuildConfiguration.BuildSettings ["CLANG_WARN_OBJC_ROOT_CLASS"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS"].FirstOrDefault ());
+		Assert.Equal ("NO", xcBuildConfiguration.BuildSettings ["COPY_PHASE_STRIP"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_CONSTANT_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_NO_COMMON_BLOCKS"].FirstOrDefault ());
+		Assert.Equal ("0", xcBuildConfiguration.BuildSettings ["GCC_OPTIMIZATION_LEVEL"].FirstOrDefault ());
+		Assert.Equal ("INCLUDE_SOURCE", xcBuildConfiguration.BuildSettings ["MTL_ENABLE_DEBUG_INFO"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["ONLY_ACTIVE_ARCH"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_NON_LITERAL_NULL_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["MTL_FAST_MATH"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["GCC_WARN_UNUSED_FUNCTION"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_OBJC_LITERAL_CONVERSION"].FirstOrDefault ());
+		Assert.Equal ("YES", xcBuildConfiguration.BuildSettings ["CLANG_WARN_DOCUMENTATION_COMMENTS"].FirstOrDefault ());
+		Assert.Equal ("libc++", xcBuildConfiguration.BuildSettings ["CLANG_CXX_LIBRARY"].FirstOrDefault ());
 
-    }
+		Assert.Equal (2, xcBuildConfiguration.BuildSettings ["GCC_PREPROCESSOR_DEFINITIONS"].Count);
+		Assert.Equal ("DEBUG=1", xcBuildConfiguration.BuildSettings ["GCC_PREPROCESSOR_DEFINITIONS"] [0]);
+		Assert.Equal ("$(inherited)", xcBuildConfiguration.BuildSettings ["GCC_PREPROCESSOR_DEFINITIONS"] [1]);
 
-    [Fact]
-    public void Deserialize_ThenSerialize_GeneratesSameJson ()
-    {
-        // Arrange
-        string testFilePath = Path.Combine (Environment.CurrentDirectory, "..", "..", "..", "Resources", "SampleProject.json");
-        string json = File.ReadAllText (testFilePath);
+	}
+
+	[Fact]
+	public void Deserialize_ThenSerialize_GeneratesSameJson ()
+	{
+		// Arrange
+		string testFilePath = Path.Combine (Environment.CurrentDirectory, "..", "..", "..", "Resources", "SampleProject.json");
+		string json = File.ReadAllText (testFilePath);
 
 		var options = new JsonSerializerOptions {
 			Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 		};
 
 		// Act
-		XcodeProject project = JsonSerializer.Deserialize<XcodeProject> (json, options);
-        var jsonString = JsonSerializer.Serialize (project, options);
+		XcodeProject? project = JsonSerializer.Deserialize<XcodeProject> (json, options);
+		var jsonString = JsonSerializer.Serialize (project, options);
 
-        // Assert
-        Assert.NotNull (jsonString);
-        Assert.Equal (json, jsonString);
-    }
+		// Assert
+		Assert.NotNull (jsonString);
+		Assert.Equal (json, jsonString);
+	}
 }
