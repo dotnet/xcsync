@@ -11,21 +11,23 @@ public class XcodeProjectObjectsJsonConverter : JsonConverter<IDictionary<string
 		var objects = new Dictionary<string, XcodeObject> ();
 
 		while (reader.Read ()) {
-			if (reader.TokenType == JsonTokenType.EndObject) {
+			switch (reader.TokenType) {
+			case JsonTokenType.EndObject:
 				return objects;
+			case JsonTokenType.PropertyName:
+				break;
+			default:
+				throw new JsonException ($"Unexpected token type '${reader.TokenType}', expected 'PropertyName'.");
 			}
 
-			// Get the key.
-			if (reader.TokenType != JsonTokenType.PropertyName) {
-				throw new JsonException ();
-			}
-
-			string token = reader.GetString ();
-			var valueConverter = (JsonConverter<XcodeObject>)options.GetConverter(typeof(XcodeObject));
+			string? token = reader.GetString ()
+							?? throw new JsonException ("Expected identifier for an element in the dictionary.");
+			var valueConverter = (JsonConverter<XcodeObject>) options.GetConverter (typeof (XcodeObject));
 			if (valueConverter is XcodeObjectConverter xcodeObjectConverter) {
 
 				xcodeObjectConverter.Token = token;
-				XcodeObject value = xcodeObjectConverter.Read(ref reader, typeof(XcodeObject), options);
+				XcodeObject value = xcodeObjectConverter.Read (ref reader, typeof (XcodeObject), options)
+									?? throw new JsonException ("Deserializing json object failed.");
 
 				// Add to dictionary.
 				objects.Add (token, value);
