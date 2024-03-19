@@ -1,4 +1,4 @@
-#nullable disable
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,6 +11,7 @@ public class BuildSettingsConverter : JsonConverter<IDictionary<string, IList<st
         var buildSettings = new Dictionary<string, IList<string>>();
 
         while (reader.Read ()) {
+            
             if (reader.TokenType == JsonTokenType.EndObject) {
                 return buildSettings;
             }

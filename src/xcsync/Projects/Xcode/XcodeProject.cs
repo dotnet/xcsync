@@ -1,5 +1,4 @@
-#nullable disable
-
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
