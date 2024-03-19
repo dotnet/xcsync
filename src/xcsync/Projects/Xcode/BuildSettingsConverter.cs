@@ -5,74 +5,67 @@ using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
 
-public class BuildSettingsConverter : JsonConverter<IDictionary<string, IList<string>>>
-{
-    public override IDictionary<string, IList<string>> Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
-        var buildSettings = new Dictionary<string, IList<string>>();
+public class BuildSettingsConverter : JsonConverter<IDictionary<string, IList<string>>> {
+	public override IDictionary<string, IList<string>> Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	{
+		var buildSettings = new Dictionary<string, IList<string>> ();
 
-        while (reader.Read ()) {
-            
-            if (reader.TokenType == JsonTokenType.EndObject) {
-                return buildSettings;
-            }
+		while (reader.Read ()) {
+			switch (reader.TokenType) {
+			case JsonTokenType.EndObject:
+				return buildSettings;
+			case JsonTokenType.PropertyName:
+				break;
+			default:
+				throw new JsonException ($"Unexpected token type '${reader.TokenType}', expected 'PropertyName'.");
+			}
 
-            // Get the key.
-            if (reader.TokenType != JsonTokenType.PropertyName) {
-                throw new JsonException();
-            }
+			var values = new List<string> ();
+			string? key = reader.GetString ()
+						  ?? throw new JsonException ("Expected identifier for an element in the dictionary.");
 
-            var value = new List<string>();
-            string key = reader.GetString();
+			reader.Read ();
+			if (reader.TokenType == JsonTokenType.StartArray) {
+				while (reader.Read ()) {
+					if (reader.TokenType == JsonTokenType.EndArray) {
+						break;
+					}
+					var value = reader.GetString ()
+								?? throw new JsonException ("Deserializing json object failed.");
+					values.Add (value);
+				}
+			} else {
+				var value = reader.GetString ()
+							?? throw new JsonException ("Deserializing json object failed.");
+				values.Add (value);
+			}
 
-            reader.Read();
-            if (reader.TokenType == JsonTokenType.StartArray)
-            {
-                while (reader.Read())
-                {
-                    if (reader.TokenType == JsonTokenType.EndArray)
-                    {
-                        break;
-                    }
+			// Add to dictionary.
+			buildSettings.Add (key, values);
+		}
 
-                    value.Add(reader.GetString());
-                }
-            }
-            else
-            {
-                value.Add(reader.GetString());
-            }
+		return buildSettings;
+	}
 
-            // Add to dictionary.
-            buildSettings.Add(key, value);
-        }        
-        
-        return buildSettings;
-    }
+	public override void Write (
+		Utf8JsonWriter writer,
+		IDictionary<string, IList<string>> objectToWrite,
+		JsonSerializerOptions options)
+	{
 
-    public override void Write(
-        Utf8JsonWriter writer,
-        IDictionary<string, IList<string>> objectToWrite,
-        JsonSerializerOptions options) {
-            
-            writer.WriteStartObject();
+		writer.WriteStartObject ();
 
-            foreach (var (key, value) in objectToWrite)
-            {
-                if (value.Count == 1)
-                {
-                    writer.WriteString(key, value[0]);
-                }
-                else
-                {
-                    writer.WriteStartArray(key);
-                    foreach (var item in value)
-                    {
-                        writer.WriteStringValue(item);
-                    }
-                    writer.WriteEndArray();
-                }
-            }
-            writer.WriteEndObject();        
-        //  JsonSerializer.Serialize(writer, objectToWrite, objectToWrite.GetType(), options);
-        }
+		foreach (var (key, value) in objectToWrite) {
+			if (value.Count == 1) {
+				writer.WriteString (key, value [0]);
+			} else {
+				writer.WriteStartArray (key);
+				foreach (var item in value) {
+					writer.WriteStringValue (item);
+				}
+				writer.WriteEndArray ();
+			}
+		}
+		writer.WriteEndObject ();
+	}
 }
