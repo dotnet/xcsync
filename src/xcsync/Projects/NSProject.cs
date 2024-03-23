@@ -6,8 +6,8 @@ namespace xcsync.Projects;
 
 public class NSProject (Dotnet project) {
 
-	public Dictionary<string, NSObject?> cliTypes = new ();
-	public Dictionary<string, NSObject> objCTypes = new ();
+	public Dictionary<string, NSObject?> cliTypes = [];
+	public Dictionary<string, NSObject> objCTypes = [];
 	public Dotnet DotnetProject { get; set; } = project;
 
 	public async IAsyncEnumerable<NSObject> GetTypes ()
@@ -15,7 +15,7 @@ public class NSProject (Dotnet project) {
 		var openProject = await DotnetProject.OpenProject ().ConfigureAwait (false);
 		await foreach (var type in DotnetProject.GetNsoTypes (openProject).ConfigureAwait (false)) {
 			var nsType = ConvertToNSObject (type);
-			if (nsType is not null)
+			if (nsType is not null && !nsType.IsProtocol)
 				yield return nsType;
 		}
 	}
@@ -27,8 +27,10 @@ public class NSProject (Dotnet project) {
 
 		// If the type is not a model, we handle the properties and methods for IBOutlets and IBActions handling too
 		var isModel = false;
+		var isProtocol = false;
 		var cliName = type.MetadataName;
 		var objCName = type.Name;
+		HashSet<string> refs = [];
 
 		if (cliTypes.TryGetValue (cliName, out var existingNSObject))
 			return existingNSObject;
@@ -44,7 +46,8 @@ public class NSProject (Dotnet project) {
 		foreach (var a in type.GetAttributes ()) {
 			switch (a.AttributeClass?.Name) {
 			case "ProtocolAttribute":
-				return null;
+				isProtocol = true;
+				break;
 			case "ModelAttribute":
 				isModel = true;
 				break;
@@ -56,35 +59,59 @@ public class NSProject (Dotnet project) {
 			}
 		}
 
-		List<IBOutlet> outlets = new ();
-		List<IBAction> actions = new ();
+		List<IBOutlet> outlets = [];
+		List<IBAction> actions = [];
 
 		if (!isModel) {
 
-			outlets.AddRange (from property in type.GetMembers ().OfType<IPropertySymbol> ()
-							  let outletAttribute = property.GetAttribute ("OutletAttribute")
-							  where outletAttribute is not null
-							  let objcName = outletAttribute.GetName () ?? property.Name
-							  let cliType = property.Type.MetadataName
-							  let isCollection = property.Type.TypeKind == TypeKind.Array
-							  let objcType = property.Type.GetObjCType (this)
-							  select new IBOutlet (property.Name, objcName, cliType, objcType, isCollection));
+			foreach (var property in type.GetMembers ().OfType<IPropertySymbol> ()) {
 
-			actions.AddRange (from method in type.GetMembers ().OfType<IMethodSymbol> ()
-							  let actionAttribute = method.GetAttribute ("ActionAttribute")
-							  where actionAttribute is not null
-							  let actionName = actionAttribute.GetName ()
-							  let info = method.GetInfo (actionName)
-							  let objcName = info.objcName
+				var outletAttribute = property.GetAttribute ("OutletAttribute");
 
-							  let parameters = method.Parameters
-								  .Select ((p, i) => new IBActionParameter (p.Name, info.@params? [i].Length == 0 ? null : info.@params? [i], p.Type.MetadataName, p.Type.GetObjCType (this)))
-								  .ToList ()
+				if (outletAttribute is null)
+					continue;
 
-							  select new IBAction (method.Name, objcName, parameters));
+				outlets.Add (new IBOutlet (
+					cliName: property.Name,
+					objcName: outletAttribute.GetName () ?? property.Name,
+					cliType: property.Type.MetadataName,
+					objcType: property.Type.GetObjCType (this),
+					isCollection: property.Type.TypeKind == TypeKind.Array));
+
+				refs.Add (property.ContainingNamespace.Name);
+			}
+
+			foreach (var method in type.GetMembers ().OfType<IMethodSymbol> ()) {
+
+				var actionAttribute = method.GetAttribute ("ActionAttribute");
+
+				if (actionAttribute is null)
+					continue;
+
+				var actionName = actionAttribute.GetName ();
+				(string? objcName, string []? strings) = method.GetInfo (actionName);
+
+				List<IBActionParameter> parameters = new (method.Parameters.Length);
+
+				var index = 0;
+				foreach (var param in method.Parameters) {
+					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, param.Type.GetObjCType (this)));
+					index++;
+					refs.Add (param.ContainingNamespace.Name);
+				}
+
+				actions.Add (new IBAction (method.Name, objcName, parameters));
+			}
 		}
 
-		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, type.InDesigner (objCName), outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions);
+		refs.Add (type.ContainingNamespace.Name);
+
+		if (baseNSObject is not null)
+			refs.UnionWith (baseNSObject.References);
+
+		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, isProtocol, type.InDesigner (objCName),
+			outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions,
+			refs.Intersect (Frameworks.MacFrameworks.Keys).ToHashSet ());
 
 		cliTypes.Add (nsObject.CliType, nsObject);
 		objCTypes.Add (nsObject.ObjCType, nsObject);
@@ -119,8 +146,5 @@ public static class Extensions {
 			return (method.Name, null);
 		var split = actionAttributeName.Split (":", StringSplitOptions.TrimEntries);
 		return split.Length > 1 ? (split [0], split [1..]) : (split [0], null);
-
 	}
 }
-
-
