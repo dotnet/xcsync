@@ -7,6 +7,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+    <T4GeneratedFilesOutputPath>$(BaseIntermediateOutputPath)t4-generated</T4GeneratedFilesOutputPath>
+    <LatestFrameworksDownloadOutputPath>$(BaseIntermediateOutputPath)downloaded</LatestFrameworksDownloadOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <XAMARIN_MACIOS_HASH>e76b7b8de65863f39a6a7353abc07ebf32c442a2</XAMARIN_MACIOS_HASH>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,15 +29,56 @@
         that directly references types in the Microsoft.Build namespace has been called. This dependency arises 
         from when a method is just-in-time compiled, so it breaks even if the reference to a Microsoft.Build type 
         has not been executed.-->
-    <PackageReference Include="Microsoft.Build" Version="17.9.5" ExcludeAssets="runtime"/>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.9.5" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.Build" Version="17.9.5" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.9.5" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.9.5" ExcludeAssets="runtime"/>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.9.5" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.0-3.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.0-3.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.9.0-3.final" />
+    <PackageReference Include="Mono.TextTemplating" Version="2.3.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <TextTemplate Include="**\*.tt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DownloadFile Include="tools/common/Frameworks.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
+    <DownloadFile Include="tools/common/ApplePlatform.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
+    <DownloadFile Include="tools/common/SdkVersions.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="@(TextTemplate->'$(T4GeneratedFilesOutputPath)/%(Filename).generated.cs')" Visible="false"/>
+    <Compile Include="@(DownloadFile->'$(BaseIntermediateOutputPath)downloaded/%(Repo)/%(Identity)')">
+      <Link>external/%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
+  <Target Name="TextTemplateTransform" BeforeTargets="BeforeBuild" Inputs="@(TextTemplate)" Outputs="$(BaseIntermediateOutputPath)t4-generated/%(TextTemplate.Filename).generated.cs">
+    <ItemGroup>
+      <T4GeneratedFiles Include="@(TextTemplate)">
+        <TypeName>$(RootNamespace).$([System.String]::Copy('%(RelativeDir)').Replace('/', '.'))%(Filename)</TypeName>
+        <OutputFile>$(T4GeneratedFilesOutputPath)/%(Filename).generated.cs</OutputFile>
+      </T4GeneratedFiles>
+    </ItemGroup>
+    <MakeDir Directories="$(T4GeneratedFilesOutputPath)" Condition="!Exists('$(T4GeneratedFilesOutputPath)')" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet t4 -v %(T4GeneratedFiles.Identity) -c %(T4GeneratedFiles.TypeName) -o %(T4GeneratedFiles.OutputFile)" />
+  </Target>
+
+  <Target Name="TextTemplateClean" AfterTargets="Clean">
+    <RemoveDir Directories="$(T4GeneratedFilesOutputPath)" />
+  </Target>
+  
+  <Target Name="GetLatestFrameworks" BeforeTargets="BeforeBuild" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')">
+    <Exec Command="curl --create-dirs -f -s 'https://raw.githubusercontent.com/xamarin/%(DownloadFile.Repo)/%(DownloadFile.Hash)/%(DownloadFile.Identity)' --output '$(LatestFrameworksDownloadOutputPath)/%(DownloadFile.Repo)/%(DownloadFile.Identity)'" />
+  </Target>
+  
+  <Target Name="LatestFrameworksClean" AfterTargets="Clean">
+    <RemoveDir Directories="$(LatestFrameworksDownloadOutputPath)" />
+  </Target>
 
 </Project>
