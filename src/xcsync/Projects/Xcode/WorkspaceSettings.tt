@@ -1,0 +1,46 @@
+<?xml version=""1.0"" encoding=""UTF-8""?>
+<!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd"">
+<plist version=""1.0"">
+<dict>
+<#= "\t"#><key>BuildLocationStyle</key>
+<#= "\t"#><string>UseAppPreferences</string>
+<#= "\t"#><key>CustomBuildIntermediatesPath</key>
+<#= "\t"#><string>Build/Intermediates.noindex</string>
+<#= "\t"#><key>CustomBuildLocationType</key>
+<#= "\t"#><string>RelativeToDerivedData</string>
+<#= "\t"#><key>CustomBuildProductsPath</key>
+<#= "\t"#><string>Build/Products</string>
+<#= "\t"#><key>CustomIndexStorePath</key>
+<#= "\t"#><string>Index/DataStore</string>
+<#= "\t"#><key>DerivedDataCustomLocation</key>
+<#= "\t"#><string>DerivedData</string>
+<#= "\t"#><key>DerivedDataLocationStyle</key>
+<#= "\t"#><string>WorkspaceRelativePath</string>
+<#= "\t"#><key>EnabledFullIndexStoreVisibility</key>
+<#= "\t"#><false/>
+<#= "\t"#><key>IDEWorkspaceUserSettings_BuildLocationStyle</key>
+<#= "\t"#><integer>0</integer>
+<#= "\t"#><key>IDEWorkspaceUserSettings_BuildSubfolderNameStyle</key>
+<#= "\t"#><integer>0</integer>
+<#= "\t"#><key>IDEWorkspaceUserSettings_DerivedDataCustomLocation</key>
+<#= "\t"#><string>DerivedData</string>
+<#= "\t"#><key>IDEWorkspaceUserSettings_DerivedDataLocationStyle</key>
+<#= "\t"#><integer>2</integer>
+<#= "\t"#><key>IDEWorkspaceUserSettings_IssueFilterStyle</key>
+<#= "\t"#><integer>0</integer>
+<#= "\t"#><key>IDEWorkspaceUserSettings_LiveSourceIssuesEnabled</key>
+<#= "\t"#><true/>
+<#= "\t"#><key>IDEWorkspaceUserSettings_SnapshotAutomaticallyBeforeSignificantChanges</key>
+<#= "\t"#><true/>
+<#= "\t"#><key>IDEWorkspaceUserSettings_SnapshotLocationStyle</key>
+<#= "\t"#><integer>0</integer>
+<#= "\t"#><key>IssueFilterStyle</key>
+<#= "\t"#><string>ShowActiveSchemeOnly</string>
+<#= "\t"#><key>LiveSourceIssuesEnabled</key>
+<#= "\t"#><true/>
+<#= "\t"#><key>SnapshotAutomaticallyBeforeSignificantChanges</key>
+<#= "\t"#><true/>
+<#= "\t"#><key>SnapshotLocationStyle</key>
+<#= "\t"#><string>Default</string>
+</dict>
+</plist>
