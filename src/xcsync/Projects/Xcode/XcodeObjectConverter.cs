@@ -14,7 +14,7 @@ public class XcodeObjectConverter : JsonConverter<XcodeObject> {
 		using var jsonDoc = JsonDocument.ParseValue (ref reader);
 		var jsonObject = jsonDoc.RootElement;
 		var isa = jsonObject.GetProperty ("isa").GetString ();
-		var xcodeObjectType = typeof (XcodeObjectConverter).Assembly.GetType ($"xcsync.Projects.Xcode.{isa}")  
+		var xcodeObjectType = typeof (XcodeObjectConverter).Assembly.GetType ($"xcsync.Projects.Xcode.{isa}")
 							  ?? throw new JsonException ($"Unknown isa value: {isa}");
 		var xcodeObject = JsonSerializer.Deserialize (jsonObject, xcodeObjectType) as XcodeObject
 						  ?? throw new JsonException ($"Failed to deserialize {isa}");
