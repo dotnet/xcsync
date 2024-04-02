@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
 namespace xcsync;
 
 /// <summary>

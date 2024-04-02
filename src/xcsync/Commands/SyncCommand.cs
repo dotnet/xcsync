@@ -2,10 +2,11 @@
 
 namespace xcsync.Commands;
 
-public class SyncCommand {
-	public static void Execute (string project, string target, bool force)
+public class SyncCommand : BaseCommand<SyncCommand> {
+	public static void Execute (string project, string target, bool force, LogLevel verbosity)
 	{
-		Console.WriteLine ($"Syncing files from project '{project}' to target '{target}'");
-		// Implement logic here
+		ConfigureLogging (verbosity);
+
+		Logger?.Information ("Syncing files from project {Project} to target {Target}", project, target);
 	}
 }

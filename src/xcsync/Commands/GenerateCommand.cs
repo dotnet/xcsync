@@ -4,10 +4,13 @@ using xcsync.Projects;
 
 namespace xcsync.Commands;
 
-public class GenerateCommand {
-	public static void Execute (string project, string target, bool force, bool open)
+public class GenerateCommand : BaseCommand<GenerateCommand> {
+
+	public static void Execute (string project, string target, bool force, bool open, LogLevel verbosity)
 	{
-		Console.WriteLine ($"Generating files from project '{project}' to target '{target}'");
+		ConfigureLogging (verbosity);
+
+		Logger?.Information ($"Generating files from project '{project}' to target '{target}'");
 
 		var dotnet = new Dotnet (project);
 		var nsProject = new NSProject (dotnet);
