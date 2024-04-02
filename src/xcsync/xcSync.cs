@@ -1,22 +1,28 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.CommandLine;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Serilog;
+using Serilog.Events;
+using xcsync;
 using xcsync.Commands;
 using InvalidOperationException = System.InvalidOperationException;
 
 namespace xcsync;
 
-public static class Program {
+public static class xcSync {
 
-	public static void Main (string [] args)
+	public static async Task Main (string [] args)
 	{
+		Console.WriteLine ($"xcSync v{typeof (xcSync).Assembly.GetName ().Version}, (c) Microsoft Corporation. All rights reserved.\n");
+
 		var force = new Option<bool> (
-			new [] { "--force", "--f" },
+			["--force", "--f"],
 			description: "Force the generation",
 			getDefaultValue: () => false);
 
 		var project = new Option<string> (
-			new [] { "--project", "--p" },
+			["--project", "--p"],
 			description: "Path to the project",
 			getDefaultValue: () => string.Empty);
 
@@ -28,7 +34,7 @@ public static class Program {
 		});
 
 		var target = new Option<string> (
-			new [] { "--target", "--t" },
+			["--target", "--t"],
 			description: "Path to the target",
 			getDefaultValue: () => string.Empty);
 
@@ -40,9 +46,15 @@ public static class Program {
 		});
 
 		var open = new Option<bool> (
-			new [] { "--open", "--o" },
+			["--open", "--o"],
 			description: "Open the generated project",
 			getDefaultValue: () => false);
+
+		var verbosity = new Option<LogLevel> (
+			["--verbosity", "-v"],
+			description: "Set the verbosity level",
+			getDefaultValue: () => LogLevel.Information
+		);
 
 		var generate = new Command ("generate",
 			"generate a Xcode project at the path specified by --target from the project identified by --project")
@@ -68,9 +80,9 @@ public static class Program {
 			force,
 		};
 
-		generate.SetHandler (GenerateCommand.Execute, project, target, force, open);
-		sync.SetHandler (SyncCommand.Execute, project, target, force);
-		watch.SetHandler (WatchCommand.Execute, project, target, force);
+		generate.SetHandler (GenerateCommand.Execute, project, target, force, open, verbosity);
+		sync.SetHandler (SyncCommand.Execute, project, target, force, verbosity);
+		watch.SetHandler (WatchCommand.Execute, project, target, force, verbosity);
 
 		var root = new RootCommand ("xcsync")
 		{
@@ -78,8 +90,8 @@ public static class Program {
 			sync,
 			watch
 		};
-
-		root.Invoke (args);
+		root.AddGlobalOption (verbosity);
+		await root.InvokeAsync (args);
 	}
 
 	static readonly List<OptionValidation> XcodeValidations = new () {
@@ -123,5 +135,8 @@ public static class Program {
 
 	static string GetXcodePath () =>
 		Path.Combine (Directory.GetCurrentDirectory (), "obj", "xcode");
+
+	public static LoggerConfiguration? LoggerFactory { get; private set; }
+	public static ILogger? Logger { get; private set; }
 
 }

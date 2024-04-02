@@ -2,10 +2,13 @@
 
 namespace xcsync.Commands;
 
-public class WatchCommand {
-	public static void Execute (string project, string target, bool force)
+public class WatchCommand : BaseCommand<WatchCommand> {
+
+	public static void Execute (string project, string target, bool force, LogLevel verbosity)
 	{
-		Console.WriteLine ($"Watching files from project '{project}' to target '{target}'");
+		ConfigureLogging (verbosity);
+
+		Logger?.Information ($"Syncing files from project '{project}' to target '{target}'");
 		// Implement logic here
 	}
 }

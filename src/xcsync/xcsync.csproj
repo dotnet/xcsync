@@ -37,7 +37,10 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.0-3.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.0-3.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.9.0-3.final" />
-    <PackageReference Include="Mono.TextTemplating" Version="2.3.1" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.2.0-dev-00756" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
@@ -52,17 +55,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="@(TextTemplate->'$(T4GeneratedFilesOutputPath)/%(Filename).generated.cs')" Visible="false"/>
+    <Compile Include="@(TextTemplate->'$(T4GeneratedFilesOutputPath)/%(Filename).g.cs')" Visible="false" />
     <Compile Include="@(DownloadFile->'$(BaseIntermediateOutputPath)downloaded/%(Repo)/%(Identity)')">
       <Link>external/%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
 
-  <Target Name="TextTemplateTransform" BeforeTargets="BeforeBuild" Inputs="@(TextTemplate)" Outputs="$(BaseIntermediateOutputPath)t4-generated/%(TextTemplate.Filename).generated.cs">
+  <Target Name="TextTemplateTransform" BeforeTargets="BeforeBuild" Inputs="@(TextTemplate)" Outputs="$(BaseIntermediateOutputPath)t4-generated/%(TextTemplate.Filename).g.cs">
     <ItemGroup>
       <T4GeneratedFiles Include="@(TextTemplate)">
         <TypeName>$(RootNamespace).$([System.String]::Copy('%(RelativeDir)').Replace('/', '.'))%(Filename)</TypeName>
-        <OutputFile>$(T4GeneratedFilesOutputPath)/%(Filename).generated.cs</OutputFile>
+        <OutputFile>$(T4GeneratedFilesOutputPath)/%(Filename).g.cs</OutputFile>
       </T4GeneratedFiles>
     </ItemGroup>
     <MakeDir Directories="$(T4GeneratedFilesOutputPath)" Condition="!Exists('$(T4GeneratedFilesOutputPath)')" />
