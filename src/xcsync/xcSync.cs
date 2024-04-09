@@ -50,6 +50,11 @@ public static class xcSync {
 			description: "Open the generated project",
 			getDefaultValue: () => false);
 
+		var tfm = new Option<string> (
+			["--framework", "--tfm", "--target-framework", "--target-frameworks"],
+			description: "Specify the target framework moniker",
+			getDefaultValue: () => string.Empty);
+
 		var verbosity = new Option<LogLevel> (
 			["--verbosity", "-v"],
 			description: "Set the verbosity level",
@@ -63,6 +68,7 @@ public static class xcSync {
 			target,
 			force,
 			open,
+			tfm,
 		};
 
 		var sync = new Command ("sync",
@@ -80,7 +86,7 @@ public static class xcSync {
 			force,
 		};
 
-		generate.SetHandler (GenerateCommand.Execute, project, target, force, open, verbosity);
+		generate.SetHandler (GenerateCommand.Execute, project, target, force, open, verbosity, tfm);
 		sync.SetHandler (SyncCommand.Execute, project, target, force, verbosity);
 		watch.SetHandler (WatchCommand.Execute, project, target, force, verbosity);
 
