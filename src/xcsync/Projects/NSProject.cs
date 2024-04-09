@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using Microsoft.CodeAnalysis;
+using xcsync.Commands;
 
 namespace xcsync.Projects;
 
-public class NSProject (Dotnet project) {
+public class NSProject (Dotnet project, string targetPlatform) {
 
 	public Dictionary<string, NSObject?> cliTypes = [];
 	public Dictionary<string, NSObject> objCTypes = [];
@@ -111,7 +112,7 @@ public class NSProject (Dotnet project) {
 
 		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, isProtocol, type.InDesigner (objCName),
 			outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions,
-			refs.Intersect (Frameworks.MacFrameworks.Keys).ToHashSet ());
+			refs.Intersect (ApplePlatforms.platforms[targetPlatform].SupportedFrameworks.Keys).ToHashSet ());
 
 		cliTypes.Add (nsObject.CliType, nsObject);
 		objCTypes.Add (nsObject.ObjCType, nsObject);

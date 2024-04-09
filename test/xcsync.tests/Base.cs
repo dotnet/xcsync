@@ -17,6 +17,6 @@ public class Base {
 			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
 		DotnetProject = new Dotnet (TestProjectPath);
-		NsProject = new NSProject (DotnetProject);
+		NsProject = new NSProject (DotnetProject, "macos");
 	}
 }
