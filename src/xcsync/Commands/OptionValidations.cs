@@ -3,12 +3,26 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Xamarin;
 
 namespace xcsync.Commands;
+
+public static class ApplePlatforms {
+	public static IReadOnlyDictionary<string, (Frameworks SupportedFrameworks, string MinOsVersion, string MaxOsVersion)> platforms = new Dictionary<string, (Frameworks, string, string)>
+	{
+		{ "ios", (Frameworks.GetiOSFrameworks(false), SdkVersions.DotNetMiniOS, SdkVersions.iOS) },
+		{ "maccatalyst", (Frameworks.GetMacCatalystFrameworks(), SdkVersions.DotNetMinMacCatalyst, SdkVersions.MacCatalyst) },
+		{ "macos", (Frameworks.MacFrameworks, SdkVersions.DotNetMinOSX, SdkVersions.OSX) },
+		{ "tvos", (Frameworks.TVOSFrameworks, SdkVersions.DotNetMinTVOS, SdkVersions.TVOS) },
+	};
+}
 
 public delegate string? OptionValidation (string path);
 
 public static class OptionValidations {
+
+	public static List<string> AppleTfms = [];
+
 	public static string? PathNameValid (string path) =>
 		string.IsNullOrWhiteSpace (path)
 			? "Path name is empty"
@@ -32,29 +46,33 @@ public static class OptionValidations {
 		return null;
 	}
 
-	static readonly string ValidFrameworks =
-		@"^net[7-9]\.\d+-(macos|ios|maccatalyst|tvos)$";
-
 	public static string? PathContainsValidTfm (string path)
 	{
 		if (!path.IsCsprojValid ())
 			return $"Path '{path}' does not contain a C# project";
 
-		if (!TryGetTfm (path, out string? tfm))
-			return $"Missing target framework in '{path}'";
+		if (!path.TryGetTfm (out var tfms))
+			return $"Missing valid target framework in '{path}'";
 
-		return tfm.IsValid ();
+		AppleTfms = tfms;
+		return IsTfmValid (ref tfms);
 	}
 
-	static bool TryGetTfm (string csproj, [NotNullWhen (true)] out string? tfm)
+	static bool TryGetTfm (this string csproj, [NotNullWhen (true)] out List<string>? tfms)
 	{
+		tfms = null;
 		try {
 			var csprojDocument = XDocument.Load (csproj);
-			tfm = csprojDocument.Descendants ("TargetFramework").FirstOrDefault ()?.Value;
-			return tfm is not null;
+
+			tfms = csprojDocument
+				.Descendants ("TargetFramework")
+				.FirstOrDefault ()?.Value.Split (';').ToList () ?? csprojDocument
+				.Descendants ("TargetFrameworks")
+				.FirstOrDefault ()?.Value.Split (';').ToList ();
+
+			return tfms is not null;
 		} catch {
 			// in case there are issues when loading the file
-			tfm = null;
 			return false;
 		}
 	}
@@ -62,8 +80,28 @@ public static class OptionValidations {
 	public static bool IsCsprojValid (this string csproj) =>
 		Path.GetExtension (csproj).Equals (".csproj", StringComparison.OrdinalIgnoreCase);
 
-	public static string? IsValid (this string tfm) =>
-		Regex.IsMatch (tfm, ValidFrameworks)
-			? null
-			: $"Invalid target framework '{tfm}' in csproj";
+	public static string? IsTfmValid (ref List<string> tfms)
+	{
+		List<string> validTfms = new ();
+		foreach (var tfm in tfms) {
+			foreach (var platform in ApplePlatforms.platforms) {
+				if (tfm.Contains (platform.Key)) {
+					string ApplePlatform = platform.Key;
+
+					string ValidFrameworks = $@"^net\d+\.\d+-{ApplePlatform}(?:\d+\.\d+)?$";
+
+					if (Regex.IsMatch (tfm, ValidFrameworks))
+						validTfms.Add (tfm);
+				}
+			}
+		}
+
+		if (validTfms.Count > 0) {
+			tfms = validTfms;
+			return null;
+		}
+
+		string targetFrameworks = string.Join (", ", tfms.Select (x => x.ToString ()));
+		return $"Invalid target framework(s) '{targetFrameworks}' in csproj";
+	}
 }

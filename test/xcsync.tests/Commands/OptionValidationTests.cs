@@ -43,7 +43,7 @@ public class OptionValidationTests {
 
 	[Fact]
 	public void PathContainsInvalidTfm () =>
-		Assert.Equal ("Invalid target framework 'net8.0' in csproj", OptionValidations.PathContainsValidTfm (Path.Combine (pwd, "xcsync.tests.csproj")));
+		Assert.Equal ("Invalid target framework(s) 'net8.0' in csproj", OptionValidations.PathContainsValidTfm (Path.Combine (pwd, "xcsync.tests.csproj")));
 
 	[Fact]
 	public void PathContainsInvalidTfm2 () =>
@@ -53,11 +53,55 @@ public class OptionValidationTests {
 	public void PathContainsValidTfm () =>
 		Assert.Null (OptionValidations.PathContainsValidTfm (Path.Combine (pwd, "Resources", "Valid.csproj")));
 
+	[Fact]
+	public void PathContainsValidMultipleTfms () =>
+		Assert.Null (OptionValidations.PathContainsValidTfm (Path.Combine (pwd, "Resources", "MultipleValid.csproj")));
+
 	[Theory]
 	[InlineData ("net8.0-macos", null)]
-	[InlineData ("net7.0", "Invalid target framework 'net7.0' in csproj")]
+	[InlineData("net8.0-macos14.0", null)]
+	[InlineData ("net7.0", "Invalid target framework(s) 'net7.0' in csproj")]
 	[InlineData ("net7.0-maccatalyst", null)]
-	[InlineData ("net6.0-ios", "Invalid target framework 'net6.0-ios' in csproj")]
-	public void IsTfmValid (string tfm, string? error) =>
-		Assert.Equal (error, tfm.IsValid ());
+	[InlineData ("net6.0-ios", null)]
+	[InlineData ("net8.0-ios17.2", null)]
+	[InlineData ("net10.0-macos", null)]
+	[InlineData ("net8.0-maccatalyst;net8.0-ios;net8.0-android", null)]
+	public void IsTfmValid (string tfm, string? error)
+	{
+		// inline data for xunit does not take in lists as a parameter, so we have to split the string
+		var tfms = tfm.Split (';').ToList ();
+		Assert.Equal (error, OptionValidations.IsTfmValid (ref tfms));
+	}
+
+	[Fact]
+	public void ValidTargetPlatformMultiTfms ()
+	{
+		List<string> ProjectTfms = new () { "net8.0-macos", "net8.0-ios", "net8.0-maccatalyst" };
+		GenerateCommand.TryGetTargetPlatform ("net8.0-ios", ProjectTfms, out string? targetPlatform);
+		Assert.Equal ("ios", targetPlatform);
+	}
+
+	[Fact]
+	public void InvalidTargetPlatformMultiTfms ()
+	{
+		List<string> ProjectTfms = new () { "net8.0-ios", "net8.0-maccatalyst" };
+		GenerateCommand.TryGetTargetPlatform ("net8.0-macos", ProjectTfms, out string? targetPlatform);
+		Assert.Null (targetPlatform);
+	}
+
+	[Fact]
+	public void SpecifyTfmError ()
+	{
+		List<string> ProjectTfms = new () { "net8.0-ios", "net8.0-maccatalyst", "net8.0-android" };
+		GenerateCommand.TryGetTargetPlatform ("", ProjectTfms, out string? targetPlatform);
+		Assert.Null (targetPlatform);
+	}
+
+	[Fact]
+	public void UseDefaultTfmIfSingle ()
+	{
+		List<string> ProjectTfms = new () { "net8.0-ios" };
+		GenerateCommand.TryGetTargetPlatform ("", ProjectTfms, out string? targetPlatform);
+		Assert.Equal ("ios", targetPlatform);
+	}
 }
