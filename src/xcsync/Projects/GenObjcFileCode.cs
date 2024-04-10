@@ -2,31 +2,10 @@
 
 namespace xcsync.Projects;
 
+#pragma warning disable CS9113 // Parameter is unread.
+
 // Necessary plumbing code to hook up NSObject to its respective .h and .m files
-public partial class GenObjcH : ITextTemplate {
-    public GenObjcH (NSObject nsObject)
-    {
-        
-#pragma warning disable CA1859 // Use concrete types when possible for improved performance
-        // Concrete types are not used here because the template is generated code and the
-        // generated code isn't available until after the first build.
-		var thisTemplate = this as ITextTemplate;
-#pragma warning restore CA1859 // Use concrete types when possible for improved performance
-		thisTemplate.Session = new Dictionary<string, object> { { "nsObject", nsObject } };
-        thisTemplate.Initialize ();
-    }
-}
+public partial class GenObjcH (NSObject nsObject) : ITextTemplate;
+public partial class GenObjcM (NSObject nsObject) : ITextTemplate;
 
-
-public partial class GenObjcM : ITextTemplate {
-    public GenObjcM (NSObject nsObject)
-    {
-#pragma warning disable CA1859 // Use concrete types when possible for improved performance
-        // Concrete types are not used here because the template is generated code and the
-        // generated code isn't available until after the first build.
-		var thisTemplate = this as ITextTemplate;
-#pragma warning restore CA1859 // Use concrete types when possible for improved performance
-		thisTemplate.Session = new Dictionary<string, object> { { "nsObject", nsObject } };
-        thisTemplate.Initialize ();
-    }
-}
+#pragma warning restore CS9113 // Parameter is unread.

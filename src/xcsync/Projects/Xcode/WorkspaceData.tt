@@ -1,9 +1,8 @@
 <#@ output extension=".xcworkspacedata" #>
-<#@ parameter name="ProjectPath" type="string" #>
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
 <#= "\t"#>version = "1.0">
 <#= "\t"#><FileRef
-<#= "\t"#>location = "self:<#= ProjectPath #>">
+<#= "\t"#>location = "self:<#= projectPath #>">
 <#= "\t"#></FileRef>
 </Workspace>

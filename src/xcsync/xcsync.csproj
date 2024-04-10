@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
-    <T4GeneratedFilesOutputPath>$(BaseIntermediateOutputPath)t4-generated</T4GeneratedFilesOutputPath>
+    <T4GeneratedFilesOutputPath>$(BaseIntermediateOutputPath)generated/t4</T4GeneratedFilesOutputPath>
     <LatestFrameworksDownloadOutputPath>$(BaseIntermediateOutputPath)downloaded</LatestFrameworksDownloadOutputPath>
   </PropertyGroup>
 
@@ -61,7 +61,7 @@
     </Compile>
   </ItemGroup>
 
-  <Target Name="TextTemplateTransform" BeforeTargets="BeforeBuild" Inputs="@(TextTemplate)" Outputs="$(BaseIntermediateOutputPath)t4-generated/%(TextTemplate.Filename).g.cs">
+  <Target Name="TextTemplateTransform" BeforeTargets="BeforeBuild" Inputs="@(TextTemplate)" Outputs="$(T4GeneratedFilesOutputPath)/%(TextTemplate.Filename).g.cs">
     <ItemGroup>
       <T4GeneratedFiles Include="@(TextTemplate)">
         <TypeName>$(RootNamespace).$([System.String]::Copy('%(RelativeDir)').Replace('/', '.'))%(Filename)</TypeName>
@@ -69,7 +69,7 @@
       </T4GeneratedFiles>
     </ItemGroup>
     <MakeDir Directories="$(T4GeneratedFilesOutputPath)" Condition="!Exists('$(T4GeneratedFilesOutputPath)')" />
-    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet t4 -v %(T4GeneratedFiles.Identity) -c %(T4GeneratedFiles.TypeName) -o %(T4GeneratedFiles.OutputFile)" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet t4 %(T4GeneratedFiles.Identity) --preprocess -out %(T4GeneratedFiles.OutputFile)" />
   </Target>
 
   <Target Name="TextTemplateClean" AfterTargets="Clean">
