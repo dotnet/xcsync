@@ -2,14 +2,6 @@
 
 namespace xcsync.Projects.Xcode;
 
-public partial class WorkspaceData : ITextTemplate {
-	public WorkspaceData (string projectPath)
-	{
-		var thisTemplate = this as ITextTemplate;
-		thisTemplate.Session = new Dictionary<string, object> { { "ProjectPath", projectPath } };
-		thisTemplate.Initialize ();
-	}
-}
+public partial class WorkspaceData (string projectPath) : ITextTemplate;
 
-public partial class WorkspaceSettings : ITextTemplate {
-}
+public partial class WorkspaceSettings : ITextTemplate;
