@@ -59,7 +59,7 @@ public class OptionValidationTests {
 
 	[Theory]
 	[InlineData ("net8.0-macos", null)]
-	[InlineData("net8.0-macos14.0", null)]
+	[InlineData ("net8.0-macos14.0", null)]
 	[InlineData ("net7.0", "Invalid target framework(s) 'net7.0' in csproj")]
 	[InlineData ("net7.0-maccatalyst", null)]
 	[InlineData ("net6.0-ios", null)]
