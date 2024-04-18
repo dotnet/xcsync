@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
@@ -31,7 +32,7 @@ public class XcodeObject {
 	string? token;
 
 	[JsonIgnore]
-	public string? Token {
+	public string Token {
 		get {
 			if (string.IsNullOrEmpty (token)) {
 
@@ -49,13 +50,13 @@ public class XcodeObject {
 public class PBXResourcesBuildPhase : XcodeObject {
 
 	[JsonPropertyName ("buildActionMask")]
-	public string? BuildActionMask { get; set; }
+	public string BuildActionMask { get; set; } = int.MaxValue.ToString ();
 
 	[JsonPropertyName ("files")]
 	public List<string>? Files { get; set; }
 
 	[JsonPropertyName ("runOnlyForDeploymentPostprocessing")]
-	public string? RunOnlyForDeploymentPostprocessing { get; set; }
+	public string RunOnlyForDeploymentPostprocessing { get; set; } = "0";
 }
 
 public class XCBuildConfiguration : XcodeObject {
@@ -98,13 +99,13 @@ public class PBXBuildFile : XcodeObject {
 public class PBXFrameworksBuildPhase : XcodeObject {
 
 	[JsonPropertyName ("buildActionMask")]
-	public string? BuildActionMask { get; set; }
+	public string BuildActionMask { get; set; } = int.MaxValue.ToString ();
 
 	[JsonPropertyName ("files")]
 	public List<string>? Files { get; set; }
 
 	[JsonPropertyName ("runOnlyForDeploymentPostprocessing")]
-	public string? RunOnlyForDeploymentPostprocessing { get; set; }
+	public string RunOnlyForDeploymentPostprocessing { get; set; } = "0";
 }
 
 public class PBXProject : XcodeObject {
@@ -156,15 +157,14 @@ public class XCConfigurationList : XcodeObject {
 }
 
 public class PBXSourcesBuildPhase : XcodeObject {
-
 	[JsonPropertyName ("buildActionMask")]
-	public string? BuildActionMask { get; set; }
+	public string BuildActionMask { get; set; } = int.MaxValue.ToString ();
 
 	[JsonPropertyName ("files")]
-	public List<object>? Files { get; set; }
+	public List<string>? Files { get; set; }
 
 	[JsonPropertyName ("runOnlyForDeploymentPostprocessing")]
-	public string? RunOnlyForDeploymentPostprocessing { get; set; }
+	public string RunOnlyForDeploymentPostprocessing { get; set; } = "0";
 }
 
 public class PBXGroup : XcodeObject {
@@ -175,7 +175,7 @@ public class PBXGroup : XcodeObject {
 	public List<string>? Children { get; set; }
 
 	[JsonPropertyName ("sourceTree")]
-	public string? SourceTree { get; set; }
+	public string SourceTree { get; set; } = "<group>";
 }
 
 public class PBXNativeTarget : XcodeObject {

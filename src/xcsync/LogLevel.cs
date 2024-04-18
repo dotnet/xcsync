@@ -1,7 +1,6 @@
-﻿namespace xcsync;
+namespace xcsync;
 
-public enum LogLevel
-{
+public enum LogLevel {
 	Fatal,
 	Error,
 	Information,

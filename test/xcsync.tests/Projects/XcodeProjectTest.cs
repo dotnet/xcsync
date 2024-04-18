@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using xcsync.Projects.Xcode;
 
 namespace xcsync.tests.Projects;
 
-public class XcodeProjectTest {
+public class XcodeProjectTest : Base {
 	[Fact]
 	public void Deserialize_RootObject_FromJson_Succeeds ()
 	{
@@ -319,5 +320,47 @@ public class XcodeProjectTest {
 		// Assert
 		Assert.NotNull (jsonString);
 		Assert.Equal (json, jsonString);
+	}
+
+	[Fact]
+	public void IsXcodeProjectGenerated ()
+	{
+		// testing entirety of generate command
+		// dotnet new macos > xcsync > verify
+
+		var projectName = Guid.NewGuid ().ToString ();
+		string tmpDir = Path.Combine (Directory.GetCurrentDirectory (), projectName);
+		Directory.CreateDirectory (tmpDir);
+
+		try {
+			// Run 'dotnet new macos' in temp dir
+			DotnetNew ("macos", tmpDir);
+
+			Assert.True (Directory.Exists (Path.Combine (tmpDir)));
+
+			var xcodeDir = Path.Combine (tmpDir, "xcode");
+			Directory.CreateDirectory (xcodeDir);
+
+			var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+
+			// Run 'xcsync generate'
+			Xcsync ($"generate --project \"{csproj}\" --target \"{xcodeDir}\"");
+
+			Assert.True (File.Exists (Path.Combine (xcodeDir, "AppDelegate.h")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, "AppDelegate.m")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, "Info.plist")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, "Main.storyboard")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, "ViewController.h")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, "ViewController.m")));
+			Assert.True (Directory.Exists (Path.Combine (xcodeDir, $"{projectName}.xcodeproj")));
+			Assert.True (Directory.Exists (Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace")));
+			Assert.True (Directory.Exists (Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata")));
+			Assert.True (Directory.Exists (Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata")));
+			Assert.True (File.Exists (Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj")));
+		} finally {
+			Directory.Delete (tmpDir, recursive: true);
+		}
 	}
 }
