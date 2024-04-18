@@ -18,7 +18,7 @@ public class XcodeObjectConverter : JsonConverter<XcodeObject> {
 							  ?? throw new JsonException ($"Unknown isa value: {isa}");
 		var xcodeObject = JsonSerializer.Deserialize (jsonObject, xcodeObjectType) as XcodeObject
 						  ?? throw new JsonException ($"Failed to deserialize {isa}");
-		xcodeObject.Token = Token;
+		xcodeObject.Token = Token!;
 		return xcodeObject;
 	}
 

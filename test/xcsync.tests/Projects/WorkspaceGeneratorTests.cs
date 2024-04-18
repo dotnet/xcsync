@@ -2,8 +2,8 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using xcsync.Projects.Xcode;
 using Xamarin;
+using xcsync.Projects.Xcode;
 
 namespace xcsync.tests.Projects;
 

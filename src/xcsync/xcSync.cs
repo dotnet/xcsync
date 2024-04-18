@@ -25,7 +25,7 @@ public static class xcSync {
 
 		project.AddValidator (result => {
 			var value = result.GetValueForOption (project);
-			var path = string.IsNullOrEmpty (value) ? GetCsprojPath () : value!;
+			var path = string.IsNullOrEmpty (value) ? GetCsprojPath () : value;
 			var error = ValidateCSharpProject (path);
 			result.ErrorMessage = error is null ? null : Strings.Options.ProjectValidationError(error);
 		});
@@ -37,7 +37,7 @@ public static class xcSync {
 
 		target.AddValidator (result => {
 			var value = result.GetValueForOption (target);
-			var path = string.IsNullOrEmpty (value) ? GetXcodePath () : value!;
+			var path = string.IsNullOrEmpty (value) ? DefaultXcodeProjectOutputPath : value!;
 			var error = ValidateXcodeProject (path, result.GetValueForOption (force));
 			result.ErrorMessage = error is null ? null : Strings.Options.TargetValidationError(error);
 		});
@@ -133,8 +133,7 @@ public static class xcSync {
 		};
 	}
 
-	static string GetXcodePath () =>
-		Path.Combine (Directory.GetCurrentDirectory (), "obj", "xcode");
+	public static string DefaultXcodeProjectOutputPath => Path.Combine (Directory.GetCurrentDirectory (), "xcode");
 
 	public static LoggerConfiguration? LoggerFactory { get; private set; }
 	public static ILogger? Logger { get; private set; }
