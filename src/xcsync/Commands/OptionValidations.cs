@@ -25,18 +25,18 @@ public static class OptionValidations {
 
 	public static string? PathNameValid (string path) =>
 		string.IsNullOrWhiteSpace (path)
-			? "Path name is empty"
+			? Strings.Errors.Validation.PathNameEmpty
 			: null;
 
 	public static string? PathExists (string path) =>
 		!Path.Exists (path)
-			? $"Path '{path}' does not exist"
+			? Strings.Errors.Validation.PathDoesNotExist (path)
 			: null;
 
 	public static string? PathIsEmpty (string path) =>
 		Directory.EnumerateFiles (path)
 			.Any ()
-			? $"Path '{path}' is not empty"
+			? Strings.Errors.Validation.PathNotEmpty (path)
 			: null;
 
 	public static string? PathCleaned (string path)
@@ -49,10 +49,10 @@ public static class OptionValidations {
 	public static string? PathContainsValidTfm (string path)
 	{
 		if (!path.IsCsprojValid ())
-			return $"Path '{path}' does not contain a C# project";
+			return Strings.Errors.Validation.PathDoesNotContainCsproj (path);
 
 		if (!path.TryGetTfm (out var tfms))
-			return $"Missing valid target framework in '{path}'";
+			return Strings.Errors.Validation.MissingTfmInCsproj(path);
 
 		AppleTfms = tfms;
 		return IsTfmValid (ref tfms);
@@ -102,6 +102,6 @@ public static class OptionValidations {
 		}
 
 		string targetFrameworks = string.Join (", ", tfms.Select (x => x.ToString ()));
-		return $"Invalid target framework(s) '{targetFrameworks}' in csproj";
+		return Strings.Errors.Validation.InvalidTfmInCsproj (targetFrameworks);
 	}
 }

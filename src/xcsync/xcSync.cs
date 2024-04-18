@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.CommandLine;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Serilog;
-using Serilog.Events;
-using xcsync;
 using xcsync.Commands;
 using InvalidOperationException = System.InvalidOperationException;
 
@@ -14,55 +11,54 @@ public static class xcSync {
 
 	public static async Task Main (string [] args)
 	{
-		Console.WriteLine ($"xcSync v{typeof (xcSync).Assembly.GetName ().Version}, (c) Microsoft Corporation. All rights reserved.\n");
+		Console.WriteLine (Strings.ProgramHeader);
 
 		var force = new Option<bool> (
 			["--force", "--f"],
-			description: "Force the generation",
+			description: Strings.Options.ForceDescription,
 			getDefaultValue: () => false);
 
 		var project = new Option<string> (
 			["--project", "--p"],
-			description: "Path to the project",
+			description: Strings.Options.ProjectDescription,
 			getDefaultValue: () => string.Empty);
 
 		project.AddValidator (result => {
 			var value = result.GetValueForOption (project);
 			var path = string.IsNullOrEmpty (value) ? GetCsprojPath () : value!;
 			var error = ValidateCSharpProject (path);
-			result.ErrorMessage = error is null ? null : $"Invalid option 'project' provided: {error}";
+			result.ErrorMessage = error is null ? null : Strings.Options.ProjectValidationError(error);
 		});
 
 		var target = new Option<string> (
 			["--target", "--t"],
-			description: "Path to the target",
+			description: Strings.Options.TargetDescription,
 			getDefaultValue: () => string.Empty);
 
 		target.AddValidator (result => {
 			var value = result.GetValueForOption (target);
 			var path = string.IsNullOrEmpty (value) ? GetXcodePath () : value!;
 			var error = ValidateXcodeProject (path, result.GetValueForOption (force));
-			result.ErrorMessage = error is null ? null : $"Invalid option 'target' provided: {error}";
+			result.ErrorMessage = error is null ? null : Strings.Options.TargetValidationError(error);
 		});
 
 		var open = new Option<bool> (
 			["--open", "--o"],
-			description: "Open the generated project",
+			description: Strings.Options.OpenDescription,
 			getDefaultValue: () => false);
 
 		var tfm = new Option<string> (
 			["--framework", "--tfm", "--target-framework", "--target-frameworks"],
-			description: "Specify the target framework moniker",
+			description: Strings.Options.TfmDescription,
 			getDefaultValue: () => string.Empty);
 
 		var verbosity = new Option<LogLevel> (
 			["--verbosity", "-v"],
-			description: "Set the verbosity level",
+			description: Strings.Options.VerbosityDescription,
 			getDefaultValue: () => LogLevel.Information
 		);
 
-		var generate = new Command ("generate",
-			"generate a Xcode project at the path specified by --target from the project identified by --project")
+		var generate = new Command ("generate", Strings.Commands.GenerateDescription)
 		{
 			project,
 			target,
@@ -71,15 +67,14 @@ public static class xcSync {
 			tfm,
 		};
 
-		var sync = new Command ("sync",
-			"used after the generate command to synchronize changes from the generated Xcode project back to the .NET project")
+		var sync = new Command ("sync", Strings.Commands.SyncDescription)
 		{
 			project,
 			target,
 			force,
 		};
 
-		var watch = new Command ("watch", "combination of both generate and sync")
+		var watch = new Command ("watch", Strings.Commands.WatchDescription)
 		{
 			project,
 			target,
@@ -132,10 +127,9 @@ public static class xcSync {
 	{
 		var csprojFiles = Directory.GetFiles (Directory.GetCurrentDirectory (), "*.csproj");
 		return csprojFiles.Length switch {
-			0 => throw new FileNotFoundException ("Could not find a .csproj file"),
+			0 => throw new FileNotFoundException (Strings.Errors.CsprojNotFound),
 			1 => csprojFiles.First (),
-			_ => throw new InvalidOperationException (
-				"Multiple .csproj files found in current directory. Specify which project to use.")
+			_ => throw new InvalidOperationException (Strings.Errors.MultipleProjectFilesFound)
 		};
 	}
 
