@@ -11,7 +11,7 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 	{
 		ConfigureLogging (verbosity);
 
-		Logger?.Information ($"Generating files from project '{project}' to target '{target}'");
+		Logger?.Information (Strings.Generate.HeaderInformation, project, target);
 
 		if (!TryGetTargetPlatform (tfm, OptionValidations.AppleTfms, out string? targetPlatform))
 			return;
@@ -25,12 +25,12 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		targetPlatform = null;
 
 		if (string.IsNullOrEmpty (tfm) && supportedTfms.Count > 1) {
-			Logger?.Fatal ("Multiple target frameworks found in the project, please specify one using --tfm option.");
+			Logger?.Fatal (Strings.Errors.MultipleTfmsFound);
 			return false;
 		}
 
 		if (!supportedTfms.Contains (tfm) && supportedTfms.Count > 1) {
-			Logger?.Fatal ("Target framework passed in is not supported by current .net project.");
+			Logger?.Fatal (Strings.Errors.TfmNotSupported);
 			return false;
 		}
 
@@ -43,7 +43,7 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 			}
 		}
 
-		Logger?.Fatal ("Target platform not found");
+		Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
 		return false;
 	}
 }

@@ -8,6 +8,13 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>latest</LangVersion>
+
+    <!-- https://github.com/dotnet/msbuild/issues/8086#issuecomment-1290568321
+        This is required because the C#/C# Dev Kit extension calls the build in a way
+        that will skip resource generation. Without this line, Roslyn won't
+        find the generated .cs files and analysis will fail.
+     -->
+    <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -42,6 +49,18 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources/Strings.resx">
+      <Generator>MSBuild:Compile</Generator>
+      <LastGenOutput>$(BaseIntermediateOutputPath)/Strings.Designer.cs</LastGenOutput>
+      <StronglyTypedFileName>$(BaseIntermediateOutputPath)/Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>xcsync.Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <LogicalName>$(RootNamespace).Resources.Strings.resources</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
