@@ -21,7 +21,8 @@ public class BaseCommand<T> {
 					})
 					.Enrich.WithThreadName ()
 					.Enrich.WithThreadId ()
-					.WriteTo.Console (outputTemplate: "{Timestamp:HH:mm:ss} [{Level}] {SourceContext} ({ThreadId}) {Message}{NewLine}{Exception}",
+					.Enrich.FromLogContext ()
+					.WriteTo.Console (outputTemplate: "{Timestamp:HH:mm:ss} [{Level}] {SourceContext} ({syncId}) ({ThreadId}) {Message}{NewLine}{Exception}",
 										theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Sixteen)
 					.CreateLogger ()
 					.ForContext ("SourceContext", typeof(T).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
