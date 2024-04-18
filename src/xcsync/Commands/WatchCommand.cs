@@ -8,7 +8,7 @@ public class WatchCommand : BaseCommand<WatchCommand> {
 	{
 		ConfigureLogging (verbosity);
 
-		Logger?.Information ($"Syncing files from project '{project}' to target '{target}'");
+		Logger?.Information (Strings.Watch.HeaderInformation, project, target);
 		// Implement logic here
 	}
 }

@@ -7,6 +7,6 @@ public class SyncCommand : BaseCommand<SyncCommand> {
 	{
 		ConfigureLogging (verbosity);
 
-		Logger?.Information ("Syncing files from project {Project} to target {Target}", project, target);
+		Logger?.Information (Strings.Sync.HeaderInformation, project, target);
 	}
 }
