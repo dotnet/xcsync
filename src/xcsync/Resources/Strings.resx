@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
 	<data name="ProgramHeader" xml:space="preserve">
-		<value>xcSync v{0}, (c) Microsoft Corporation. All rights reserved.\n</value>
+		<value>xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
+		</value>
 		<comment>{0} is a numerical based string containing the version number for the command line tool</comment>
 	</data>
 
