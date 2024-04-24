@@ -52,7 +52,7 @@ public static class OptionValidations {
 			return Strings.Errors.Validation.PathDoesNotContainCsproj (path);
 
 		if (!path.TryGetTfm (out var tfms))
-			return Strings.Errors.Validation.MissingTfmInCsproj(path);
+			return Strings.Errors.Validation.MissingTfmInCsproj (path);
 
 		AppleTfms = tfms;
 		return IsTfmValid (ref tfms);

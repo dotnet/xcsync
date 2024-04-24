@@ -71,6 +71,8 @@
     <DownloadFile Include="tools/common/Frameworks.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
     <DownloadFile Include="tools/common/ApplePlatform.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
     <DownloadFile Include="tools/common/SdkVersions.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
+    <DownloadFile Include="tools/common/Execution.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
+    <DownloadFile Include="tools/common/StringUtils.cs" Repo="xamarin-macios" Hash="$(XAMARIN_MACIOS_HASH)" />
   </ItemGroup>
 
   <ItemGroup>
