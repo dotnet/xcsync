@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.Diagnostics.CodeAnalysis;
+using Serilog;
 using xcsync.Projects;
 using xcsync.Projects.Xcode;
 
@@ -399,6 +400,11 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		// generate xcode workspace
 		XcodeWorkspaceGenerator.Generate (Path.GetFileNameWithoutExtension (project), Environment.UserName, target, xcodeProject);
 		Logger?.Information ($"Generated Xcode project at '{target}'");
+
+		if (open) {
+			string workspacePath = Path.Combine (target, Path.GetFileNameWithoutExtension (project) + ".xcodeproj", "project.xcworkspace");
+			Logger?.Information (Scripts.Run (Scripts.OpenXcodeProject (workspacePath)) + " is open in Xcode");
+		}
 	}
 
 	public static bool TryGetTargetPlatform (string tfm, List<string> supportedTfms, [NotNullWhen (true)] out string? targetPlatform)

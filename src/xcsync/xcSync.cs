@@ -27,7 +27,7 @@ public static class xcSync {
 			var value = result.GetValueForOption (project);
 			var path = string.IsNullOrEmpty (value) ? GetCsprojPath () : value;
 			var error = ValidateCSharpProject (path);
-			result.ErrorMessage = error is null ? null : Strings.Options.ProjectValidationError(error);
+			result.ErrorMessage = error is null ? null : Strings.Options.ProjectValidationError (error);
 		});
 
 		var target = new Option<string> (
@@ -39,7 +39,7 @@ public static class xcSync {
 			var value = result.GetValueForOption (target);
 			var path = string.IsNullOrEmpty (value) ? DefaultXcodeProjectOutputPath : value!;
 			var error = ValidateXcodeProject (path, result.GetValueForOption (force));
-			result.ErrorMessage = error is null ? null : Strings.Options.TargetValidationError(error);
+			result.ErrorMessage = error is null ? null : Strings.Options.TargetValidationError (error);
 		});
 
 		var open = new Option<bool> (
