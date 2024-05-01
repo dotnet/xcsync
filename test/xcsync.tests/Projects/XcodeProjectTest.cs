@@ -323,7 +323,7 @@ public class XcodeProjectTest : Base {
 	}
 
 	[Fact]
-	public void IsXcodeProjectGenerated ()
+	public void IsXcodeProjectGeneratedMacos ()
 	{
 		// testing entirety of generate command
 		// dotnet new macos > xcsync > verify
@@ -334,7 +334,7 @@ public class XcodeProjectTest : Base {
 		// Run 'dotnet new macos' in temp dir
 		DotnetNew ("macos", tmpDir);
 
-		Assert.True (Directory.Exists (Path.Combine (tmpDir)));
+		Assert.True (Directory.Exists (tmpDir));
 
 		var xcodeDir = Path.Combine (tmpDir, "xcode");
 		Directory.CreateDirectory (xcodeDir);
@@ -344,14 +344,49 @@ public class XcodeProjectTest : Base {
 		// Run 'xcsync generate'
 		Xcsync ($"generate --project \"{csproj}\" --target \"{xcodeDir}\"");
 
-
-		var files = new List<string> () {
+		var files = new List<string> {
 			"AppDelegate.h",
 			"AppDelegate.m",
 			"Info.plist",
 			"Main.storyboard",
 			"ViewController.h",
 			"ViewController.m",
+			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
+			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
+			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj")
+		};
+
+		foreach (var file in files) {
+			Assert.True (File.Exists (Path.Combine (xcodeDir, file)));
+		}
+	}
+
+	[Theory]
+	[InlineData ("net8.0-ios")]
+	[InlineData ("net8.0-maccatalyst")]
+	public void IsXcodeProjectGeneratedMaui (string tfm)
+	{
+		// testing entirety of generate command
+		// dotnet new maui > xcsync > verify
+
+		var projectName = Guid.NewGuid ().ToString ();
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+
+		DotnetNew ("maui", tmpDir);
+
+		var xcodeDir = Path.Combine (tmpDir, "xcode");
+		Directory.CreateDirectory (xcodeDir);
+
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+		// Assert.True (File.Exists (csproj));
+
+		// Run 'xcsync generate'
+		Xcsync ($"generate --project \"{csproj}\" --target \"{xcodeDir}\" --tfm \"{tfm}\"");
+
+		var files = new List<string> {
+			"AppDelegate.h",
+			"AppDelegate.m",
+			"Info.plist",
 			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
 			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
 			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj")

@@ -11,7 +11,6 @@ public class DotnetTest : Base {
 			"AlsoNoSkip",
 			"AppDelegate",
 			"ModelVariety",
-			"NoRegisterButStillValid",
 			"NoSkip",
 			"ProtocolModelVariety",
 			"ProtocolVariety",

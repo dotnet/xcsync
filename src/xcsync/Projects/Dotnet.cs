@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 namespace xcsync.Projects;
 
-public class Dotnet (string project) {
+public class Dotnet (string project, string tfm) {
 
 	public async Task<Project> OpenProject ()
 	{
@@ -15,7 +15,11 @@ public class Dotnet (string project) {
 		Console.WriteLine ($"Creating workspace for '{project}'");
 		if (!MSBuildLocator.IsRegistered)
 			MSBuildLocator.RegisterDefaults ();
-		using var workspace = MSBuildWorkspace.Create ();
+
+		using var workspace = MSBuildWorkspace.Create (new Dictionary<string, string> {
+			{"TargetFrameworks", tfm}
+		});
+
 		return await workspace.OpenProjectAsync (project).ConfigureAwait (false);
 	}
 
@@ -35,12 +39,7 @@ public class Dotnet (string project) {
 
 		foreach (var ns in namespaces) {
 			foreach (var type in ns.GetTypeMembers ().Where (type => type.IsNsoDerived ())) {
-
-				var regAttr = type.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == "RegisterAttribute");
-				var skip = regAttr?.NamedArguments.FirstOrDefault (x => x.Key == "SkipRegistration").Value.Value as bool?;
-
-				if (skip != true)
-					yield return type;
+				yield return type;
 			}
 		}
 	}
@@ -49,14 +48,12 @@ public class Dotnet (string project) {
 public static class DotnetExtensions {
 	public static bool IsNsoDerived (this INamedTypeSymbol? type)
 	{
-		while (type is not null) {
-			if (type.Name.Equals ("NSObject", StringComparison.Ordinal) &&
-				type.ContainingNamespace.Name.Equals ("Foundation", StringComparison.Ordinal))
-				return true;
+		var registerAttribute = type?.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == "RegisterAttribute");
+		var skipAttribute = registerAttribute?.NamedArguments.FirstOrDefault (x => x.Key == "SkipRegistration");
 
-			type = type.BaseType;
-		}
+		if (skipAttribute?.Value.Value is true)
+			return false;
 
-		return false;
+		return registerAttribute is not null;
 	}
 }

@@ -17,7 +17,7 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		if (!TryGetTargetPlatform (tfm, OptionValidations.AppleTfms, out string? targetPlatform))
 			return;
 
-		var dotnet = new Dotnet (project);
+		var dotnet = new Dotnet (project, tfm);
 		var nsProject = new NSProject (dotnet, targetPlatform);
 		HashSet<string> frameworks = new () { "Foundation", "Cocoa" };
 
@@ -48,8 +48,18 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 
 		// copy storyboard, entitlements/info.plist files to the target directory 
 		var ext = new List<string> { "storyboard", "plist" };
+
+		// support for maui apps
+		string altPath = targetPlatform switch {
+			"ios" => Path.Combine (Path.GetDirectoryName (project)!, "Platforms", "iOS"),
+			"maccatalyst" => Path.Combine (Path.GetDirectoryName (project)!, "Platforms", "MacCatalyst"),
+			_ => ""
+		};
+
+		var appleDirectory = Path.Exists (altPath) ? altPath : Path.GetDirectoryName (project)!;
+
 		var appleFiles = Directory
-			.EnumerateFiles (Path.GetDirectoryName (project)!, "*.*", SearchOption.TopDirectoryOnly)
+			.EnumerateFiles (appleDirectory, "*.*", SearchOption.TopDirectoryOnly)
 			.Where (s => ext.Contains (Path.GetExtension (s).TrimStart ('.').ToLowerInvariant ()));
 
 		foreach (var file in appleFiles) {
