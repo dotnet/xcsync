@@ -4,7 +4,6 @@ using xcsync.Projects;
 namespace xcsync.tests;
 
 public class Base {
-
 	protected readonly string XcsyncExe =
 		Path.Combine (Directory.GetCurrentDirectory (), "..", "..", "..", "..", "xcsync", "bin", "Debug", "net8.0", "xcsync");
 
@@ -20,7 +19,7 @@ public class Base {
 		if (!File.Exists (TestProjectPath))
 			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
-		DotnetProject = new Dotnet (TestProjectPath);
+		DotnetProject = new Dotnet (TestProjectPath, "net8.0-macos");
 		NsProject = new NSProject (DotnetProject, "macos");
 	}
 
