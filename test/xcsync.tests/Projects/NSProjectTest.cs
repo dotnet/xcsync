@@ -9,7 +9,6 @@ public class NSProjectTest : Base {
 			"AlsoNoSkip",
 			"AppDelegate",
 			"ModelVariety",
-			"NoRegisterButStillValid",
 			"NoSkip",
 			"ViewController",
 		};
@@ -22,7 +21,6 @@ public class NSProjectTest : Base {
 
 	[InlineData ("ModelVariety", "ObjectiveCModelVariety", true, false, "NSObject", "NSObject", false)]
 	[InlineData ("ViewController", "ViewController", false, true, "NSViewController", "NSViewController", false)]
-	[InlineData ("NoRegisterButStillValid", "NoRegisterButStillValid", false, false, "ModelVariety", "ObjectiveCModelVariety", true)]
 	[Theory]
 	public async Task ConvertToNSObject (string cliName, string objcName, bool isModel, bool inDesigner, string cliBaseName, string objcBaseName, bool baseIsModel)
 	{

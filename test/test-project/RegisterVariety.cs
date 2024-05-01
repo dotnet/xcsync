@@ -1,9 +1,5 @@
 namespace test_project;
 
-
-public class RegisterVariety {
-}
-
 [Register ("SkipRegistration", SkipRegistration = true)]
 public class SkipRegistration : NSObject {
 }
@@ -16,14 +12,15 @@ public class NoSkip : NSObject {
 public class AlsoNoSkip : NSObject {
 }
 
-public class NoRegisterButStillValid : ModelVariety {
+public class NoRegisterNotValid : ModelVariety {
 }
 
-[Protocol]
+[Protocol, Register]
 public class ProtocolVariety : NSObject {
 }
 
-[Protocol]
+
+[Protocol, Register]
 [Model]
 public class ProtocolModelVariety : NSObject {
 }
