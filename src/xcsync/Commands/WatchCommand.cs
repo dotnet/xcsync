@@ -1,14 +1,19 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.CommandLine;
+
 namespace xcsync.Commands;
 
-public class WatchCommand : BaseCommand<WatchCommand> {
-
-	public static void Execute (string project, string target, bool force, LogLevel verbosity)
+public class WatchCommand : XcodeCommand<WatchCommand> {
+	public WatchCommand () : base ("watch",
+			"generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project")
 	{
-		ConfigureLogging (verbosity);
+		this.SetHandler (Execute, project, target, tfm, force, open);
+	}
 
-		Logger?.Information (Strings.Watch.HeaderInformation, project, target);
+	public void Execute (string project, string target, string tfm, bool force, bool open)
+	{
+		LogInformation ("Continuously syncing files between project '{projectPath}' and target '{targetPath} for '{tfm}' platform ", ProjectPath, TargetPath, Tfm);
 		// Implement logic here
 	}
 }

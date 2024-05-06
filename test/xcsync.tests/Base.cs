@@ -1,10 +1,15 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using System.Diagnostics;
+using System.Text;
+using Xamarin.Utils;
 using xcsync.Projects;
+using Xunit.Abstractions;
 
 namespace xcsync.tests;
 
 public class Base {
-	protected readonly string XcsyncExe =
+	protected static readonly string XcsyncExe =
 		Path.Combine (Directory.GetCurrentDirectory (), "..", "..", "..", "..", "xcsync", "bin", "Debug", "net8.0", "xcsync");
 
 	protected readonly string TestProjectPath =
@@ -23,27 +28,43 @@ public class Base {
 		NsProject = new NSProject (DotnetProject, "macos");
 	}
 
-	protected void DotnetNew (string platform, string path)
+	static void Run (ITestOutputHelper output, string path, string executable, params string[] arguments)
 	{
-		var process = new Process ();
-		process.StartInfo.FileName = "dotnet";
-		process.StartInfo.Arguments = $"new {platform} -o \"{path}\"";
-		process.StartInfo.RedirectStandardOutput = false;
-		process.StartInfo.UseShellExecute = false;
-		process.StartInfo.CreateNoWindow = true;
-		process.Start ();
-		process.WaitForExit ();
+		output.WriteLine ($"Running: {path}/{executable} {arguments}");
+		var outputWrapper = new LoggingOutputWriter(output);
+		var exec = Execution.RunAsync (
+				executable,
+				arguments,
+				workingDirectory: path,
+				standardOutput: outputWrapper,
+				standardError: outputWrapper
+			).Result;
+		Assert.Equal (0, exec.ExitCode);
 	}
 
-	protected void Xcsync (string arguments)
+	protected static void DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "")
 	{
-		var process = new Process ();
-		process.StartInfo.FileName = XcsyncExe;
-		process.StartInfo.Arguments = arguments;
-		process.StartInfo.RedirectStandardOutput = true;
-		process.StartInfo.UseShellExecute = false;
-		process.StartInfo.CreateNoWindow = true;
-		process.Start ();
-		process.WaitForExit ();
+		Run (output, path, "dotnet", "new", template, "-o", path, templateOptions);
 	}
+
+	protected static void Xcsync (ITestOutputHelper output, params string[] arguments)
+	{
+		Run (output, Directory.GetCurrentDirectory (), XcsyncExe, arguments);
+	}
+
+	class LoggingOutputWriter(ITestOutputHelper helper) : TextWriter {
+
+		public override void WriteLine (string? value)
+		{
+			if ( value is not null)
+				helper.WriteLine (value?.ToString ());
+		}
+
+		public override Encoding Encoding {
+			get {
+				return Encoding.UTF8;
+			}
+		}
+	}
+
 }
