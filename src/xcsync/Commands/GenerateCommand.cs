@@ -1,28 +1,32 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
-using Serilog;
 using xcsync.Projects;
 using xcsync.Projects.Xcode;
 
 namespace xcsync.Commands;
 
-public class GenerateCommand : BaseCommand<GenerateCommand> {
-	public async static Task Execute (string project, string target, bool force, bool open, LogLevel verbosity, string tfm)
+public class GenerateCommand : XcodeCommand<GenerateCommand> {
+	public GenerateCommand () : base ("generate",
+			"generate a Xcode project at the path specified by --target from the project identified by --project")
 	{
-		ConfigureLogging (verbosity);
+		this.SetHandler (Execute);
+	}
 
-		Logger?.Information (Strings.Generate.HeaderInformation, project, target);
+	public async Task Execute ()
+	{
+		Logger?.Information (Strings.Generate.HeaderInformation, ProjectPath, TargetPath);
 
-		if (!TryGetTargetPlatform (tfm, OptionValidations.AppleTfms, out string? targetPlatform))
+		if (!TryGetTargetPlatform (Tfm, out string targetPlatform))
 			return;
 
-		var dotnet = new Dotnet (project, tfm);
+		var dotnet = new Dotnet (ProjectPath, Tfm);
 		var nsProject = new NSProject (dotnet, targetPlatform);
-		HashSet<string> frameworks = new () { "Foundation", "Cocoa" };
+		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
-		(string sdkroot, string deployment) platform = targetPlatform switch {
+		(string sdkroot, string deployment) = Tfm switch {
 			"macos" => ("macosx", "macosx"),
 			"ios" => ("iphoneos", "iphoneos"),
 			"maccatalyst" => ("iphoneos", "iphoneos"),
@@ -33,10 +37,10 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		await foreach (var t in nsProject.GetTypes ()) {
 			// all NSObjects get a corresponding .h + .m file generated
 			var gen = new GenObjcH (t).TransformText ();
-			await File.WriteAllTextAsync (Path.Combine (target, t.ObjCType + ".h"), gen).ConfigureAwait (false);
+			await File.WriteAllTextAsync (Path.Combine (TargetPath, t.ObjCType + ".h"), gen).ConfigureAwait (false);
 
 			var genM = new GenObjcM (t).TransformText ();
-			await File.WriteAllTextAsync (Path.Combine (target, t.ObjCType + ".m"), genM).ConfigureAwait (false);
+			await File.WriteAllTextAsync (Path.Combine (TargetPath, t.ObjCType + ".m"), genM).ConfigureAwait (false);
 
 			// add references for framework resolution at project level
 			foreach (var r in t.References) {
@@ -51,19 +55,19 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 
 		// support for maui apps
 		string altPath = targetPlatform switch {
-			"ios" => Path.Combine (Path.GetDirectoryName (project)!, "Platforms", "iOS"),
-			"maccatalyst" => Path.Combine (Path.GetDirectoryName (project)!, "Platforms", "MacCatalyst"),
+			"ios" => Path.Combine (Path.GetDirectoryName (ProjectPath)!, "Platforms", "iOS"),
+			"maccatalyst" => Path.Combine (Path.GetDirectoryName (ProjectPath)!, "Platforms", "MacCatalyst"),
 			_ => ""
 		};
 
-		var appleDirectory = Path.Exists (altPath) ? altPath : Path.GetDirectoryName (project)!;
+		var appleDirectory = Path.Exists (altPath) ? altPath : Path.GetDirectoryName (ProjectPath)!;
 
 		var appleFiles = Directory
 			.EnumerateFiles (appleDirectory, "*.*", SearchOption.TopDirectoryOnly)
 			.Where (s => ext.Contains (Path.GetExtension (s).TrimStart ('.').ToLowerInvariant ()));
 
 		foreach (var file in appleFiles) {
-			File.Copy (file, Path.Combine (target, Path.GetFileName (file)), true);
+			File.Copy (file, Path.Combine (TargetPath, Path.GetFileName (file)), true);
 		}
 
 		// create in memory representation of Xcode assets
@@ -73,8 +77,10 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		var pbxFrameworksBuildFiles = new List<string> ();
 		var pbxGroupFiles = new List<string> ();
 
+		var projectName = Path.GetFileNameWithoutExtension (ProjectPath);
+
 		// for each file in target directory create FileReference and add to PBXResourcesBuildPhase
-		foreach (var file in Directory.GetFiles (target)) {
+		foreach (var file in Directory.GetFiles (TargetPath)) {
 
 			var fileReference = new PBXFileReference ();
 			var buildFile = new PBXBuildFile ();
@@ -140,8 +146,8 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		var appFileReference = new PBXFileReference {
 			Isa = "PBXFileReference",
 			ExplicitFileType = "wrapper.application",
-			Name = $"{Path.GetFileNameWithoutExtension (project)}.app",
-			Path = $"{Path.GetFileNameWithoutExtension (project)}.app",
+			Name = $"{projectName}.app",
+			Path = $"{projectName}.app",
 			SourceTree = "BUILT_PRODUCTS_DIR",
 			IncludeInIndex = "0",
 		};
@@ -149,7 +155,7 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 
 		var productsGroup = new PBXGroup {
 			Isa = "PBXGroup",
-			Children = new List<string> { appFileReference.Token },
+			Children = [appFileReference.Token],
 			Name = "Products",
 		};
 		xcodeObjects.Add (productsGroup.Token, productsGroup);
@@ -187,15 +193,15 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		var projectGroup = new PBXGroup {
 			Isa = "PBXGroup",
 			Children = pbxGroupFiles,
-			Name = Path.GetFileNameWithoutExtension (project),
+			Name = projectName,
 		};
 		xcodeObjects.Add (projectGroup.Token, projectGroup);
 
 		var pbxGroup = new PBXGroup {
 			Isa = "PBXGroup",
-			Children = new List<string> {
+			Children = [
 				productsGroup.Token, frameworksGroup.Token, projectGroup.Token
-			}
+			]
 		};
 		xcodeObjects.Add (pbxGroup.Token, pbxGroup);
 
@@ -263,10 +269,10 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 				{"GCC_WARN_UNINITIALIZED_AUTOS", new List<string> {"YES_AGGRESSIVE"}},
 				{"GCC_WARN_UNUSED_FUNCTION", new List<string> {"YES"}},
 				{"GCC_WARN_UNUSED_VARIABLE", new List<string> {"YES"}},
-				{$"{platform.deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {"14.0"}},
+				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {"14.0"}},
 				{"MTL_ENABLE_DEBUG_INFO", new List<string> {"YES"}},
 				{"ONLY_ACTIVE_ARCH", new List<string> {"YES"}},
-				{"SDKROOT", new List<string> {platform.sdkroot}},
+				{"SDKROOT", new List<string> {sdkroot}},
 			},
 			Name = "Debug",
 		};
@@ -315,9 +321,9 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 				{"GCC_WARN_UNINITIALIZED_AUTOS", new List<string> {"YES_AGGRESSIVE"}},
 				{"GCC_WARN_UNUSED_FUNCTION", new List<string> {"YES"}},
 				{"GCC_WARN_UNUSED_VARIABLE", new List<string> {"YES"}},
-				{$"{platform.deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {"14.0"}},
+				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {"14.0"}},
 				{"MTL_ENABLE_DEBUG_INFO", new List<string> {"NO"}},
-				{"SDKROOT", new List<string> {platform.sdkroot}},
+				{"SDKROOT", new List<string> {sdkroot}},
 				{"VALIDATE_PRODUCT", new List<string> {"YES"}},
 			},
 			Name = "Release",
@@ -331,7 +337,7 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 			{ "CODE_SIGN_STYLE", new List<string> { "Automatic" } },
 			{ "LD_RUNPATH_SEARCH_PATHS", new List<string> { "$(inherited)", "@executable_path/../Frameworks" } }, {
 				"PRODUCT_BUNDLE_IDENTIFIER",
-				new List<string> { $"com.companyname.{Path.GetFileNameWithoutExtension (project)}" }
+				new List<string> { $"com.companyname.{projectName}" }
 			},
 		};
 
@@ -351,9 +357,9 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 
 		var targetBuildCombo = new XCConfigurationList {
 			Isa = "XCConfigurationList",
-			BuildConfigurations = new List<string> {
+			BuildConfigurations = [
 				debugTargetBuildConfiguration.Token,
-				releaseTargetBuildConfiguration.Token },
+				releaseTargetBuildConfiguration.Token ],
 			DefaultConfigurationName = "Debug",
 			DefaultConfigurationIsVisible = "0",
 		};
@@ -375,8 +381,8 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 			BuildPhases = new List<string> { pbxSourcesBuildPhase.Token, pbxResourcesBuildPhase.Token, pbxFrameworksBuildPhase.Token },
 			BuildRules = new List<object> (),
 			Dependencies = new List<object> (),
-			Name = Path.GetFileNameWithoutExtension (project),
-			ProductName = Path.GetFileNameWithoutExtension (project),
+			Name = projectName,
+			ProductName = projectName,
 			ProductReference = appFileReference.Token,
 			ProductType = "com.apple.product-type.application"
 		};
@@ -396,7 +402,7 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 			ProductRefGroup = productsGroup.Token,
 			ProjectDirPath = "",
 			ProjectRoot = "",
-			Targets = new List<string> { nativeTarget.Token }
+			Targets = [nativeTarget.Token]
 		};
 		xcodeObjects.Add (pbxProject.Token, pbxProject);
 
@@ -408,33 +414,21 @@ public class GenerateCommand : BaseCommand<GenerateCommand> {
 		};
 
 		// generate xcode workspace
-		XcodeWorkspaceGenerator.Generate (Path.GetFileNameWithoutExtension (project), Environment.UserName, target, xcodeProject);
-		Logger?.Information ($"Generated Xcode project at '{target}'");
+		XcodeWorkspaceGenerator.Generate (projectName, Environment.UserName, TargetPath, xcodeProject);
+		Logger?.Information ($"Generated Xcode project at '{TargetPath}'");
 
-		if (open) {
-			string workspacePath = Path.Combine (target, Path.GetFileNameWithoutExtension (project) + ".xcodeproj", "project.xcworkspace");
+		if (Open) {
+			string workspacePath = Path.Combine (TargetPath, projectName + ".xcodeproj", "project.xcworkspace");
 			Logger?.Information (Scripts.Run (Scripts.OpenXcodeProject (workspacePath)) + " is open in Xcode");
 		}
 	}
 
-	public static bool TryGetTargetPlatform (string tfm, List<string> supportedTfms, [NotNullWhen (true)] out string? targetPlatform)
+	static bool TryGetTargetPlatform (string tfm, /* List<string> supportedTfms, */ [NotNullWhen (true)] out string targetPlatform)
 	{
-		targetPlatform = null;
+		targetPlatform = string.Empty;
 
-		if (string.IsNullOrEmpty (tfm) && supportedTfms.Count > 1) {
-			Logger?.Fatal (Strings.Errors.MultipleTfmsFound);
-			return false;
-		}
-
-		if (!supportedTfms.Contains (tfm) && supportedTfms.Count > 1) {
-			Logger?.Fatal (Strings.Errors.TfmNotSupported);
-			return false;
-		}
-
-		var currentTfm = supportedTfms.Count == 1 ? supportedTfms [0] : tfm;
-
-		foreach (var platform in ApplePlatforms.platforms) {
-			if (currentTfm.Contains (platform.Key)) {
+		foreach (var platform in xcSync.ApplePlatforms) {
+			if (tfm.Contains (platform.Key)) {
 				targetPlatform = platform.Key;
 				return true;
 			}
