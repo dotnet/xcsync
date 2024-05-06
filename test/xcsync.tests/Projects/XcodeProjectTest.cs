@@ -4,10 +4,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xamarin;
 using xcsync.Projects.Xcode;
+using Xunit.Abstractions;
 
 namespace xcsync.tests.Projects;
 
-public class XcodeProjectTest : Base {
+public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
+
 	[Fact]
 	public void Deserialize_RootObject_FromJson_Succeeds ()
 	{
@@ -322,8 +324,14 @@ public class XcodeProjectTest : Base {
 		Assert.Equal (json, jsonString);
 	}
 
-	[Fact]
-	public void IsXcodeProjectGeneratedMacos ()
+	[Theory]
+	[InlineData ("macos", "", "net8.0-macos", new string [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
+	[InlineData ("maccatalyst", "", "net8.0-maccatalyst", new string [] { "AppDelegate", "Info.plist", "SceneDelegate" })]
+	[InlineData ("ios", "", "net8.0-ios", new string [] { "AppDelegate", "Info.plist", "LaunchScreen.storyboard", "SceneDelegate" })]
+	[InlineData ("tvos", "", "net8.0-tvos", new string [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
+	[InlineData ("maui", "", "net8.0-ios", new string [] { "AppDelegate", "Info.plist" })]
+	[InlineData ("maui", "", "net8.0-maccatalyst", new string [] { "AppDelegate", "Info.plist" })]
+	public void IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
 	{
 		// testing entirety of generate command
 		// dotnet new macos > xcsync > verify
@@ -332,7 +340,8 @@ public class XcodeProjectTest : Base {
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
 		// Run 'dotnet new macos' in temp dir
-		DotnetNew ("macos", tmpDir);
+		// DotnetNew (TestOutput, "globaljson", tmpDir, "--sdk-version 8.0.0 --roll-forward feature");
+		DotnetNew (TestOutput, projectType, tmpDir, templateOptions);
 
 		Assert.True (Directory.Exists (tmpDir));
 
@@ -342,59 +351,18 @@ public class XcodeProjectTest : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		// Run 'xcsync generate'
-		Xcsync ($"generate --project \"{csproj}\" --target \"{xcodeDir}\"");
+		Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm);
 
-		var files = new List<string> {
-			"AppDelegate.h",
-			"AppDelegate.m",
-			"Info.plist",
-			"Main.storyboard",
-			"ViewController.h",
-			"ViewController.m",
-			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
-			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
-			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj")
-		};
-
-		foreach (var file in files) {
-			Assert.True (File.Exists (Path.Combine (xcodeDir, file)));
-		}
-	}
-
-	[Theory]
-	[InlineData ("net8.0-ios")]
-	[InlineData ("net8.0-maccatalyst")]
-	public void IsXcodeProjectGeneratedMaui (string tfm)
-	{
-		// testing entirety of generate command
-		// dotnet new maui > xcsync > verify
-
-		var projectName = Guid.NewGuid ().ToString ();
-		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
-
-		DotnetNew ("maui", tmpDir);
-
-		var xcodeDir = Path.Combine (tmpDir, "xcode");
-		Directory.CreateDirectory (xcodeDir);
-
-		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
-		// Assert.True (File.Exists (csproj));
-
-		// Run 'xcsync generate'
-		Xcsync ($"generate --project \"{csproj}\" --target \"{xcodeDir}\" --tfm \"{tfm}\"");
-
-		var files = new List<string> {
-			"AppDelegate.h",
-			"AppDelegate.m",
-			"Info.plist",
-			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
-			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
-			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj")
-		};
-
-		foreach (var file in files) {
-			Assert.True (File.Exists (Path.Combine (xcodeDir, file)));
-		}
+		projectFiles.SelectMany (projectFile => {
+			return (IEnumerable<string>) (Path.HasExtension (projectFile) ? ([projectFile]) : ([$"{projectFile}.m", $"{projectFile}.h"]));
+		}).Union ([
+			 Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
+			 Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
+			 Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj"),
+		]).ToList ().ForEach (file => {
+			var fullPathToFile = Path.Combine (xcodeDir, file);
+			Assert.True (File.Exists (fullPathToFile), $"{fullPathToFile} does not exist");
+		});
 	}
 
 	[Fact]
@@ -406,7 +374,7 @@ public class XcodeProjectTest : Base {
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
 		// Run 'dotnet new macos' in temp dir
-		DotnetNew ("macos", tmpDir);
+		DotnetNew (TestOutput, "macos", tmpDir);
 
 		Assert.True (Directory.Exists (Path.Combine (tmpDir)));
 
@@ -417,7 +385,7 @@ public class XcodeProjectTest : Base {
 
 		try {
 			// Run 'xcsync generate'
-			Xcsync ($"generate --project \"{csproj}\" --target \"{xcodeDir}\" --open");
+			Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "--open");
 
 			// check if xcode has project open
 
