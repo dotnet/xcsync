@@ -28,10 +28,10 @@ public class Base {
 		NsProject = new NSProject (DotnetProject, "macos");
 	}
 
-	static void Run (ITestOutputHelper output, string path, string executable, params string[] arguments)
+	static void Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
 		output.WriteLine ($"Running: {path}/{executable} {arguments}");
-		var outputWrapper = new LoggingOutputWriter(output);
+		var outputWrapper = new LoggingOutputWriter (output);
 		var exec = Execution.RunAsync (
 				executable,
 				arguments,
@@ -47,16 +47,16 @@ public class Base {
 		Run (output, path, "dotnet", "new", template, "-o", path, templateOptions);
 	}
 
-	protected static void Xcsync (ITestOutputHelper output, params string[] arguments)
+	protected static void Xcsync (ITestOutputHelper output, params string [] arguments)
 	{
 		Run (output, Directory.GetCurrentDirectory (), XcsyncExe, arguments);
 	}
 
-	class LoggingOutputWriter(ITestOutputHelper helper) : TextWriter {
+	class LoggingOutputWriter (ITestOutputHelper helper) : TextWriter {
 
 		public override void WriteLine (string? value)
 		{
-			if ( value is not null)
+			if (value is not null)
 				helper.WriteLine (value?.ToString ());
 		}
 
