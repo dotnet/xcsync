@@ -12,14 +12,13 @@ public class Dotnet (string project, string tfm) {
 	{
 		// we care about the project interactions
 		// the workspace is simply a means of accessing the project
-		Console.WriteLine ($"Creating workspace for '{project}'");
 		if (!MSBuildLocator.IsRegistered)
 			MSBuildLocator.RegisterDefaults ();
 
 		using var workspace = MSBuildWorkspace.Create (new Dictionary<string, string> {
 			{"TargetFrameworks", tfm}
 		});
-
+		
 		return await workspace.OpenProjectAsync (project).ConfigureAwait (false);
 	}
 

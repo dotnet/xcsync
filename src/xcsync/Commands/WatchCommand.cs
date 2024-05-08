@@ -5,6 +5,8 @@ using System.CommandLine;
 namespace xcsync.Commands;
 
 public class WatchCommand : XcodeCommand<WatchCommand> {
+	bool keepRunning = true;
+
 	public WatchCommand () : base ("watch",
 			"generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project")
 	{
@@ -13,6 +15,12 @@ public class WatchCommand : XcodeCommand<WatchCommand> {
 
 	public async Task Execute (string project, string target, string tfm, bool force, bool open)
 	{
+		Console.CancelKeyPress += delegate (object? sender, ConsoleCancelEventArgs e)
+		{
+			e.Cancel = true;
+			keepRunning = false;
+		};
+
 		LogInformation ("Continuously syncing files between project '{projectPath}' and target '{targetPath} for '{tfm}' platform, press [ESC] to end.", ProjectPath, TargetPath, Tfm);
 		using var cts = new CancellationTokenSource ();
 
@@ -23,12 +31,15 @@ public class WatchCommand : XcodeCommand<WatchCommand> {
 			try {
 				await sync.SyncAsync (cts.Token).ConfigureAwait (false);
 			} catch (OperationCanceledException) {
-				LogInformation ("Synchronizing is being stopped.");
+				LogInformation ("Stopping synchronization and completing remaining jobs.");
 			}
 		});
 
-		// Wait for user input (e.g., Enter key) to cancel the task
-		do { } while (Console.ReadKey (true).Key != ConsoleKey.Escape);
+		// Wait for user input (e.g., ESC key) to cancel the task
+		do {
+			keepRunning = !Console.KeyAvailable && Console.ReadKey (true).Key != ConsoleKey.Escape;
+			await Task.Delay (500);
+		} while (keepRunning);
 
 		// Cancel the task
 		cts.Cancel ();
