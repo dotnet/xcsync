@@ -16,20 +16,20 @@ class SyncContext (SyncDirection Direction, string projectPath, string targetDir
 		else
 			await SyncFromXcodeAsync (token);
 
-		Logger.Information ("Synchronization complete.");
+		Logger.Debug ("Synchronization complete.");
 	}
 
 	async Task SyncToXcodeAsync (CancellationToken token)
 	{
 		// TODO : Add code to Generate Xcode project from CLR project 
 		await Task.Delay (1000, token);
-		Logger.Information ("Generating Xcode project files...");
+		Logger.Debug ("Generating Xcode project files...");
 	}
 
 	async Task SyncFromXcodeAsync (CancellationToken token)
 	{
 		// TODO : Add code to Generate CLR changes from Xcode project 
 		await Task.Delay (1000, token);
-		Logger.Information ("Synchronizing changes from Xcode project...");
+		Logger.Debug ("Synchronizing changes from Xcode project...");
 	}
 }
