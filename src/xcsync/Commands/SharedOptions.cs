@@ -6,7 +6,7 @@ namespace xcsync.Commands;
 
 public static class SharedOptions {
 	public static readonly Option<Verbosity> Verbose =
-		new (["--verbose", "-v"],
+		new (["--verbosity", "-v"],
 			getDefaultValue: () => Verbosity.Quiet) {
 			IsRequired = false,
 			Arity = ArgumentArity.ZeroOrOne,

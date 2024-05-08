@@ -18,6 +18,12 @@ public class GenerateCommand : XcodeCommand<GenerateCommand> {
 	{
 		Logger?.Information (Strings.Generate.HeaderInformation, ProjectPath, TargetPath);
 
+		// TODO: Move the implementation from this method to the SyncContext.SyncToXcode method and uncomment the following lines
+		//       When moving this code over, create Tasks for each file, then Task.WaitAll to ensure all files are generated before exiting.
+		//
+		// var sync = new SyncContext (SyncDirection.ToXcode, ProjectPath, TargetPath, Tfm, Logger!);
+		// await sync.SyncAsync ().ConfigureAwait (false);
+
 		if (!TryGetTargetPlatform (Tfm, out string targetPlatform))
 			return;
 
