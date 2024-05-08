@@ -28,7 +28,7 @@ class ContinuousSyncContext (string projectPath, string targetDir, string framew
 			// TODO:  Use a FIFO queue to process the jobs
 			// Keep executing sync jobs until the user presses the esc sequence [CTRL-Q]
 			await Task.Delay (1000, token); // Run next Job
-			Logger.Information ("Checking for changes in the projects...");
+			Logger.Debug ("Checking for changes in the projects...");
 		} while (token.IsCancellationRequested == false);
 	}
 }
