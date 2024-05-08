@@ -10,8 +10,9 @@ public class SyncCommand : BaseCommand<SyncCommand> {
 		this.SetHandler (Execute);
 	}
 
-	public void Execute ()
+	public async Task Execute ()
 	{
-		LogInformation ("Syncing files from project {Project} to target {Target} for {TFM} platform ", ProjectPath, TargetPath, Tfm);
+		var sync = new SyncContext (SyncDirection.FromXcode, ProjectPath, TargetPath, Tfm, Logger!);
+		await sync.SyncAsync ().ConfigureAwait (false);
 	}
 }
