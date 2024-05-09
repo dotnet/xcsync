@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="xcsync.tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" /> <!-- Needed for Moq -->
   </ItemGroup>
 
   <ItemGroup>
@@ -54,6 +55,8 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="TestableIO.System.IO.Abstractions" Version="21.0.2" />
+    <!-- <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers" Version="2022.0.0" /> -->
   </ItemGroup>
 
   <ItemGroup>
