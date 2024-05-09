@@ -1,69 +1,165 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
+using System.IO.Abstractions;
+using System.Text.RegularExpressions;
 using Serilog;
 
 namespace xcsync;
 
-class ProjectFileChangeMonitor (ISyncableProject project, ILogger logger) : IDisposable {
-	readonly ILogger Logger = logger;
-	readonly ISyncableProject Project = project;
+/// <summary>
+/// Monitors file changes in the specified project.
+/// </summary>
+/// <param name="fileSystemWatcher">an instance of a <see cref="FileSystemWatcher"/></param>
+/// <param name="logger"></param>
+class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger logger) : IDisposable {
+	readonly static Action<string> defaultOnFileChanged = _ => { };
+	readonly static Action<string, string> defaultOnFileRenamed = (_, _) => { };
+	readonly static Action<Exception> defaultOnError = _ => { };
 
-	readonly FileSystemWatcher watcher = new () {
-		Path = project.RootPath,
-		NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
-		Filter = project.ProjectFilesFilter
-	};
+	/// <summary>
+	/// Called when a file is changed.
+	/// </summary>
+	public Action<string> OnFileChanged { get; set; } = defaultOnFileChanged;
+
+	/// <summary>
+	/// Called when a file is renamed.
+	/// </summary>
+	public Action<string, string> OnFileRenamed { get; set; } = defaultOnFileRenamed;
+
+	/// <summary>
+	/// Called when an error occurs.
+	/// </summary>
+	public Action<Exception> OnError { get; set; } = defaultOnError;
+
+	readonly ILogger logger = logger;
+	ISyncableProject? project;
+	CancellationToken token;
+
+	readonly IFileSystemWatcher watcher = fileSystemWatcher; 
 
 	bool disposedValue;
 
-	public void StartMonitoring (CancellationToken token = default)
+	Regex? fileFilterRegex;
+
+	/// <summary>
+	/// Starts monitoring the project file changes.
+	/// </summary>
+	/// <param name="token"></param>
+	public void StartMonitoring (ISyncableProject project, CancellationToken token = default)
 	{
-		Logger.Information ("Monitoring project file changes...");
-		watcher.Changed += OnChanged;
-		watcher.Created += OnChanged;
-		watcher.Deleted += OnChanged;
-		watcher.Renamed += OnRenamed;
+		logger.Debug (string.Format("Monitoring project file changes in {0} started.", project.RootPath));
+		this.token = token;
+
+		this.project = project;
+
+		watcher.Path = project.RootPath;
+
+		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+		watcher.Filter = "*.*";
+		watcher.IncludeSubdirectories = true;
+
+		watcher.Changed += OnChangedHandler;
+		watcher.Created += OnChangedHandler;
+		watcher.Deleted += OnChangedHandler;
+		watcher.Renamed += OnRenamedHandler;
+		watcher.Error += OnErrorHandler;
 
 		watcher.EnableRaisingEvents = true;
+
+		var filters = string.Join ("|", this.project.ProjectFilesFilter.Select ( f => f.Replace (".", @"\.").Replace ("*", ".*").Replace ("?", ".?")));
+		if (string.IsNullOrEmpty(filters))
+			filters = ".*";
+		fileFilterRegex = new Regex ($"^{filters}$", RegexOptions.IgnoreCase);
+		logger.Debug (string.Format ("Filtering file changes to files that match {0}.", fileFilterRegex.ToString ()));
+	}
+
+	/// <summary>
+	/// Stops monitoring the project file changes.
+	/// </summary>
+	public void StopMonitoring ()
+	{
+		logger.Debug (string.Format ("Monitoring project file changes in {0} stopped.", project!.RootPath));
+
+		watcher.EnableRaisingEvents = false;
+
+		watcher.Changed -= OnChangedHandler;
+		watcher.Created -= OnChangedHandler;
+		watcher.Deleted -= OnChangedHandler;
+		watcher.Renamed -= OnRenamedHandler;
+		watcher.Error -= OnErrorHandler;
 	}
 
 	protected virtual void Dispose (bool disposing)
 	{
 		if (!disposedValue) {
 			if (disposing) {
-				// TODO: dispose managed state (managed objects)
+				StopMonitoring ();
+				watcher.Dispose ();
+
+				OnFileChanged = defaultOnFileChanged;
+				OnFileRenamed = defaultOnFileRenamed;
+				OnError = defaultOnError;
+
+				logger.Debug (string.Format ("Monitoring project file changes in {0} stopped.", project!.RootPath));
 			}
-
-			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-			// TODO: set large fields to null
-			watcher.Changed -= OnChanged;
-			watcher.Created -= OnChanged;
-			watcher.Deleted -= OnChanged;
-			watcher.Renamed -= OnRenamed;
-
-			watcher.EnableRaisingEvents = false;
-			watcher.Dispose ();
 
 			disposedValue = true;
 		}
 	}
 
-	void OnRenamed (object sender, RenamedEventArgs e)
+	void OnRenamedHandler (object sender, RenamedEventArgs e)
 	{
-		Logger.Information (string.Format ("File renamed from {0} to {1} in {2} project.", e.OldFullPath, e.FullPath, Project.Name));
+		if (disposedValue)
+			return;
+
+		if (token.IsCancellationRequested) {
+			StopMonitoring ();
+			return;	
+		}
+
+		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+			return;
+
+		logger.Information (string.Format ("File renamed from {0} to {1} in {2} project.", e.OldFullPath, e.FullPath, project!.Name));
+
+		OnFileRenamed (e.OldFullPath, e.FullPath);
 	}
 
-	void OnChanged (object sender, FileSystemEventArgs e)
+	void OnChangedHandler (object sender, FileSystemEventArgs e)
 	{
-		Logger.Information (string.Format ("Changes detected for {0} in {1} project.", e.FullPath, Project.Name));
+		if (disposedValue)
+			return;
+
+		if (token.IsCancellationRequested) {
+			StopMonitoring ();
+			return;
+		}
+
+		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+			return;
+
+		logger.Information (string.Format ("Changes detected for {0} in {1} project.", e.FullPath, project!.Name));
+
+		OnFileChanged (e.FullPath);
 	}
 
-	// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-	// ~ProjectFileChangeMonitor()
-	// {
-	//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-	//     Dispose(disposing: false);
-	// }
+	void OnErrorHandler (object sender, ErrorEventArgs e)
+	{
+		if (disposedValue)
+			return;
+
+		if (token.IsCancellationRequested) {
+			StopMonitoring ();
+			return;
+		}
+
+		var ex = e.GetException ();
+		logger.Error (ex, "An error occurred while monitoring file changes.");
+
+		OnError (ex);
+
+		Dispose ();
+	}
 
 	public void Dispose ()
 	{
