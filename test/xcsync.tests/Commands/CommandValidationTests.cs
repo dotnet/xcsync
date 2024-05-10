@@ -57,21 +57,21 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var baseCommand = new BaseCommand<string> ("test", "test description", fullProjectPath, tfm, targetPath);
 
-		var errorMessage = baseCommand.ValidateCommand (ref fullProjectPath, ref tfm, ref targetPath);
+		var validation = baseCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
 
-		Assert.Equal (expectedError, errorMessage);
+		Assert.Equal (expectedError, validation.Error);
 		if (string.IsNullOrEmpty (expectedError)) {
-			Assert.NotEmpty (fullProjectPath);
-			Assert.EndsWith (".csproj", fullProjectPath);
-			Assert.NotEmpty (tfm);
-			Assert.NotEmpty (targetPath);
-			Assert.True (Directory.Exists (targetPath));
+			Assert.NotEmpty (validation.ProjectPath);
+			Assert.EndsWith (".csproj", validation.ProjectPath);
+			Assert.NotEmpty (validation.Tfm);
+			Assert.NotEmpty (validation.TargetPath);
+			Assert.True (Directory.Exists (validation.TargetPath));
 		}
 	}
 
 	[Theory]
-	[InlineData ("", "Multiple .csproj files found in")]
-	[InlineData ("does-not-exist.csproj", "File not found")]
+	[InlineData ("", "Multiple .csproj files found in '{CsProjFile}', please specify the project file to use: {Project1}, {Project2}")]
+	[InlineData ("does-not-exist.csproj", "File not found: '{CsProjFile}'")]
 	public void BaseCommandValidation_MultipleProjects (string projectNameParam, string expectedError)
 	{
 		var projectName = Guid.NewGuid ().ToString ();
@@ -82,17 +82,25 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		// DotnetNew (TestOutput, "globaljson", tmpDir, "--sdk-version 8.0.0 --roll-forward feature");
 		DotnetNew (TestOutput, "macos", tmpDir);
 
-		File.Copy (Path.Combine (tmpDir, $"{projectName}.csproj"), Path.Combine (tmpDir, $"{projectName}-2.csproj"));
+		var project1Path = Path.Combine (tmpDir, $"{projectName}.csproj");
+		var project2Path = Path.Combine (tmpDir, $"{projectName}-2.csproj");
+
+		File.Copy (project1Path, project2Path);
 
 		var fullProjectPath = Path.Combine (tmpDir, $"{projectNameParam}");
 		Assert.False (File.Exists (fullProjectPath));
+		expectedError = expectedError
+			.Replace ("{Directory}", File.Exists (fullProjectPath) ? Path.GetDirectoryName (fullProjectPath) : fullProjectPath)
+			.Replace ("{CsProjFile}", fullProjectPath)
+			.Replace ("{Project1}", project2Path)
+			.Replace ("{Project2}", project1Path);
 
 		var tfm = "net8.0-macos"; var targetPath = "";
 		var baseCommand = new BaseCommand<string> ("test", "test description", fullProjectPath, tfm, targetPath);
 
-		var errorMessage = baseCommand.ValidateCommand (ref fullProjectPath, ref tfm, ref targetPath);
+		var validation = baseCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
 
-		Assert.Contains (expectedError, errorMessage);
+		Assert.Equal (expectedError, validation.Error);
 	}
 
 	[Theory]
@@ -122,17 +130,17 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var XcodeCommand = new XcodeCommand<string> ("test", "test description", fullProjectPath, tfm, targetPath, force);
 
-		var errorMessage = XcodeCommand.ValidateCommand (ref fullProjectPath, ref tfm, ref targetPath);
+		var validation = XcodeCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
 
-		errorMessage = XcodeCommand.ValidateCommand (force);
+		var errorMessage = XcodeCommand.ValidateCommand (force);
 
 		Assert.Equal (expectedError, errorMessage);
 		if (string.IsNullOrEmpty (expectedError)) {
-			Assert.NotEmpty (fullProjectPath);
-			Assert.EndsWith (".csproj", fullProjectPath);
-			Assert.NotEmpty (tfm);
-			Assert.NotEmpty (targetPath);
-			Assert.True (Directory.Exists (targetPath));
+			Assert.NotEmpty (validation.ProjectPath);
+			Assert.EndsWith (".csproj", validation.ProjectPath);
+			Assert.NotEmpty (validation.Tfm);
+			Assert.NotEmpty (validation.TargetPath);
+			Assert.True (Directory.Exists (validation.TargetPath));
 		}
 	}
 
