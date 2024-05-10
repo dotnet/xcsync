@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.CommandLine;
-using System.CommandLine.Parsing;
 
 namespace xcsync.Commands;
 
-public class XcodeCommand<T> : BaseCommand<T> {
+class XcodeCommand<T> : BaseCommand<T> {
 
 	protected bool Force { get; private set; }
 	protected bool Open { get; private set; }

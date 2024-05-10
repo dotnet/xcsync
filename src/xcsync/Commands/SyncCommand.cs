@@ -4,7 +4,7 @@ using System.CommandLine;
 
 namespace xcsync.Commands;
 
-public class SyncCommand : BaseCommand<SyncCommand> {
+class SyncCommand : BaseCommand<SyncCommand> {
 	public SyncCommand () : base ("sync", "synchronize changes from the Xcode project back to the.NET project")
 	{
 		this.SetHandler (Execute);

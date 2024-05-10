@@ -6,7 +6,7 @@ using Serilog.Events;
 
 namespace xcsync.Commands;
 
-public class XcSyncCommand : RootCommand {
+class XcSyncCommand : RootCommand {
 
 	public static ILogger? Logger { get; private set; }
 
