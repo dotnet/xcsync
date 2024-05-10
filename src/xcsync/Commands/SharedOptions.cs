@@ -10,6 +10,6 @@ public static class SharedOptions {
 			getDefaultValue: () => Verbosity.Normal) {
 			IsRequired = false,
 			Arity = ArgumentArity.ZeroOrOne,
-			Description = "Verbosity setting."
+			Description = Strings.Options.VerbosityDescription
 		};
 }
