@@ -3,6 +3,7 @@
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
+using System.IO.Abstractions;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -17,13 +18,14 @@ static class xcSync {
 
 	static internal readonly LoggingLevelSwitch LogLevelSwitch = new (LogEventLevel.Information);
 	public static ILogger? Logger { get; private set; }
+	public static IFileSystem FileSystem { get; } = new FileSystem ();
 
 	public static async Task Main (string [] args)
 	{
 		ConfigureLogging ();
 		WriteHeader ();
 
-		var parser = new CommandLineBuilder (new XcSyncCommand ())
+		var parser = new CommandLineBuilder (new XcSyncCommand (FileSystem))
 			.UseDefaults ()
 			.Build ();
 

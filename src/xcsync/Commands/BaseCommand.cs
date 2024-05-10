@@ -2,19 +2,22 @@
 
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Serilog;
 
 namespace xcsync.Commands;
 
-public class BaseCommand<T> : Command {
-	protected static string DefaultXcodeOutputFolder => Path.Combine ("obj", "xcode");
+class BaseCommand<T> : Command {
+	protected const string DefaultXcodeOutputFolder = "obj/xcode";
 	protected static ILogger? Logger { get; private set; }
 
 	protected string ProjectPath { get; private set; } = string.Empty;
 	protected string TargetPath { get; private set; } = string.Empty;
 	protected string Tfm { get; private set; } = string.Empty;
+
+	protected readonly IFileSystem fileSystem;
 
 	protected Option<string> project = new (
 		["--project", "-p"],
@@ -29,7 +32,7 @@ public class BaseCommand<T> : Command {
 	protected Option<string> target = new (
 		["--target", "-t"],
 		description: "Path to the folder for the Xcode project",
-		getDefaultValue: () => Path.Combine (".", DefaultXcodeOutputFolder));
+		getDefaultValue: () => $".{Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
 
 	static BaseCommand ()
 	{
@@ -37,8 +40,10 @@ public class BaseCommand<T> : Command {
 					.ForContext ("SourceContext", typeof (T).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
 	}
 
-	public BaseCommand (string name, string description) : base (name, description)
+	public BaseCommand (IFileSystem fileSystem, string name, string description) : base (name, description)
 	{
+		this.fileSystem = fileSystem ?? throw new ArgumentNullException (nameof (fileSystem));
+
 		Add (project);
 		Add (tfm);
 		Add (target);
@@ -62,7 +67,8 @@ public class BaseCommand<T> : Command {
 	/// <param name="name"></param>
 	/// <param name="description"></param>
 	/// <param name="logger"></param>
-	internal BaseCommand (string name, string description, string projectPath, string tfm, string targetPath) : base (name, description)
+	internal BaseCommand (IFileSystem fileSystem, string name, string description, string projectPath, string tfm, string targetPath)
+		: this (fileSystem, name, description)
 	{
 		ProjectPath = projectPath;
 		Tfm = tfm;
@@ -76,7 +82,7 @@ public class BaseCommand<T> : Command {
 		string error;
 
 		(error, string newProjectPath) = TryValidateProjectPath (projectPath);
-		if (!string.IsNullOrEmpty(error)) { return new ValidationResult(projectPath, tfm, targetPath, error); }
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, tfm, targetPath, error); }
 
 		(error, string newTfm) = TryValidateTfm (projectPath, tfm);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, tfm, targetPath, error); }
@@ -92,16 +98,16 @@ public class BaseCommand<T> : Command {
 		string error = string.Empty;
 		var updatedPath = projectPath;
 
-		if (!FileSystem.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && !FileSystem.FileExists (projectPath) && !FileSystem.DirectoryExists (projectPath)) {
+		if (!fileSystem.Path.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && !fileSystem.File.Exists (projectPath) && !fileSystem.Directory.Exists (projectPath)) {
 			LogDebug ("'{projectPath}' is not a valid path to a .NET project or a directory.", projectPath);
 			error = $"'{projectPath}' is not a valid path to a .NET project or a directory.";
 			return (error, projectPath);
 		}
-		
-		if (!FileSystem.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && FileSystem.DirectoryExists (projectPath)) {
+
+		if (!fileSystem.Path.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && fileSystem.Directory.Exists (projectPath)) {
 			// We have been given a directory, let's see if we can find a .csproj file
 			LogDebug ("'{projectPath}' is not a .csproj file, searching for .csproj files in directory", projectPath);
-			var csprojFiles = FileSystem.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly).ToArray ();
+			var csprojFiles = fileSystem.Directory.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly).ToArray ();
 			if (csprojFiles.Length == 0) {
 				LogDebug ("No .csproj files found in '{projectPath}'", projectPath);
 				error = $"No .csproj files found in '{projectPath}'";
@@ -115,7 +121,7 @@ public class BaseCommand<T> : Command {
 			LogDebug ("Found .csproj file '{csprojFile}' in '{projectPath}'", csprojFiles [0], projectPath);
 			updatedPath = csprojFiles [0];
 		}
-		if (!FileSystem.FileExists (updatedPath)) {
+		if (!fileSystem.File.Exists (updatedPath)) {
 			LogDebug ("File not found: '{projectPath}'", updatedPath);
 			error = $"File not found: '{updatedPath}'";
 			return (error, projectPath);
@@ -170,14 +176,14 @@ public class BaseCommand<T> : Command {
 		string error = string.Empty;
 
 		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose ("Target path is the default location or empty, prefixing with '{projectPath}'", FileSystem.GetDirectoryName (projectPath));
-			targetPath = FileSystem.Combine (FileSystem.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
-			if (!Directory.Exists (targetPath)) {
+			LogVerbose ("Target path is the default location or empty, prefixing with '{projectPath}'", fileSystem.Path.GetDirectoryName (projectPath));
+			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
+			if (!fileSystem.Directory.Exists (targetPath)) {
 				LogDebug ("Target path '{targetPath}' does not exist, but is the default location, creating.", targetPath);
-				FileSystem.CreateDirectory (targetPath);
+				fileSystem.Directory.CreateDirectory (targetPath);
 			}
 		}
-		if (!FileSystem.DirectoryExists (targetPath)) {
+		if (!fileSystem.Directory.Exists (targetPath)) {
 			LogDebug ("Target path '{targetPath}' does not exist, will create directory if [--force, -f] is set.", targetPath);
 			error = $"Target path '{targetPath}' does not exist, will create directory if [--force, -f] is set.";
 			return (error, targetPath);
@@ -186,14 +192,14 @@ public class BaseCommand<T> : Command {
 		return (error, targetPath);
 	}
 
-	static bool TryGetTfmFromProject (string csproj, [NotNullWhen (true)] out List<string>? tfms)
+	bool TryGetTfmFromProject (string csproj, [NotNullWhen (true)] out List<string>? tfms)
 	{
 		// TODO: This should an MSBuild target to get the valid TFMs, this currently will not suppoprt 
 		// cases where the TFM is set via an <Import/> or Directory.Build.props
 		// BUG: This will not return all the TFMs for a standard .NET MAUI project
 		tfms = null;
 		try {
-			var csprojDocument = XDocument.Load (csproj);
+			var csprojDocument = XDocument.Load (fileSystem.File.OpenRead (csproj));
 
 			tfms = (csprojDocument.Descendants ("TargetFramework").FirstOrDefault () ??
 					 csprojDocument.Descendants ("TargetFrameworks").FirstOrDefault ())?

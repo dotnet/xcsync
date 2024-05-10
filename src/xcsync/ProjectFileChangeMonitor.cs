@@ -35,7 +35,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 	ISyncableProject? project;
 	CancellationToken token;
 
-	readonly IFileSystemWatcher watcher = fileSystemWatcher; 
+	readonly IFileSystemWatcher watcher = fileSystemWatcher;
 
 	bool disposedValue;
 
@@ -66,8 +66,8 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 
 		watcher.EnableRaisingEvents = true;
 
-		var filters = string.Join ("|", this.project.ProjectFilesFilter.Select ( f => f.Replace (".", @"\.").Replace ("*", ".*").Replace ("?", ".?")));
-		if (string.IsNullOrEmpty(filters))
+		var filters = string.Join ("|", this.project.ProjectFilesFilter.Select (f => f.Replace (".", @"\.").Replace ("*", ".*").Replace ("?", ".?")));
+		if (string.IsNullOrEmpty (filters))
 			filters = ".*";
 		fileFilterRegex = new Regex ($"^{filters}$", RegexOptions.IgnoreCase);
 		logger.Debug (Strings.Watch.FileChangeFilter (fileFilterRegex.ToString ()));
@@ -112,7 +112,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 
 		if (token.IsCancellationRequested) {
 			StopMonitoring ();
-			return;	
+			return;
 		}
 
 		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
