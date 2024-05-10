@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
 
-public class XcodeObjectConverter : JsonConverter<XcodeObject> {
+class XcodeObjectConverter : JsonConverter<XcodeObject> {
 
 	public string? Token { get; set; }
 

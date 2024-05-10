@@ -5,7 +5,7 @@ using Xamarin;
 
 namespace xcsync;
 
-public class ApplePlatforms : IReadOnlyDictionary<string, (Frameworks SupportedFrameworks, string MinOsVersion, string MaxOsVersion)> {
+class ApplePlatforms : IReadOnlyDictionary<string, (Frameworks SupportedFrameworks, string MinOsVersion, string MaxOsVersion)> {
 	static readonly Dictionary<string, (Frameworks, string, string)> applePlatforms = new ()
 		{
 			{ "ios", (Frameworks.GetiOSFrameworks(false), SdkVersions.DotNetMiniOS, SdkVersions.iOS) },

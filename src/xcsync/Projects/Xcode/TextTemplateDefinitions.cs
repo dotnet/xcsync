@@ -2,6 +2,6 @@
 
 namespace xcsync.Projects.Xcode;
 
-public partial class WorkspaceData (string projectPath) : ITextTemplate;
+partial class WorkspaceData (string projectPath) : ITextTemplate;
 
-public partial class WorkspaceSettings : ITextTemplate;
+partial class WorkspaceSettings : ITextTemplate;

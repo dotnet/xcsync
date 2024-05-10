@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
 
-public class XcodeWorkspaceGenerator {
+class XcodeWorkspaceGenerator {
 	public static void Generate (string projectName, string username, string projectPath, XcodeProject? xcodeProject)
 	{
 		var projectBundle = CreateFolder ($"{projectName}.xcodeproj", projectPath);

@@ -4,7 +4,7 @@ using System.CommandLine;
 
 namespace xcsync.Commands;
 
-public static class SharedOptions {
+static class SharedOptions {
 	public static readonly Option<Verbosity> Verbose =
 		new (["--verbosity", "-v"],
 			getDefaultValue: () => Verbosity.Normal) {

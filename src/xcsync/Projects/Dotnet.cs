@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 namespace xcsync.Projects;
 
-public class Dotnet (string project, string tfm) {
+class Dotnet (string project, string tfm) {
 
 	public async Task<Project> OpenProject ()
 	{

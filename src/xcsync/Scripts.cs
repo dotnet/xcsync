@@ -4,7 +4,7 @@ using Xamarin.Utils;
 
 namespace xcsync;
 
-public static class Scripts {
+static class Scripts {
 	static string SelectXcode ()
 	{
 		var exec = Execution.RunAsync ("xcode-select", new List<string> { "-p" }, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;

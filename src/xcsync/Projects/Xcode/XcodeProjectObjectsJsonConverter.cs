@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
 
-public class XcodeProjectObjectsJsonConverter : JsonConverter<IDictionary<string, XcodeObject>> {
+class XcodeProjectObjectsJsonConverter : JsonConverter<IDictionary<string, XcodeObject>> {
 	public override IDictionary<string, XcodeObject> Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
 		var objects = new Dictionary<string, XcodeObject> ();

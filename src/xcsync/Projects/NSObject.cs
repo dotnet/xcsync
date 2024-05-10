@@ -2,7 +2,7 @@
 
 namespace xcsync.Projects;
 
-public class NSObject (string cliType, string objcType, NSObject? baseType, bool isModel, bool isProtocol, bool inDesigner, List<IBOutlet>? outlets, List<IBAction>? actions, HashSet<string> References) {
+class NSObject (string cliType, string objcType, NSObject? baseType, bool isModel, bool isProtocol, bool inDesigner, List<IBOutlet>? outlets, List<IBAction>? actions, HashSet<string> References) {
 
 	public string CliType { get; set; } = cliType;
 	public string ObjCType { get; set; } = objcType;
@@ -15,7 +15,7 @@ public class NSObject (string cliType, string objcType, NSObject? baseType, bool
 	public HashSet<string> References { get; set; } = References;
 }
 
-public class IBOutlet (string cliName, string objcName, string cliType, string? objcType, bool isCollection) {
+class IBOutlet (string cliName, string objcName, string cliType, string? objcType, bool isCollection) {
 	public string CliName { get; set; } = cliName;
 	public string ObjCName { get; set; } = objcName;
 	public string CliType { get; set; } = cliType;
@@ -23,13 +23,13 @@ public class IBOutlet (string cliName, string objcName, string cliType, string? 
 	public bool IsCollection { get; set; } = isCollection;
 }
 
-public class IBAction (string cliName, string objcName, List<IBActionParameter> parameters) {
+class IBAction (string cliName, string objcName, List<IBActionParameter> parameters) {
 	public string CliName { get; set; } = cliName;
 	public string ObjCName { get; set; } = objcName;
 	public List<IBActionParameter> Parameters { get; set; } = parameters;
 }
 
-public class IBActionParameter (string cliName, string? objcName, string cliType, string? objcType) {
+class IBActionParameter (string cliName, string? objcName, string cliType, string? objcType) {
 	public string CliName { get; set; } = cliName;
 	public string? ObjCName { get; set; } = objcName;
 	public string CliType { get; set; } = cliType;
