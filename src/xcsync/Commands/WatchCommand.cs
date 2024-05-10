@@ -4,7 +4,7 @@ using System.CommandLine;
 
 namespace xcsync.Commands;
 
-public class WatchCommand : XcodeCommand<WatchCommand> {
+class WatchCommand : XcodeCommand<WatchCommand> {
 	bool keepRunning = true;
 
 	public WatchCommand () : base ("watch",

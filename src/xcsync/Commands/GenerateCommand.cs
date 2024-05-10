@@ -7,7 +7,7 @@ using xcsync.Projects.Xcode;
 
 namespace xcsync.Commands;
 
-public class GenerateCommand : XcodeCommand<GenerateCommand> {
+class GenerateCommand : XcodeCommand<GenerateCommand> {
 	public GenerateCommand () : base ("generate",
 			"generate a Xcode project at the path specified by --target from the project identified by --project")
 	{
