@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.CommandLine;
+using System.IO.Abstractions;
 using Serilog;
 using Serilog.Events;
 
@@ -16,11 +17,11 @@ class XcSyncCommand : RootCommand {
 					.ForContext ("SourceContext", typeof (XcSyncCommand).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
 	}
 
-	public XcSyncCommand () : base ("xcsync")
+	public XcSyncCommand (IFileSystem fileSystem) : base ("xcsync")
 	{
-		AddCommand (new GenerateCommand ());
-		AddCommand (new SyncCommand ());
-		AddCommand (new WatchCommand ());
+		AddCommand (new GenerateCommand (fileSystem));
+		AddCommand (new SyncCommand (fileSystem));
+		AddCommand (new WatchCommand (fileSystem));
 
 		AddGlobalOption (SharedOptions.Verbose);
 		SharedOptions.Verbose.AddValidator (result => {

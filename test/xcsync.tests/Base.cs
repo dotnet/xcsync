@@ -1,5 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.Diagnostics;
+using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 using Xamarin.Utils;
 using Xunit.Abstractions;

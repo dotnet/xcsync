@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using Xamarin;
 using xcsync.Commands;
 using Xunit.Abstractions;
@@ -11,14 +13,18 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[Fact]
 	public void TestBaseCommandCreation ()
 	{
-		var baseCommand = new BaseCommand<string> ("test", "test description");
+		var fileSystem = new MockFileSystem ();
+
+		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
 		Assert.NotNull (baseCommand);
 	}
 
 	[Fact]
 	public void TestXcodeCommandCreation ()
 	{
-		var baseCommand = new XcodeCommand<string> ("test", "test description");
+		var fileSystem = new MockFileSystem ();
+
+		var baseCommand = new XcodeCommand<string> (fileSystem, "test", "test description");
 		Assert.NotNull (baseCommand);
 	}
 
@@ -34,28 +40,105 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("maui", "net8.0-ios", "{Directory}/xcode", "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
 	public void BaseCommandValidation_SingleProject (string projectType, string tfm, string targetPath, string expectedError)
 	{
+		var projectTypes = new Dictionary<string, string> {
+			{ "ios", @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+	<TargetFramework>net8.0-ios</TargetFramework>
+	<OutputType>Exe</OutputType>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>true</ImplicitUsings>
+	<SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+</Project>
+			" },
+			{"macos", @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+	<PropertyGroup>
+		<TargetFramework>net8.0-macos</TargetFramework>
+		<RootNamespace>test_project</RootNamespace>
+		<OutputType>Exe</OutputType>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>true</ImplicitUsings>
+		<SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
+	</PropertyGroup>
+</Project>" },
+			{ "maui", @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition=""$([MSBuild]::IsOSPlatform('windows'))"">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
+		<!-- Note for MacCatalyst:
+			The default runtime is maccatalyst - x64, except in Release config, in which case the default is maccatalyst - x64; maccatalyst - arm64.
+			When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
+			The Mac App Store will NOT accept apps with ONLY maccatalyst - arm64 indicated;
+			either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
+		<!--For example: <RuntimeIdentifiers>maccatalyst-x64; maccatalyst-arm64</RuntimeIdentifiers> -->
+		<OutputType> Exe </OutputType>
+		<RootNamespace> MauiTest </RootNamespace>
+		<UseMaui> true </UseMaui>
+		<SingleProject> true </SingleProject>
+		<ImplicitUsings> enable </ImplicitUsings>
+		<Nullable> enable </Nullable>
+		<!--Display name-->
+		<ApplicationTitle> MauiTest </ApplicationTitle>
+		<!--App Identifier-->
+		<ApplicationId> com.companyname.mauitest </ApplicationId>
+		<!--Versions-->
+		<ApplicationDisplayVersion> 1.0 </ApplicationDisplayVersion>
+		<ApplicationVersion > 1 </ApplicationVersion>
+		<SupportedOSPlatformVersion Condition = ""$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'"" > 11.0 </SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition = ""$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'"" > 13.1 </SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition = ""$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'"" > 21.0 </SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition = ""$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'"" > 10.0.17763.0 </SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition = ""$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'"" > 10.0.17763.0 </TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition = ""$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'"" > 6.5 </SupportedOSPlatformVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<!--App Icon-->
+		<MauiIcon Include = ""Resources\AppIcon\appicon.svg"" ForegroundFile = ""Resources\AppIcon\appiconfg.svg"" Color = ""#512BD4"" />
+		<!--Splash Screen-->
+		<MauiSplashScreen Include = ""Resources\Splash\splash.svg"" Color = ""#512BD4"" BaseSize = ""128,128"" />
+		<!--Images-->
+		<MauiImage Include = ""Resources\Images\*"" />
+		<MauiImage Update = ""Resources\Images\dotnet_bot.png"" Resize = ""True"" BaseSize = ""300,185"" />
+		<!--Custom Fonts-->
+		<MauiFont Include = ""Resources\Fonts\*"" />
+		<!--Raw Assets (also remove the ""Resources\Raw"" prefix)-->
+		<MauiAsset Include = ""Resources\Raw\**"" LogicalName = ""%(RecursiveDir)%(Filename)%(Extension)"" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include = ""Microsoft.Maui.Controls"" Version = ""$(MauiVersion)"" />
+		<PackageReference Include = ""Microsoft.Maui.Controls.Compatibility"" Version = ""$(MauiVersion)"" />
+		<PackageReference Include = ""Microsoft.Extensions.Logging.Debug"" Version = ""9.0.0-preview.1.24080.9"" />
+	</ItemGroup>
+</Project>
+		" }
+		};
+
 		var projectName = Guid.NewGuid ().ToString ();
-		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+		var projectDir = projectType;
 
-		// Run 'dotnet new macos' in temp dir
-		// DotnetNew (TestOutput, "globaljson", tmpDir, "--sdk-version 8.0.0 --roll-forward feature");
-		DotnetNew (TestOutput, projectType, tmpDir);
-
-		Assert.True (Directory.Exists (tmpDir));
-
-		var fullProjectPath = Path.Combine (tmpDir, $"{projectName}.csproj");
-		Assert.True (File.Exists (fullProjectPath));
+		var fileSystem = new MockFileSystem (
+		// new Dictionary<string, MockFileData> {
+		// 	{ fullProjectPath, new MockFileData (projectTypes[projectType]) },
+		// }
+		);
+		var fullProjectPath = fileSystem.Path.Combine (projectDir, $"{projectName}.csproj");
+		fileSystem.AddFile (fullProjectPath, new MockFileData (projectTypes [projectType]));
 
 		targetPath = targetPath
-			.Replace ("{Directory}", Path.GetDirectoryName (fullProjectPath));
+			.Replace ("{Directory}", fileSystem.Path.GetDirectoryName (fullProjectPath));
 
 		expectedError = expectedError
-			.Replace ("{Directory}", File.Exists (fullProjectPath) ? Path.GetDirectoryName (fullProjectPath) : fullProjectPath)
+			.Replace ("{Directory}", fileSystem.File.Exists (fullProjectPath) ? fileSystem.Path.GetDirectoryName (fullProjectPath) : fullProjectPath)
 			.Replace ("{CsProjFile}", fullProjectPath)
 			.Replace ("{TargetFramework}", tfm)
 			.Replace ("{TargetPath}", targetPath);
 
-		var baseCommand = new BaseCommand<string> ("test", "test description", fullProjectPath, tfm, targetPath);
+		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description", fullProjectPath, tfm, targetPath);
 
 		var validation = baseCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
 
@@ -65,7 +148,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			Assert.EndsWith (".csproj", validation.ProjectPath);
 			Assert.NotEmpty (validation.Tfm);
 			Assert.NotEmpty (validation.TargetPath);
-			Assert.True (Directory.Exists (validation.TargetPath));
+			Assert.True (fileSystem.Directory.Exists (validation.TargetPath));
 		}
 	}
 
@@ -75,28 +158,29 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	public void BaseCommandValidation_MultipleProjects (string projectNameParam, string expectedError)
 	{
 		var projectName = Guid.NewGuid ().ToString ();
-		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
-		Assert.True (Directory.Exists (tmpDir));
+		var projectDir = "/src";
 
-		// Run 'dotnet new macos' in temp dir
-		// DotnetNew (TestOutput, "globaljson", tmpDir, "--sdk-version 8.0.0 --roll-forward feature");
-		DotnetNew (TestOutput, "macos", tmpDir);
+		var fileSystem = new MockFileSystem (
+			new Dictionary<string, MockFileData> {
+				{ Path.Combine (projectDir, $"{projectName}.csproj"), new MockFileData ("") },
+				{ Path.Combine (projectDir, $"{projectName}-2.csproj"), new MockFileData ("") }
+			}
+		);
 
-		var project1Path = Path.Combine (tmpDir, $"{projectName}.csproj");
-		var project2Path = Path.Combine (tmpDir, $"{projectName}-2.csproj");
+		var project1Path = fileSystem.Path.Combine (projectDir, $"{projectName}.csproj");
+		var project2Path = fileSystem.Path.Combine (projectDir, $"{projectName}-2.csproj");
 
-		File.Copy (project1Path, project2Path);
-
-		var fullProjectPath = Path.Combine (tmpDir, $"{projectNameParam}");
-		Assert.False (File.Exists (fullProjectPath));
+		var fullProjectPath = fileSystem.Path.Combine (projectDir, $"{projectNameParam}");
+		Assert.False (fileSystem.File.Exists (fullProjectPath));
 		expectedError = expectedError
-			.Replace ("{Directory}", File.Exists (fullProjectPath) ? Path.GetDirectoryName (fullProjectPath) : fullProjectPath)
+			.Replace ("{Directory}", fileSystem.File.Exists (fullProjectPath) ? fileSystem.Path.GetDirectoryName (fullProjectPath) : fullProjectPath)
 			.Replace ("{CsProjFile}", fullProjectPath)
-			.Replace ("{Project1}", project2Path)
-			.Replace ("{Project2}", project1Path);
+			.Replace ("{Project1}", project1Path)
+			.Replace ("{Project2}", project2Path);
 
-		var tfm = "net8.0-macos"; var targetPath = "";
-		var baseCommand = new BaseCommand<string> ("test", "test description", fullProjectPath, tfm, targetPath);
+		var tfm = "net8.0-macos";
+		var targetPath = "";
+		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description", fullProjectPath, tfm, targetPath);
 
 		var validation = baseCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
 
@@ -108,6 +192,8 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("{Directory}/xcode", true, "")]
 	public void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
 	{
+		var fileSystem = new MockFileSystem ();
+
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 		Assert.True (Directory.Exists (tmpDir));
@@ -128,7 +214,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			.Replace ("{TargetFramework}", tfm)
 			.Replace ("{TargetPath}", targetPath);
 
-		var XcodeCommand = new XcodeCommand<string> ("test", "test description", fullProjectPath, tfm, targetPath, force);
+		var XcodeCommand = new XcodeCommand<string> (fileSystem, "test", "test description", fullProjectPath, tfm, targetPath, force);
 
 		var validation = XcodeCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
 
@@ -140,7 +226,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			Assert.EndsWith (".csproj", validation.ProjectPath);
 			Assert.NotEmpty (validation.Tfm);
 			Assert.NotEmpty (validation.TargetPath);
-			Assert.True (Directory.Exists (validation.TargetPath));
+			Assert.True (fileSystem.Directory.Exists (validation.TargetPath));
 		}
 	}
 

@@ -1,40 +1,41 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
 
 class XcodeWorkspaceGenerator {
-	public static void Generate (string projectName, string username, string projectPath, XcodeProject? xcodeProject)
+	public static void Generate (IFileSystem fileSystem, string projectName, string username, string projectPath, XcodeProject? xcodeProject)
 	{
-		var projectBundle = CreateFolder ($"{projectName}.xcodeproj", projectPath);
-		var workspaceBundle = CreateFolder ("project.xcworkspace", projectBundle);
-		var xcuserdata = CreateFolder ("xcuserdata", workspaceBundle);
-		var xcuserdatad = CreateFolder ($"{username}.xcuserdatad", xcuserdata);
+		var projectBundle = CreateFolder (fileSystem, $"{projectName}.xcodeproj", projectPath);
+		var workspaceBundle = CreateFolder (fileSystem, "project.xcworkspace", projectBundle);
+		var xcuserdata = CreateFolder (fileSystem, "xcuserdata", workspaceBundle);
+		var xcuserdatad = CreateFolder (fileSystem, $"{username}.xcuserdatad", xcuserdata);
 
-		GenerateWorkspaceSettingsFile (xcuserdatad);
-		GenerateWorkspaceDataFile ($"{projectName}.xcodeproj", workspaceBundle);
-		GenerateXcodeProjectFile (projectBundle, xcodeProject);
+		GenerateWorkspaceSettingsFile (fileSystem, xcuserdatad);
+		GenerateWorkspaceDataFile (fileSystem, $"{projectName}.xcodeproj", workspaceBundle);
+		GenerateXcodeProjectFile (fileSystem, projectBundle, xcodeProject);
 	}
 
-	static void GenerateWorkspaceSettingsFile (string path)
+	static void GenerateWorkspaceSettingsFile (IFileSystem fileSystem, string path)
 	{
 		var workspaceSettingsTemplate = new WorkspaceSettings ();
 		var workspaceSettings = workspaceSettingsTemplate.TransformText ();
-		var workspaceSettingsPath = Path.Combine (path, "WorkspaceSettings.xcsettings");
-		File.WriteAllText (workspaceSettingsPath, workspaceSettings);
+		var workspaceSettingsPath = fileSystem.Path.Combine (path, "WorkspaceSettings.xcsettings");
+		fileSystem.File.WriteAllText (workspaceSettingsPath, workspaceSettings);
 	}
 
-	static void GenerateWorkspaceDataFile (string projectName, string path)
+	static void GenerateWorkspaceDataFile (IFileSystem fileSystem, string projectName, string path)
 	{
 		var workspaceDataTemplate = new WorkspaceData (projectName);
 		var workspaceData = workspaceDataTemplate.TransformText ();
-		var workspaceDataPath = Path.Combine (path, "contents.xcworkspacedata");
-		File.WriteAllText (workspaceDataPath, workspaceData);
+		var workspaceDataPath = fileSystem.Path.Combine (path, "contents.xcworkspacedata");
+		fileSystem.File.WriteAllText (workspaceDataPath, workspaceData);
 	}
 
-	static void GenerateXcodeProjectFile (string projectPath, XcodeProject? xcodeProject)
+	static void GenerateXcodeProjectFile (IFileSystem fileSystem, string projectPath, XcodeProject? xcodeProject)
 	{
 		ArgumentNullException.ThrowIfNull (xcodeProject);
 
@@ -42,15 +43,15 @@ class XcodeWorkspaceGenerator {
 			Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 		});
-		var xcodeProjectPath = Path.Combine (projectPath, "project.pbxproj");
-		File.WriteAllText (xcodeProjectPath, jsonString);
+		var xcodeProjectPath = fileSystem.Path.Combine (projectPath, "project.pbxproj");
+		fileSystem.File.WriteAllText (xcodeProjectPath, jsonString);
 	}
 
-	static string CreateFolder (string folderName, string parentPath)
+	static string CreateFolder (IFileSystem fileSystem, string folderName, string parentPath)
 	{
-		var folderPath = Path.Combine (parentPath, folderName);
-		if (!Directory.Exists (folderPath))
-			Directory.CreateDirectory (folderPath);
+		var folderPath = fileSystem.Path.Combine (parentPath, folderName);
+		if (!fileSystem.Directory.Exists (folderPath))
+			fileSystem.Directory.CreateDirectory (folderPath);
 		return folderPath;
 	}
 }

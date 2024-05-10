@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.CommandLine;
+using System.IO.Abstractions;
 
 namespace xcsync.Commands;
 
 class WatchCommand : XcodeCommand<WatchCommand> {
 	bool keepRunning = true;
 
-	public WatchCommand () : base ("watch",
+	public WatchCommand (IFileSystem fileSystem) : base (fileSystem, "watch",
 			"generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project")
 	{
 		this.SetHandler (Execute, project, target, tfm, force, open);
