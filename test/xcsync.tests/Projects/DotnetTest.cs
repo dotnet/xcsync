@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using Microsoft.CodeAnalysis;
 using xcsync.Projects;
 
@@ -21,7 +22,8 @@ public class DotnetTest : Base {
 			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
 		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
-		var xcodeProject = new NSProject (cliProject, "macos");
+		// TODO: Convert this to MockFileSystem
+		var xcodeProject = new NSProject (new FileSystem (), cliProject, "macos");
 
 		var project = await cliProject.OpenProject ().ConfigureAwait (false);
 		List<INamedTypeSymbol> types = await cliProject.GetNsoTypes (project).ToListAsync ().ConfigureAwait (false);

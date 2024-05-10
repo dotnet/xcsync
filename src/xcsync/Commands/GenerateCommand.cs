@@ -2,13 +2,14 @@
 
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
 using xcsync.Projects;
 using xcsync.Projects.Xcode;
 
 namespace xcsync.Commands;
 
 class GenerateCommand : XcodeCommand<GenerateCommand> {
-	public GenerateCommand () : base ("generate",
+	public GenerateCommand (IFileSystem fileSystem) : base (fileSystem, "generate",
 			"generate a Xcode project at the path specified by --target from the project identified by --project")
 	{
 		this.SetHandler (Execute);
@@ -28,7 +29,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 			return;
 
 		var dotnet = new Dotnet (ProjectPath, Tfm);
-		var nsProject = new NSProject (dotnet, targetPlatform);
+		var nsProject = new NSProject (fileSystem, dotnet, targetPlatform);
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
@@ -43,10 +44,10 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		await foreach (var t in nsProject.GetTypes ()) {
 			// all NSObjects get a corresponding .h + .m file generated
 			var gen = new GenObjcH (t).TransformText ();
-			await File.WriteAllTextAsync (Path.Combine (TargetPath, t.ObjCType + ".h"), gen).ConfigureAwait (false);
+			await fileSystem.File.WriteAllTextAsync (fileSystem.Path.Combine (TargetPath, t.ObjCType + ".h"), gen).ConfigureAwait (false);
 
 			var genM = new GenObjcM (t).TransformText ();
-			await File.WriteAllTextAsync (Path.Combine (TargetPath, t.ObjCType + ".m"), genM).ConfigureAwait (false);
+			await fileSystem.File.WriteAllTextAsync (fileSystem.Path.Combine (TargetPath, t.ObjCType + ".m"), genM).ConfigureAwait (false);
 
 			// add references for framework resolution at project level
 			foreach (var r in t.References) {
@@ -61,19 +62,19 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 
 		// support for maui apps
 		string altPath = targetPlatform switch {
-			"ios" => Path.Combine (Path.GetDirectoryName (ProjectPath)!, "Platforms", "iOS"),
-			"maccatalyst" => Path.Combine (Path.GetDirectoryName (ProjectPath)!, "Platforms", "MacCatalyst"),
+			"ios" => fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (ProjectPath)!, "Platforms", "iOS"),
+			"maccatalyst" => fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (ProjectPath)!, "Platforms", "MacCatalyst"),
 			_ => ""
 		};
 
-		var appleDirectory = Path.Exists (altPath) ? altPath : Path.GetDirectoryName (ProjectPath)!;
+		var appleDirectory = fileSystem.Path.Exists (altPath) ? altPath : fileSystem.Path.GetDirectoryName (ProjectPath)!;
 
-		var appleFiles = Directory
+		var appleFiles = fileSystem.Directory
 			.EnumerateFiles (appleDirectory, "*.*", SearchOption.TopDirectoryOnly)
-			.Where (s => ext.Contains (Path.GetExtension (s).TrimStart ('.').ToLowerInvariant ()));
+			.Where (s => ext.Contains (fileSystem.Path.GetExtension (s).TrimStart ('.').ToLowerInvariant ()));
 
 		foreach (var file in appleFiles) {
-			File.Copy (file, Path.Combine (TargetPath, Path.GetFileName (file)), true);
+			fileSystem.File.Copy (file, fileSystem.Path.Combine (TargetPath, fileSystem.Path.GetFileName (file)), true);
 		}
 
 		// create in memory representation of Xcode assets
@@ -83,21 +84,21 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		var pbxFrameworksBuildFiles = new List<string> ();
 		var pbxGroupFiles = new List<string> ();
 
-		var projectName = Path.GetFileNameWithoutExtension (ProjectPath);
+		var projectName = fileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
 
 		// for each file in target directory create FileReference and add to PBXResourcesBuildPhase
-		foreach (var file in Directory.GetFiles (TargetPath)) {
+		foreach (var file in fileSystem.Directory.GetFiles (TargetPath)) {
 
 			var fileReference = new PBXFileReference ();
 			var buildFile = new PBXBuildFile ();
 
-			switch (Path.GetExtension (file).ToLower ()) {
+			switch (fileSystem.Path.GetExtension (file).ToLower ()) {
 			case ".h":
 				fileReference = new PBXFileReference {
 					Isa = "PBXFileReference",
 					LastKnownFileType = "sourcecode.c.h",
-					Name = Path.GetFileName (file),
-					Path = Path.GetFileName (file),
+					Name = fileSystem.Path.GetFileName (file),
+					Path = fileSystem.Path.GetFileName (file),
 					SourceTree = "<group>"
 				};
 				xcodeObjects.Add (fileReference.Token, fileReference);
@@ -109,8 +110,8 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 				fileReference = new PBXFileReference {
 					Isa = "PBXFileReference",
 					LastKnownFileType = "sourcecode.c.objc",
-					Name = Path.GetFileName (file),
-					Path = Path.GetFileName (file),
+					Name = fileSystem.Path.GetFileName (file),
+					Path = fileSystem.Path.GetFileName (file),
 					SourceTree = "<group>"
 				};
 				xcodeObjects.Add (fileReference.Token, fileReference);
@@ -130,8 +131,8 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 				fileReference = new PBXFileReference {
 					Isa = "PBXFileReference",
 					LastKnownFileType = "text.plist.xml",
-					Name = Path.GetFileName (file),
-					Path = Path.GetFileName (file),
+					Name = fileSystem.Path.GetFileName (file),
+					Path = fileSystem.Path.GetFileName (file),
 					SourceTree = "<group>"
 				};
 				xcodeObjects.Add (fileReference.Token, fileReference);
@@ -173,7 +174,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 			var fileReference = new PBXFileReference {
 				Isa = "PBXFileReference",
 				LastKnownFileType = "wrapper.framework",
-				Name = Path.GetFileName (path),
+				Name = fileSystem.Path.GetFileName (path),
 				Path = path,
 				SourceTree = "SDKROOT"
 			};
@@ -420,11 +421,11 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		};
 
 		// generate xcode workspace
-		XcodeWorkspaceGenerator.Generate (projectName, Environment.UserName, TargetPath, xcodeProject);
+		XcodeWorkspaceGenerator.Generate (fileSystem, projectName, Environment.UserName, TargetPath, xcodeProject);
 		Logger?.Information ($"Generated Xcode project at '{TargetPath}'");
 
 		if (Open) {
-			string workspacePath = Path.Combine (TargetPath, projectName + ".xcodeproj", "project.xcworkspace");
+			string workspacePath = fileSystem.Path.Combine (TargetPath, projectName + ".xcodeproj", "project.xcworkspace");
 			Logger?.Information (Scripts.Run (Scripts.OpenXcodeProject (workspacePath)) + " is open in Xcode");
 		}
 	}

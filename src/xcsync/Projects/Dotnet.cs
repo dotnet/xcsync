@@ -18,7 +18,7 @@ class Dotnet (string project, string tfm) {
 		using var workspace = MSBuildWorkspace.Create (new Dictionary<string, string> {
 			{"TargetFrameworks", tfm}
 		});
-		
+
 		return await workspace.OpenProjectAsync (project).ConfigureAwait (false);
 	}
 

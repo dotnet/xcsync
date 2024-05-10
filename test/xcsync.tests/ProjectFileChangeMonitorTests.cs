@@ -46,10 +46,10 @@ public class ProjectFileChangeMonitorTests {
 	}
 
 	[Theory]
-	[InlineData (new string [] { } , @"/repos/repo/project/src", "Some.File")]
+	[InlineData (new string [] { }, @"/repos/repo/project/src", "Some.File")]
 	[InlineData (new string [] { "*.resx", "*.cs" }, @"/repos/repo/project/src", "Some.File.cs")]
 	[InlineData (new string [] { "*/Resources/*.resx", "*.cs" }, @"/repos/repo/project/src/Resources", "Some.File.resx")]
-	public void OnFileChanged_ShouldBeCalled_WhenFileChangesDetected (string[] fileFilter, string filePath, string fileName)
+	public void OnFileChanged_ShouldBeCalled_WhenFileChangesDetected (string [] fileFilter, string filePath, string fileName)
 	{
 		// Arrange
 		var watcher = Mock.Of<IFileSystemWatcher> ();
@@ -59,7 +59,7 @@ public class ProjectFileChangeMonitorTests {
 		var monitor = new ProjectFileChangeMonitor (watcher, logger);
 
 		var fileChanged = false;
-		monitor.OnFileChanged = 
+		monitor.OnFileChanged =
 			path => fileChanged = true;
 
 		// Act

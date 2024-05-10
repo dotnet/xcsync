@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
 using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
@@ -151,7 +152,8 @@ public class GenObjcFileTest : Base {
 		Assert.True (File.Exists (TestProjectPath));
 
 		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
-		var xcodeProject = new NSProject (cliProject, "macos");
+		// TODO: Convert this to MockFileSystem
+		var xcodeProject = new NSProject (new FileSystem (), cliProject, "macos");
 		return (cliProject, xcodeProject);
 	}
 

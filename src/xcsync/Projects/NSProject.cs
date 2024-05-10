@@ -1,14 +1,17 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
 using Microsoft.CodeAnalysis;
 
 namespace xcsync.Projects;
 
-class NSProject (Dotnet project, string targetPlatform) {
+class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) {
 
 	public Dictionary<string, NSObject?> cliTypes = [];
 	public Dictionary<string, NSObject> objCTypes = [];
 	public Dotnet DotnetProject { get; set; } = project;
+
+	IFileSystem fileSystem { get; } = fileSystem;
 
 	public async IAsyncEnumerable<NSObject> GetTypes ()
 	{
@@ -109,7 +112,7 @@ class NSProject (Dotnet project, string targetPlatform) {
 		if (baseNSObject is not null)
 			refs.UnionWith (baseNSObject.References);
 
-		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, isProtocol, type.InDesigner (objCName),
+		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, isProtocol, InDesignerFile (type, objCName),
 			outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions,
 			refs.Intersect (xcSync.ApplePlatforms [targetPlatform].SupportedFrameworks.Keys).ToHashSet ());
 
@@ -118,15 +121,17 @@ class NSProject (Dotnet project, string targetPlatform) {
 
 		return nsObject;
 	}
+
+	public bool InDesignerFile (ITypeSymbol type, string objCName)
+	{
+		var source = type.Locations.FirstOrDefault ()?.SourceTree;
+		var sourceDir = fileSystem.Path.GetDirectoryName (source?.FilePath) ?? string.Empty;
+		return fileSystem.File.Exists (fileSystem.Path.Combine (sourceDir, $"{objCName}.designer.cs"));
+	}
+
 }
 
 static class Extensions {
-	public static bool InDesigner (this ITypeSymbol type, string objCName)
-	{
-		var source = type.Locations.FirstOrDefault ()?.SourceTree;
-		var sourceDir = Path.GetDirectoryName (source?.FilePath) ?? string.Empty;
-		return File.Exists (Path.Combine (sourceDir, $"{objCName}.designer.cs"));
-	}
 
 	public static AttributeData? GetAttribute (this ISymbol symbol, string attributeName) =>
 		symbol.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == attributeName);

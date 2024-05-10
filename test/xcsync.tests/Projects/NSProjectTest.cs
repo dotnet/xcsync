@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
@@ -17,7 +18,7 @@ public class NSProjectTest : Base {
 
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
-		Assert.Equal (expectedTypes.Count, xcodeProject.GetTypes ().CountAsync ().Result);
+		Assert.Equal (expectedTypes.Count, await xcodeProject.GetTypes ().CountAsync ());
 		await foreach (var type in xcodeProject.GetTypes ()) {
 			Assert.Contains (type.CliType, expectedTypes);
 		}
@@ -116,7 +117,8 @@ public class NSProjectTest : Base {
 		Assert.True (File.Exists (TestProjectPath));
 
 		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
-		var xcodeProject = new NSProject (cliProject, "macos");
+		// TODO: Convert this to MockFileSystem
+		var xcodeProject = new NSProject (new FileSystem (), cliProject, "macos");
 		return (cliProject, xcodeProject);
 	}
 

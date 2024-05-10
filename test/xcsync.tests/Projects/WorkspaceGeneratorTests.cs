@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions.TestingHelpers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xamarin;
@@ -15,6 +16,8 @@ public class XcodeWorkspaceGeneratorTests {
 	[Fact]
 	public void Generate_CreatesExpectedWorkspace ()
 	{
+		var fileSystem = new MockFileSystem ();
+
 		// Arrange
 		string testFilePath = Path.Combine (Environment.CurrentDirectory, "..", "..", "..", "Resources", "SampleProject.json");
 		string xcodeProjectJson = File.ReadAllText (testFilePath);
@@ -26,17 +29,12 @@ public class XcodeWorkspaceGeneratorTests {
 		});
 
 		// Act
-		XcodeWorkspaceGenerator.Generate (testProjectName, testUsername, testProjectPath, xcodeProject);
+		XcodeWorkspaceGenerator.Generate (fileSystem, testProjectName, testUsername, testProjectPath, xcodeProject);
 
 		// Assert
-		Assert.True (Directory.Exists (Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj")));
-		Assert.True (Directory.Exists (Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.xcworkspace")));
-		Assert.True (Directory.Exists (Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.xcworkspace", "xcuserdata")));
-		Assert.True (Directory.Exists (Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{testUsername}.xcuserdatad")));
-
-		Assert.True (File.Exists (Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{testUsername}.xcuserdatad", "WorkspaceSettings.xcsettings")));
-		Assert.True (File.Exists (Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata")));
-		Assert.True (File.Exists (Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.pbxproj")));
+		Assert.True (fileSystem.File.Exists (fileSystem.Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{testUsername}.xcuserdatad", "WorkspaceSettings.xcsettings")));
+		Assert.True (fileSystem.File.Exists (fileSystem.Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata")));
+		Assert.True (fileSystem.File.Exists (fileSystem.Path.Combine (testProjectPath, $"{testProjectName}.xcodeproj", "project.pbxproj")));
 	}
 
 	[Fact]

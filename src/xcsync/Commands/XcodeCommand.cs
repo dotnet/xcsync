@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.CommandLine;
+using System.IO.Abstractions;
 
 namespace xcsync.Commands;
 
@@ -19,7 +20,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 		description: "Open the generated project",
 		getDefaultValue: () => false);
 
-	public XcodeCommand (string name, string description) : base (name, description)
+	public XcodeCommand (IFileSystem fileSystem, string name, string description) : base (fileSystem, name, description)
 	{
 		Add (force);
 		Add (open);
@@ -44,7 +45,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 	/// <param name="name"></param>
 	/// <param name="description"></param>
 	/// <param name="logger"></param>
-	internal XcodeCommand (string name, string description, string projectPath, string tfm, string targetPath, bool force) : base (name, description, projectPath, tfm, targetPath)
+	internal XcodeCommand (IFileSystem fileSystem, string name, string description, string projectPath, string tfm, string targetPath, bool force) : base (fileSystem, name, description, projectPath, tfm, targetPath)
 	{
 		Force = force;
 	}
@@ -55,17 +56,17 @@ class XcodeCommand<T> : BaseCommand<T> {
 		LogVerbose ("[Begin] {Command} Validation", nameof (XcodeCommand<T>));
 
 		if (Force) {
-			if (FileSystem.DirectoryExists (TargetPath) && FileSystem.EnumerateFileSystemEntries (TargetPath).Any ()) {
-				FileSystem.Delete (TargetPath, true);
+			if (fileSystem.Directory.Exists (TargetPath) && fileSystem.Directory.EnumerateFileSystemEntries (TargetPath).Any ()) {
+				fileSystem.Directory.Delete (TargetPath, true);
 			}
-			if (!FileSystem.DirectoryExists (TargetPath)) {
-				FileSystem.CreateDirectory (TargetPath);
+			if (!fileSystem.Directory.Exists (TargetPath)) {
+				fileSystem.Directory.CreateDirectory (TargetPath);
 			}
 		} else {
-			if (FileSystem.DirectoryExists (TargetPath) && FileSystem.EnumerateFileSystemEntries (TargetPath).Any ()) {
+			if (fileSystem.Directory.Exists (TargetPath) && fileSystem.Directory.EnumerateFileSystemEntries (TargetPath).Any ()) {
 				LogDebug ($"The target path '{{TargetPath}}' already exists and is not empty. Use [{string.Join (", ", this.force.Aliases)}] to overwrite the existing project.", TargetPath);
 				return $"The target path '{TargetPath}' already exists and is not empty. Use [{string.Join (", ", this.force.Aliases)}] to overwrite the existing project.";
-			} else if (!FileSystem.DirectoryExists (TargetPath) && string.Compare (TargetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
+			} else if (!fileSystem.Directory.Exists (TargetPath) && string.Compare (TargetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
 				LogDebug ($"The target path '{{TargetPath}}' does not exist. Use [{string.Join (", ", this.force.Aliases)}] to force creation.", TargetPath);
 				return $"The target path '{TargetPath}' does not exist. Use [{string.Join (", ", this.force.Aliases)}] to force creation.";
 			}
