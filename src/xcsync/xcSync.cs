@@ -13,10 +13,7 @@ namespace xcsync;
 
 static class xcSync {
 
-#pragma warning disable CA2211 // Non-constant fields should not be visible
-	public static ApplePlatforms ApplePlatforms = new ();
-
-#pragma warning restore CA2211 // Non-constant fields should not be visible
+	public static ApplePlatforms ApplePlatforms { get; } = new ();
 
 	static internal readonly LoggingLevelSwitch LogLevelSwitch = new (LogEventLevel.Information);
 	public static ILogger? Logger { get; private set; }
