@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
-using System.Diagnostics;
 using System.Text;
 using Xamarin.Utils;
-using xcsync.Projects;
 using Xunit.Abstractions;
 
 namespace xcsync.tests;
@@ -14,19 +12,6 @@ public class Base {
 
 	protected readonly string TestProjectPath =
 		Path.Combine ("..", "..", "..", "..", "test-project", "test-project.csproj");
-
-	protected readonly Dotnet DotnetProject;
-
-	protected readonly NSProject NsProject;
-
-	protected Base ()
-	{
-		if (!File.Exists (TestProjectPath))
-			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
-
-		DotnetProject = new Dotnet (TestProjectPath, "net8.0-macos");
-		NsProject = new NSProject (DotnetProject, "macos");
-	}
 
 	static void Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{

@@ -11,7 +11,7 @@ using xcsync.Commands;
 
 namespace xcsync;
 
-public static class xcSync {
+static class xcSync {
 
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 	public static ApplePlatforms ApplePlatforms = new ();

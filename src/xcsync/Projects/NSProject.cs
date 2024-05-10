@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 namespace xcsync.Projects;
 
-public class NSProject (Dotnet project, string targetPlatform) {
+class NSProject (Dotnet project, string targetPlatform) {
 
 	public Dictionary<string, NSObject?> cliTypes = [];
 	public Dictionary<string, NSObject> objCTypes = [];
@@ -120,7 +120,7 @@ public class NSProject (Dotnet project, string targetPlatform) {
 	}
 }
 
-public static class Extensions {
+static class Extensions {
 	public static bool InDesigner (this ITypeSymbol type, string objCName)
 	{
 		var source = type.Locations.FirstOrDefault ()?.SourceTree;

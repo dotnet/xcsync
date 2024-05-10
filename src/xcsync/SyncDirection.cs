@@ -2,7 +2,7 @@
 
 namespace xcsync;
 
-public enum SyncDirection {
+enum SyncDirection {
 	FromXcode,
 	ToXcode
 }

@@ -5,7 +5,7 @@ namespace xcsync.Projects;
 #pragma warning disable CS9113 // Parameter is unread.
 
 // Necessary plumbing code to hook up NSObject to its respective .h and .m files
-public partial class GenObjcH (NSObject nsObject) : ITextTemplate;
-public partial class GenObjcM (NSObject nsObject) : ITextTemplate;
+partial class GenObjcH (NSObject nsObject) : ITextTemplate;
+partial class GenObjcM (NSObject nsObject) : ITextTemplate;
 
 #pragma warning restore CS9113 // Parameter is unread.
