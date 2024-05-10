@@ -47,7 +47,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 	/// <param name="token"></param>
 	public void StartMonitoring (ISyncableProject project, CancellationToken token = default)
 	{
-		logger.Debug (string.Format("Monitoring project file changes in {0} started.", project.RootPath));
+		logger.Debug (Strings.Watch.StartMonitoringProject (project.RootPath));
 		this.token = token;
 
 		this.project = project;
@@ -70,7 +70,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 		if (string.IsNullOrEmpty(filters))
 			filters = ".*";
 		fileFilterRegex = new Regex ($"^{filters}$", RegexOptions.IgnoreCase);
-		logger.Debug (string.Format ("Filtering file changes to files that match {0}.", fileFilterRegex.ToString ()));
+		logger.Debug (Strings.Watch.FileChangeFilter (fileFilterRegex.ToString ()));
 	}
 
 	/// <summary>
@@ -78,7 +78,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 	/// </summary>
 	public void StopMonitoring ()
 	{
-		logger.Debug (string.Format ("Monitoring project file changes in {0} stopped.", project!.RootPath));
+		logger.Debug (Strings.Watch.StartMonitoringProject (project!.RootPath));
 
 		watcher.EnableRaisingEvents = false;
 
@@ -99,8 +99,6 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 				OnFileChanged = defaultOnFileChanged;
 				OnFileRenamed = defaultOnFileRenamed;
 				OnError = defaultOnError;
-
-				logger.Debug (string.Format ("Monitoring project file changes in {0} stopped.", project!.RootPath));
 			}
 
 			disposedValue = true;
@@ -120,7 +118,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
 			return;
 
-		logger.Information (string.Format ("File renamed from {0} to {1} in {2} project.", e.OldFullPath, e.FullPath, project!.Name));
+		logger.Information (Strings.Watch.FileRenamed (e.OldFullPath, e.FullPath, project!.Name));
 
 		OnFileRenamed (e.OldFullPath, e.FullPath);
 	}
@@ -138,7 +136,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
 			return;
 
-		logger.Information (string.Format ("Changes detected for {0} in {1} project.", e.FullPath, project!.Name));
+		logger.Information (Strings.Watch.FileChanged (e.FullPath, project!.Name));
 
 		OnFileChanged (e.FullPath);
 	}
@@ -154,7 +152,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 		}
 
 		var ex = e.GetException ();
-		logger.Error (ex, "An error occurred while monitoring file changes.");
+		logger.Error (ex, Strings.Watch.ErrorWhileMonitoring (project!.RootPath));
 
 		OnError (ex);
 

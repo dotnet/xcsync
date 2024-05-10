@@ -57,6 +57,12 @@ static class Strings {
 	}
 	internal static class Watch {
 		internal static string HeaderInformation => Resources.Strings.Watch_HeaderInformation;
+		internal static string StartMonitoringProject (string projectRootPath) => string.Format (Resources.Strings.Watch_StartMonitoringProject, projectRootPath);
+		internal static string StopMonitoringProject (string projectRootPath) => string.Format (Resources.Strings.Watch_StopMonitoringProject, projectRootPath);
+		internal static string FileChangeFilter (string filter) => string.Format (Resources.Strings.Watch_FileChangeFilter, filter);
+		internal static string FileRenamed (string oldPath, string newPath, string projectName) => string.Format (Resources.Strings.Watch_FileRenameDetected, oldPath, newPath, projectName);
+		internal static string FileChanged (string path, string projectName) => string.Format (Resources.Strings.Watch_FileChangeDetected, path, projectName);
+		internal static string ErrorWhileMonitoring (string path) => string.Format (Resources.Strings.Watch_ErrorMonitoringProjectFiles, path);
 	}
 
 }
