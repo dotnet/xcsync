@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
 
@@ -16,9 +17,14 @@ public class DotnetTest : Base {
 			"ProtocolVariety",
 			"ViewController",
 		};
+		if (!File.Exists (TestProjectPath))
+			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
-		var project = await DotnetProject.OpenProject ().ConfigureAwait (false);
-		List<INamedTypeSymbol> types = await DotnetProject.GetNsoTypes (project).ToListAsync ().ConfigureAwait (false);
+		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
+		var xcodeProject = new NSProject (cliProject, "macos");
+
+		var project = await cliProject.OpenProject ().ConfigureAwait (false);
+		List<INamedTypeSymbol> types = await cliProject.GetNsoTypes (project).ToListAsync ().ConfigureAwait (false);
 		Assert.Equal (expectedTypes, types.Select (x => x.Name).OrderBy (x => x).ToList ());
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace xcsync;
 
-public enum Verbosity {
+enum Verbosity {
 	Quiet,
 	Minimal,
 	Normal,

@@ -10,7 +10,7 @@ namespace xcsync;
 /// and uses the "default implementation of interfaces" feature.
 /// Learn More: https://devblogs.microsoft.com/dotnet/default-implementations-in-interfaces/
 /// </remarks>
-public interface ITextTemplate {
+interface ITextTemplate {
 	IDictionary<string, object> Session { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
 
 	void Initialize () => throw new NotImplementedException ();

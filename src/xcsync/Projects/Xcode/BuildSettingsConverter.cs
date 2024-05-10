@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace xcsync.Projects.Xcode;
 
-public class BuildSettingsConverter : JsonConverter<IDictionary<string, IList<string>>> {
+class BuildSettingsConverter : JsonConverter<IDictionary<string, IList<string>>> {
 	public override IDictionary<string, IList<string>> Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
 		var buildSettings = new Dictionary<string, IList<string>> ();

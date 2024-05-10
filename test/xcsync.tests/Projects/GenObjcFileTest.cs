@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
@@ -27,7 +29,9 @@ public class GenObjcFileTest : Base {
 	[Fact]
 	public async Task GenerateAppDelegateHFile ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "AppDelegate");
 
 		Assert.NotNull (nsType);
@@ -54,7 +58,9 @@ public class GenObjcFileTest : Base {
 	[Fact]
 	public async Task GenerateAppDelegateMFile ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "AppDelegate");
 
 		Assert.NotNull (nsType);
@@ -78,7 +84,9 @@ public class GenObjcFileTest : Base {
 	[Fact]
 	public async Task GenerateViewControllerHFile ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
 
 		Assert.NotNull (nsType);
@@ -110,7 +118,9 @@ public class GenObjcFileTest : Base {
 	[Fact]
 	public async Task GenerateViewControllerMFile ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
 
 		Assert.NotNull (nsType);
@@ -135,4 +145,14 @@ public class GenObjcFileTest : Base {
 
 		Assert.Equal (expected, generated);
 	}
+
+	(Dotnet, NSProject) InitializeProjects ()
+	{
+		Assert.True (File.Exists (TestProjectPath));
+
+		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
+		var xcodeProject = new NSProject (cliProject, "macos");
+		return (cliProject, xcodeProject);
+	}
+
 }

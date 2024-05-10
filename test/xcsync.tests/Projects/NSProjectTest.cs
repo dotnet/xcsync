@@ -1,3 +1,5 @@
+using xcsync.Projects;
+
 namespace xcsync.tests.Projects;
 
 public class NSProjectTest : Base {
@@ -13,8 +15,10 @@ public class NSProjectTest : Base {
 			"ViewController",
 		};
 
-		Assert.Equal (expectedTypes.Count, NsProject.GetTypes ().CountAsync ().Result);
-		await foreach (var type in NsProject.GetTypes ()) {
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		Assert.Equal (expectedTypes.Count, xcodeProject.GetTypes ().CountAsync ().Result);
+		await foreach (var type in xcodeProject.GetTypes ()) {
 			Assert.Contains (type.CliType, expectedTypes);
 		}
 	}
@@ -24,7 +28,9 @@ public class NSProjectTest : Base {
 	[Theory]
 	public async Task ConvertToNSObject (string cliName, string objcName, bool isModel, bool inDesigner, string cliBaseName, string objcBaseName, bool baseIsModel)
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == cliName);
 
 		Assert.NotNull (nsType);
@@ -39,7 +45,9 @@ public class NSProjectTest : Base {
 	[Fact]
 	public async Task ViewControllerOutlets ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
 
 		Assert.NotNull (nsType);
@@ -56,7 +64,9 @@ public class NSProjectTest : Base {
 	[Fact]
 	public async Task ViewControllerActions ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
 
 		Assert.NotNull (nsType);
@@ -78,7 +88,9 @@ public class NSProjectTest : Base {
 	[Fact]
 	public async Task NoOutletActionAttribute ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "AppDelegate");
 
 		Assert.NotNull (nsType);
@@ -89,11 +101,23 @@ public class NSProjectTest : Base {
 	[Fact]
 	public async Task ModelOutletAndAction ()
 	{
-		var types = await NsProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
+		(_, NSProject xcodeProject) = InitializeProjects ();
+
+		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
 		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ModelVariety");
 
 		Assert.NotNull (nsType);
 		Assert.Null (nsType.Outlets);
 		Assert.Null (nsType.Actions);
 	}
+
+	(Dotnet, NSProject) InitializeProjects ()
+	{
+		Assert.True (File.Exists (TestProjectPath));
+
+		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
+		var xcodeProject = new NSProject (cliProject, "macos");
+		return (cliProject, xcodeProject);
+	}
+
 }
