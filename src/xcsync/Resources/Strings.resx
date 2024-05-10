@@ -100,11 +100,33 @@
 		<value>Syncing files from project '{0}' to target '{1}'</value>
 		<comment>{0} is the path to the project file, {1} is the path to the target project</comment>
 	</data>
-
 	<!-- Watch Messages -->
 	<data name="Watch.HeaderInformation" xml:space="preserve">
 		<value>Syncing changes between project '{0}' and '{1}'.</value>
 		<comment>{0} is the path to the project file, {1} is the path to the target project</comment>
 	</data>
-
+	<data name="Watch.StartMonitoringProject" xml:space="preserve">
+		<value>Monitoring project file changes in {0} started.</value>
+		<comment>{0} is the path to the project file</comment>
+	</data>
+	<data name="Watch.StopMonitoringProject" xml:space="preserve">
+		<value>Monitoring project file changes in {0} stopped.</value>
+		<comment>{0} is the path to the project file</comment>
+	</data>
+	<data name="Watch.FileChangeFilter" xml:space="preserve">
+		<value>Filtering file changes to files that match {0}.</value>
+		<comment>{0} is a regex string used to filter files.</comment>
+	</data>
+	<data name="Watch.FileChangeDetected" xml:space="preserve">
+		<value>Changes detected for {0} in {1} project.</value>
+		<comment>{0} is the path to the file that changed, {1} is the name of the project</comment>
+	</data>
+	<data name="Watch.FileRenameDetected" xml:space="preserve">
+		<value>File renamed from {0} to {1} in {2} project.</value>
+		<comment>{0} and {1} are the old and new paths to the file that was renamed, {2} is the name of the project</comment>
+	</data>
+	<data name="Watch.ErrorMonitoringProjectFiles" xml:space="preserve">
+		<value>An error occurred while monitoring file changes in {0}.</value>
+		<comment>{0} is the path to the project folder</comment>
+	</data>
 </root>
