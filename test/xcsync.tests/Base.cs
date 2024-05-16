@@ -1,8 +1,5 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
-using System.Diagnostics;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 using Xamarin.Utils;
 using Xunit.Abstractions;
@@ -11,7 +8,7 @@ namespace xcsync.tests;
 
 public class Base {
 	protected static readonly string XcsyncExe =
-		Path.Combine (Directory.GetCurrentDirectory (), "..", "..", "..", "..", "xcsync", "bin", "Debug", "net8.0", "xcsync");
+		Path.Combine (Directory.GetCurrentDirectory (), "xcsync");
 
 	protected readonly string TestProjectPath =
 		Path.Combine ("..", "..", "..", "..", "test-project", "test-project.csproj");
