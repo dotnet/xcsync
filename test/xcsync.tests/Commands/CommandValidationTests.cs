@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using Xamarin;
 using xcsync.Commands;
@@ -39,25 +40,16 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("maui", "net8.0-ios", "{Directory}/xcode", "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
 	public void BaseCommandValidation_SingleProject (string projectType, string tfm, string targetPath, string expectedError)
 	{
-		var projectTypes = new Dictionary<string, string> {
-			{ "ios", net_8_0_iosProject },
-			{"macos", net_8_0_macosProject},
-			{ "maui", mauiProject }
-		};
-
 		var projectName = Guid.NewGuid ().ToString ();
-		var projectDir = projectType;
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
-		var fileSystem = new MockFileSystem (
-		// new Dictionary<string, MockFileData> {
-		// 	{ fullProjectPath, new MockFileData (projectTypes[projectType]) },
-		// }
-		);
-		var fullProjectPath = fileSystem.Path.Combine (projectDir, $"{projectName}.csproj");
-		fileSystem.AddFile (fullProjectPath, new MockFileData (projectTypes [projectType]));
+		var fileSystem = new FileSystem ();
+		DotnetNew (TestOutput, projectType, tmpDir, "");
+		Assert.True (Directory.Exists (tmpDir));
+		var fullProjectPath = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		targetPath = targetPath
-			.Replace ("{Directory}", fileSystem.Path.GetDirectoryName (fullProjectPath));
+			.Replace ("{Directory}", Path.GetDirectoryName (fullProjectPath));
 
 		expectedError = expectedError
 			.Replace ("{Directory}", fileSystem.File.Exists (fullProjectPath) ? fileSystem.Path.GetDirectoryName (fullProjectPath) : fullProjectPath)
@@ -94,9 +86,6 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			}
 		);
 
-		var project1Path = fileSystem.Path.Combine (projectDir, $"{projectName}.csproj");
-		var project2Path = fileSystem.Path.Combine (projectDir, $"{projectName}-2.csproj");
-
 		var fullProjectPath = fileSystem.Path.Combine (projectDir, $"{projectNameParam}");
 		Assert.False (fileSystem.File.Exists (fullProjectPath));
 		expectedError = expectedError
@@ -124,8 +113,6 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 		Assert.True (Directory.Exists (tmpDir));
 
-		// Run 'dotnet new macos' in temp dir
-		// DotnetNew (TestOutput, "globaljson", tmpDir, "--sdk-version 8.0.0 --roll-forward feature");
 		DotnetNew (TestOutput, "macos", tmpDir);
 
 		string fullProjectPath = $"{tmpDir}{projectName}/{projectName}.csproj";
@@ -157,22 +144,23 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData (net_8_0_macosProject, new string [] { "net8.0-macos" })]
-	[InlineData (mauiProject, new string [] { "net8.0-android", "net8.0-ios", "net8.0-maccatalyst", "net8.0-windows10.0.19041.0" })]
-	public void BaseCommandValidation_GetTFMs (string csProject, string [] expectedTfms)
+	[InlineData ("macos", new string [] { "net8.0-macos" })]
+	[InlineData ("maui", new string [] { "net8.0-android", "net8.0-ios", "net8.0-maccatalyst" })]
+	public void BaseCommandValidation_GetTFMs (string projectType, string [] expectedTfms)
 	{
 		var projectName = Guid.NewGuid ().ToString ();
-		var projectDir = "/src";
 
-		var fileSystem = new MockFileSystem (
-			new Dictionary<string, MockFileData> {
-				{ Path.Combine (projectDir, $"{projectName}.csproj"), new MockFileData (csProject) },
-			}
-		);
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+
+		var fileSystem = new FileSystem ();
+
+		DotnetNew (TestOutput, projectType, tmpDir, "");
+		Assert.True (Directory.Exists (tmpDir));
+		var fullProjectPath = fileSystem.Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
 
-		baseCommand.TryGetTfmFromProject (Path.Combine (projectDir, $"{projectName}.csproj"), out var tfms);
+		baseCommand.TryGetTfmFromProject (fullProjectPath, out var tfms);
 
 		Assert.NotNull (tfms);
 		Assert.NotEmpty (tfms);

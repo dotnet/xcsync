@@ -1,10 +1,13 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
+using Newtonsoft.Json.Linq;
 using Xamarin.Utils;
 
 namespace xcsync;
 
-static class Scripts {
+static partial class Scripts {
+
 	static string SelectXcode ()
 	{
 		var exec = Execution.RunAsync ("xcode-select", new List<string> { "-p" }, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
@@ -16,6 +19,40 @@ static class Scripts {
 			throw new InvalidOperationException ($"'xcode-select -p' failed with exit code '{exec.ExitCode}'");
 
 		return $"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..";
+	}
+
+	public static List<string> GetTfms (IFileSystem fileSystem, string projPath)
+	{
+		var resultFile = fileSystem.Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" }; 
+		var exec = Execution.RunAsync ("dotnet", args, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
+
+		if (exec.TimedOut)
+			throw new TimeoutException ($"'dotnet {exec.Arguments}' execution took > 60 seconds, process has timed out");
+
+		if (exec.ExitCode != 0)
+			throw new InvalidOperationException ($"'dotnet {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
+
+		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile)) ;
+
+		List<string> tfms = [];
+
+		var tfmsToken = jsonObject.SelectToken ("$.Properties.TargetFrameworks");
+
+		if (tfmsToken is not null)
+			tfms = tfmsToken
+				.ToString ()
+				.Split (';')
+				.Where (tfm => !string.IsNullOrWhiteSpace (tfm))
+				.ToList ();
+
+		var tfmToken = jsonObject.SelectToken ("$.Properties.TargetFramework")?.ToString ();
+
+		if (!string.IsNullOrEmpty (tfmToken))
+			// to deal w nullability
+			tfms = [.. tfms, tfmToken];
+
+		return tfms;
 	}
 
 	public static string Run (string script)

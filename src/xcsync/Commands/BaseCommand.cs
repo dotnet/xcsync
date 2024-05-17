@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 using Serilog;
 
 namespace xcsync.Commands;
@@ -194,17 +195,12 @@ class BaseCommand<T> : Command {
 
 	internal bool TryGetTfmFromProject (string csproj, [NotNullWhen (true)] out List<string> tfms)
 	{
-		// TODO: This should an MSBuild target to get the valid TFMs, this currently will not suppoprt 
-		// cases where the TFM is set via an <Import/> or Directory.Build.props
-		// BUG: This will not return all the TFMs for a standard .NET MAUI project
+
 		tfms = [];
 		try {
-			var csprojDocument = XDocument.Load (fileSystem.File.OpenRead (csproj));
+			tfms = Scripts.GetTfms (fileSystem, csproj);
 
-			tfms = csprojDocument.Descendants ("TargetFramework")
-							.Concat (csprojDocument.Descendants ("TargetFrameworks"))
-							.SelectMany (elem => elem.Value.Split (';')).ToList ();
-			return tfms is not null && tfms.Count > 0;
+			return tfms.Count > 0;
 		} catch {
 			// in case there are issues when loading the file
 			return false;
