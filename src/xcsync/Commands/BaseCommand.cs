@@ -22,17 +22,17 @@ class BaseCommand<T> : Command {
 
 	protected Option<string> project = new (
 		["--project", "-p"],
-		description: "Path to the source .NET project",
+		description: Strings.Options.ProjectDescription,
 		getDefaultValue: () => ".");
 
 	protected Option<string> tfm = new (
 		["--target-framework-moniker", "-tfm"],
-		description: "Specify the target framework moniker",
+		description: Strings.Options.TfmDescription,
 		getDefaultValue: () => string.Empty);
 
 	protected Option<string> target = new (
 		["--target", "-t"],
-		description: "Path to the folder for the Xcode project",
+		description: Strings.Options.TargetDescription,
 		getDefaultValue: () => $".{Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
 
 	static BaseCommand ()
@@ -100,33 +100,38 @@ class BaseCommand<T> : Command {
 		var updatedPath = projectPath;
 
 		if (!fileSystem.Path.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && !fileSystem.File.Exists (projectPath) && !fileSystem.Directory.Exists (projectPath)) {
-			LogDebug ("'{projectPath}' is not a valid path to a .NET project or a directory.", projectPath);
-			error = $"'{projectPath}' is not a valid path to a .NET project or a directory.";
+			LogDebug (Strings.Errors.Validation.PathDoesNotContainCsproj (projectPath));
+			error = Strings.Errors.Validation.PathDoesNotContainCsproj (projectPath);
 			return (error, projectPath);
 		}
 
 		if (!fileSystem.Path.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && fileSystem.Directory.Exists (projectPath)) {
 			// We have been given a directory, let's see if we can find a .csproj file
-			LogDebug ("'{projectPath}' is not a .csproj file, searching for .csproj files in directory", projectPath);
+			LogDebug (Strings.Base.SearchForProjectFiles (projectPath));
+
 			var csprojFiles = fileSystem.Directory.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly).ToArray ();
+
 			if (csprojFiles.Length == 0) {
-				LogDebug ("No .csproj files found in '{projectPath}'", projectPath);
-				error = $"No .csproj files found in '{projectPath}'";
+				LogDebug (Strings.Errors.CsprojNotFound (projectPath));
+				error = Strings.Errors.CsprojNotFound (projectPath);
 				return (error, projectPath);
 			}
 			if (csprojFiles.Length > 1) {
-				LogDebug ("Multiple .csproj files found in '{projectPath}', please specify the project file to use: {csprojFiles}", projectPath, string.Join (", ", csprojFiles));
-				error = $"Multiple .csproj files found in '{projectPath}', please specify the project file to use: {string.Join (", ", csprojFiles)}";
+				LogDebug (Strings.Errors.MultipleProjectFilesFound (projectPath, string.Join (", ", csprojFiles)));
+				error = Strings.Errors.MultipleProjectFilesFound (projectPath, string.Join (", ", csprojFiles));
 				return (error, projectPath);
 			}
-			LogDebug ("Found .csproj file '{csprojFile}' in '{projectPath}'", csprojFiles [0], projectPath);
+
+			LogDebug (Strings.Base.FoundProjectFile (csprojFiles [0], projectPath));
 			updatedPath = csprojFiles [0];
 		}
+
 		if (!fileSystem.File.Exists (updatedPath)) {
-			LogDebug ("File not found: '{projectPath}'", updatedPath);
-			error = $"File not found: '{updatedPath}'";
+			LogDebug (Strings.Errors.Validation.PathDoesNotExist (updatedPath));
+			error = Strings.Errors.Validation.PathDoesNotExist (updatedPath);
 			return (error, projectPath);
 		}
+
 		projectPath = updatedPath;
 		return (error, projectPath);
 	}
@@ -136,35 +141,35 @@ class BaseCommand<T> : Command {
 		string error = string.Empty;
 
 		if (!TryGetTfmFromProject (projectPath, out var supportedTfmsInProject)) {
-			LogDebug ("No target framework monikers found in '{projectPath}'", projectPath);
-			error = $"No target framework monikers found in '{projectPath}'";
+			LogDebug (Strings.Errors.Validation.MissingTfmInPath (projectPath));
+			error = Strings.Errors.Validation.MissingTfmInPath (projectPath);
 			return (error, tfm);
 		}
 
-		LogDebug ("Project target frameworks: {supportedTfmsInProject}", string.Join (", ", supportedTfmsInProject));
+		LogDebug (Strings.Base.ProjectTfms (string.Join (", ", supportedTfmsInProject)));
 
 		if (string.IsNullOrEmpty (tfm) && supportedTfmsInProject.Count > 1) {
-			LogDebug ($"Multiple target frameworks found in the project, please specify one using [{string.Join (", ", this.tfm.Aliases)}] option.");
-			error = $"Multiple target frameworks found in the project, please specify one using [{string.Join (", ", this.tfm.Aliases)}] option.";
+			LogDebug (Strings.Errors.MultipleTfmsFound);
+			error = Strings.Errors.MultipleTfmsFound;
 			return (error, tfm);
 		}
 
 		if (string.IsNullOrEmpty (tfm) && supportedTfmsInProject.Count == 1) {
-			LogDebug ("No target framework moniker specified, using the first one found in the project.");
+			LogDebug (Strings.Base.UseDefaultTfm);
 			tfm = supportedTfmsInProject [0];
 		}
 
 		if (!supportedTfmsInProject.Contains (tfm)) {
-			LogDebug ("Target framework is not supported by current .net project.");
-			error = "Target framework is not supported by current .net project.";
+			LogDebug (Strings.Errors.TfmNotSupported);
+			error = Strings.Errors.TfmNotSupported;
 			return (error, tfm);
 		}
 
 		var currentTfm = supportedTfmsInProject.Count == 1 ? supportedTfmsInProject [0] : tfm;
 
 		if (!IsValidTfm (currentTfm, xcSync.ApplePlatforms.Keys.ToArray ())) {
-			LogDebug ("Target framework moniker '{currentTfm}' does not target Apple platforms.'", currentTfm, projectPath);
-			error = $"Target framework moniker '{currentTfm}' does not target Apple platforms.";
+			LogDebug (Strings.Errors.Validation.InvalidTfm (currentTfm));
+			error = Strings.Errors.Validation.InvalidTfm (currentTfm);
 			return (error, currentTfm);
 		}
 
@@ -177,16 +182,18 @@ class BaseCommand<T> : Command {
 		string error = string.Empty;
 
 		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose ("Target path is the default location or empty, prefixing with '{projectPath}'", fileSystem.Path.GetDirectoryName (projectPath));
+			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
 			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
+
 			if (!fileSystem.Directory.Exists (targetPath)) {
-				LogDebug ("Target path '{targetPath}' does not exist, but is the default location, creating.", targetPath);
+				LogDebug (Strings.Base.CreateDefaultTarget (targetPath));
 				fileSystem.Directory.CreateDirectory (targetPath);
 			}
 		}
+
 		if (!fileSystem.Directory.Exists (targetPath)) {
-			LogDebug ("Target path '{targetPath}' does not exist, will create directory if [--force, -f] is set.", targetPath);
-			error = $"Target path '{targetPath}' does not exist, will create directory if [--force, -f] is set.";
+			LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
+			error = Strings.Errors.Validation.TargetDoesNotExist (targetPath);
 			return (error, targetPath);
 		}
 
