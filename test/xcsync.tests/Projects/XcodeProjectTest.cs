@@ -357,8 +357,8 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 			return (IEnumerable<string>) (Path.HasExtension (projectFile) ? ([projectFile]) : ([$"{projectFile}.m", $"{projectFile}.h"]));
 		}).Union ([
 			 Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
-			 Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
-			 Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj"),
+			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
+			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj"),
 		]).ToList ().ForEach (file => {
 			var fullPathToFile = Path.Combine (xcodeDir, file);
 			Assert.True (File.Exists (fullPathToFile), $"{fullPathToFile} does not exist");

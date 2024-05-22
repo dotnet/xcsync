@@ -12,12 +12,12 @@ class XcodeCommand<T> : BaseCommand<T> {
 
 	protected Option<bool> force = new (
 		["--force", "-f"],
-		description: "Force overwrite of an existing Xcode project",
+		description: Strings.Options.ForceDescription,
 		getDefaultValue: () => false);
 
 	protected Option<bool> open = new (
 		["--open", "-o"],
-		description: "Open the generated project",
+		description: Strings.Options.OpenDescription,
 		getDefaultValue: () => false);
 
 	public XcodeCommand (IFileSystem fileSystem, string name, string description) : base (fileSystem, name, description)
@@ -59,16 +59,19 @@ class XcodeCommand<T> : BaseCommand<T> {
 			if (fileSystem.Directory.Exists (TargetPath) && fileSystem.Directory.EnumerateFileSystemEntries (TargetPath).Any ()) {
 				fileSystem.Directory.Delete (TargetPath, true);
 			}
+
 			if (!fileSystem.Directory.Exists (TargetPath)) {
 				fileSystem.Directory.CreateDirectory (TargetPath);
 			}
 		} else {
 			if (fileSystem.Directory.Exists (TargetPath) && fileSystem.Directory.EnumerateFileSystemEntries (TargetPath).Any ()) {
-				LogDebug ($"The target path '{{TargetPath}}' already exists and is not empty. Use [{string.Join (", ", this.force.Aliases)}] to overwrite the existing project.", TargetPath);
-				return $"The target path '{TargetPath}' already exists and is not empty. Use [{string.Join (", ", this.force.Aliases)}] to overwrite the existing project.";
-			} else if (!fileSystem.Directory.Exists (TargetPath) && string.Compare (TargetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
-				LogDebug ($"The target path '{{TargetPath}}' does not exist. Use [{string.Join (", ", this.force.Aliases)}] to force creation.", TargetPath);
-				return $"The target path '{TargetPath}' does not exist. Use [{string.Join (", ", this.force.Aliases)}] to force creation.";
+				LogDebug (Strings.Errors.Validation.TargetNotEmpty (TargetPath));
+				return Strings.Errors.Validation.TargetNotEmpty (TargetPath);
+			}
+
+			if (!fileSystem.Directory.Exists (TargetPath) && string.Compare (TargetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
+				LogDebug (Strings.Errors.Validation.TargetDoesNotExist (TargetPath));
+				return Strings.Errors.Validation.TargetDoesNotExist (TargetPath);
 			}
 		}
 		LogVerbose ("[End] {Command} Validation", nameof (XcodeCommand<T>));
