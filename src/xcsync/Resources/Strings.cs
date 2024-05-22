@@ -33,23 +33,34 @@ static class Strings {
 		internal static class Validation {
 			internal static string PathNameEmpty => Resources.Strings.Errors_Validation_PathNameIsEmpty;
 			internal static string PathDoesNotExist (string path) => string.Format (Resources.Strings.Errors_Validation_PathDoesNotExist, path);
-			internal static string PathNotEmpty (string path) => string.Format (Resources.Strings.Errors_Validation_PathIsNotEmpty, path);
+			internal static string TargetDoesNotExist (string path) => string.Format (Resources.Strings.Errors_Validation_TargetDoesNotExist, path);
+			internal static string TargetNotEmpty (string path) => string.Format (Resources.Strings.Errors_Validation_TargetIsNotEmpty, path);
 			internal static string PathDoesNotContainCsproj (string path) => string.Format (Resources.Strings.Errors_Validation_PathDoesNotContainCsproj, path);
-			internal static string MissingTfmInCsproj (string path) => string.Format (Resources.Strings.Errors_Validation_MissingValidTargetFrameworkInPath, path);
-			internal static string InvalidTfmInCsproj (string tfm) => string.Format (Resources.Strings.Errors_Validation_InvalidTargetFrameworkInCsproj, tfm);
+			internal static string MissingTfmInPath (string path) => string.Format (Resources.Strings.Errors_Validation_MissingValidTargetFrameworkInPath, path);
+			internal static string InvalidTfm (string tfm) => string.Format (Resources.Strings.Errors_Validation_InvalidTargetFramework, tfm);
 		}
 
 		internal static string InvalidOption (string option, string error) => string.Format (Resources.Strings.Errors_InvalidOption, option, error);
-		internal static string MultipleProjectFilesFound => Resources.Strings.Errors_MultipleProjectFilesFound;
-		internal static string CsprojNotFound => Resources.Strings.Errors_CsprojNotFound;
+		internal static string MultipleProjectFilesFound (string path, string projectFilesFound) => string.Format (Resources.Strings.Errors_MultipleProjectFilesFound, path, projectFilesFound);
+		internal static string CsprojNotFound (string path) => string.Format (Resources.Strings.Errors_CsprojNotFound, path);
 		internal static string MultipleTfmsFound => Resources.Strings.Errors_MultipleTfmsFound;
 		internal static string TargetPlatformNotFound => Resources.Strings.Errors_TargetPlatformNotFound;
 		internal static string TfmNotSupported => Resources.Strings.Errors_TfmNotSupported;
 	}
 
+	internal static class Base {
+		internal static string SearchForProjectFiles (string path) => string.Format (Resources.Strings.Base_SearchForProjectFiles, path);
+		internal static string FoundProjectFile (string projectFile, string path) => string.Format (Resources.Strings.Base_FoundProjectFile, projectFile, path);
+		internal static string ProjectTfms (string tfms) => string.Format (Resources.Strings.Base_ProjectTfms, tfms);
+		internal static string UseDefaultTfm => Resources.Strings.Base_UseDefaultTfm;
+		internal static string EstablishDefaultTarget (string path) => string.Format (Resources.Strings.Base_EstablishDefaultTarget, path);
+		internal static string CreateDefaultTarget (string path) => string.Format (Resources.Strings.Base_CreateDefaultTarget, path);
+	}
 	internal static class Generate {
 		internal static string HeaderInformation => Resources.Strings.Generate_HeaderInformation;
-
+		internal static string GeneratedFiles => Resources.Strings.Generate_GeneratedFiles;
+		internal static string GeneratedProject (string path) => string.Format (Resources.Strings.Generate_GeneratedProject, path);
+		internal static string OpenProject (string path) => string.Format (Resources.Strings.Generate_OpenProject, path);
 	}
 
 	internal static class Sync {

@@ -55,7 +55,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 			}
 		}
 
-		Logger?.Debug ($"Generated nsProject header and implementation files");
+		Logger?.Debug (Strings.Generate.GeneratedFiles);
 
 		// copy storyboard, entitlements/info.plist files to the target directory 
 		var ext = new List<string> { "storyboard", "plist" };
@@ -207,7 +207,9 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		var pbxGroup = new PBXGroup {
 			Isa = "PBXGroup",
 			Children = [
-				productsGroup.Token, frameworksGroup.Token, projectGroup.Token
+				productsGroup.Token,
+				frameworksGroup.Token,
+				projectGroup.Token
 			]
 		};
 		xcodeObjects.Add (pbxGroup.Token, pbxGroup);
@@ -366,7 +368,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 			Isa = "XCConfigurationList",
 			BuildConfigurations = [
 				debugTargetBuildConfiguration.Token,
-				releaseTargetBuildConfiguration.Token ],
+				releaseTargetBuildConfiguration.Token],
 			DefaultConfigurationName = "Debug",
 			DefaultConfigurationIsVisible = "0",
 		};
@@ -422,11 +424,11 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 
 		// generate xcode workspace
 		XcodeWorkspaceGenerator.Generate (fileSystem, projectName, Environment.UserName, TargetPath, xcodeProject);
-		Logger?.Information ($"Generated Xcode project at '{TargetPath}'");
+		Logger?.Information (Strings.Generate.GeneratedProject (TargetPath));
 
 		if (Open) {
 			string workspacePath = fileSystem.Path.Combine (TargetPath, projectName + ".xcodeproj", "project.xcworkspace");
-			Logger?.Information (Scripts.Run (Scripts.OpenXcodeProject (workspacePath)) + " is open in Xcode");
+			Logger?.Information (Strings.Generate.OpenProject (Scripts.Run(Scripts.OpenXcodeProject(workspacePath))));
 		}
 	}
 

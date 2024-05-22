@@ -24,7 +24,7 @@ static partial class Scripts {
 	public static List<string> GetTfms (IFileSystem fileSystem, string projPath)
 	{
 		var resultFile = fileSystem.Path.GetTempFileName ();
-		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" }; 
+		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" };
 		var exec = Execution.RunAsync ("dotnet", args, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
 
 		if (exec.TimedOut)
@@ -33,7 +33,7 @@ static partial class Scripts {
 		if (exec.ExitCode != 0)
 			throw new InvalidOperationException ($"'dotnet {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
 
-		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile)) ;
+		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
 
 		List<string> tfms = [];
 

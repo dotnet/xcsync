@@ -32,11 +32,11 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("macos", "", "", "")]
 	[InlineData ("macos", "net8.0-macos", "", "")]
 	[InlineData ("macos", "net8.0-macos", "obj/xcode", "")]
-	[InlineData ("macos", "net9.0-macos", "obj/xcode", "Target framework is not supported by current .net project.")]
-	[InlineData ("maui", "", "", "Multiple target frameworks found in the project, please specify one using [--target-framework-moniker, -tfm] option.")]
+	[InlineData ("macos", "net9.0-macos", "obj/xcode", "Target framework is not supported by current .NET project.")]
+	[InlineData ("maui", "", "", "Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.")]
 	[InlineData ("maui", "net8.0-ios", "obj/xcode", "")]
 	[InlineData ("maui", "net8.0-maccatalyst", "obj/xcode", "")]
-	[InlineData ("maui", "net8.0-macos", "obj/xcode", "Target framework is not supported by current .net project.")]
+	[InlineData ("maui", "net8.0-macos", "obj/xcode", "Target framework is not supported by current .NET project.")]
 	[InlineData ("maui", "net8.0-ios", "{Directory}/xcode", "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
 	public void BaseCommandValidation_SingleProject (string projectType, string tfm, string targetPath, string expectedError)
 	{
@@ -72,8 +72,8 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData ("", "Multiple .csproj files found in '{CsProjFile}', please specify the project file to use:")]
-	[InlineData ("does-not-exist.csproj", "File not found: '{CsProjFile}'")]
+	[InlineData ("", "Multiple .csproj files found in '{CsProjFile}', please specify which project file to use via the [--project, -p] option:")]
+	[InlineData ("does-not-exist.csproj", "Path '{CsProjFile}' does not exist")]
 	public void BaseCommandValidation_MultipleProjects (string projectNameParam, string expectedError)
 	{
 		var projectName = Guid.NewGuid ().ToString ();
@@ -103,7 +103,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData ("{Directory}/xcode", false, "The target path '{TargetPath}' does not exist. Use [--force, -f] to force creation.")]
+	[InlineData ("{Directory}/xcode", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
 	[InlineData ("{Directory}/xcode", true, "")]
 	public void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
 	{
