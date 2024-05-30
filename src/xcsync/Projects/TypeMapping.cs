@@ -2,18 +2,8 @@
 
 namespace xcsync.Projects;
 
-class NSObject (string cliType, string objcType, NSObject? baseType, bool isModel, bool isProtocol, bool inDesigner, List<IBOutlet>? outlets, List<IBAction>? actions, HashSet<string> References) {
-
-	public string CliType { get; set; } = cliType;
-	public string ObjCType { get; set; } = objcType;
-	public NSObject? BaseType { get; set; } = baseType;
-	public bool IsModel { get; set; } = isModel;
-	public bool IsProtocol { get; set; } = isProtocol;
-	public bool InDesigner { get; set; } = inDesigner;
-	public List<IBOutlet>? Outlets { get; set; } = outlets;
-	public List<IBAction>? Actions { get; set; } = actions;
-	public HashSet<string> References { get; set; } = References;
-}
+record TypeMapping (string CliType, string ObjCType, TypeMapping? BaseType, bool IsModel, bool IsProtocol,
+	bool InDesigner, List<IBOutlet>? Outlets, List<IBAction>? Actions, HashSet<string> References);
 
 class IBOutlet (string cliName, string objcName, string cliType, string? objcType, bool isCollection) {
 	public string CliName { get; set; } = cliName;

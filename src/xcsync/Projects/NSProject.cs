@@ -7,26 +7,28 @@ namespace xcsync.Projects;
 
 class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) {
 
-	public Dictionary<string, NSObject?> cliTypes = [];
-	public Dictionary<string, NSObject> objCTypes = [];
+	public Dictionary<string, TypeMapping?> cliTypes = [];
+	public Dictionary<string, TypeMapping> objCTypes = [];
 	public Dotnet DotnetProject { get; set; } = project;
 
 	IFileSystem fileSystem { get; } = fileSystem;
 
-	public async IAsyncEnumerable<NSObject> GetTypes ()
+	public async IAsyncEnumerable<TypeMapping> GetTypes ()
 	{
 		var openProject = await DotnetProject.OpenProject ().ConfigureAwait (false);
 		await foreach (var type in DotnetProject.GetNsoTypes (openProject).ConfigureAwait (false)) {
-			var nsType = ConvertToNSObject (type);
-			if (nsType is not null && !nsType.IsProtocol)
+			var nsType = ConvertToTypeMapping (type);
+			if (nsType is not null && !nsType.IsProtocol) {
+				// todo: use context to add Type to the TypeService
 				yield return nsType;
+			}
 		}
 	}
-	public NSObject? ConvertToNSObject (ITypeSymbol type)
+	public TypeMapping? ConvertToTypeMapping (ITypeSymbol type)
 	{
-		// NSObjectType bridges the gap between the .net + objc worlds
+		// TypeMapping bridges the gap between the .net + objc worlds
 		// extracts the necessary info from the roslyn detected type for objc .h and .m file generation
-		// so this method is orchestrating the conversion of the roslyn type to the NSObjectType
+		// so this method is orchestrating the conversion of the roslyn type to TypeMapping
 
 		// If the type is not a model, we handle the properties and methods for IBOutlets and IBActions handling too
 		var isModel = false;
@@ -35,8 +37,8 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 		var objCName = type.Name;
 		HashSet<string> refs = [];
 
-		if (cliTypes.TryGetValue (cliName, out var existingNSObject))
-			return existingNSObject;
+		if (cliTypes.TryGetValue (cliName, out var existingTypeMapping))
+			return existingTypeMapping;
 
 		var baseType = type.BaseType;
 		if (baseType is null) {
@@ -44,7 +46,7 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 			return null;
 		}
 
-		var baseNSObject = ConvertToNSObject (baseType);
+		var baseTypeMapping = ConvertToTypeMapping (baseType);
 
 		foreach (var a in type.GetAttributes ()) {
 			switch (a.AttributeClass?.Name) {
@@ -109,17 +111,17 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 
 		refs.Add (type.ContainingNamespace.Name);
 
-		if (baseNSObject is not null)
-			refs.UnionWith (baseNSObject.References);
+		if (baseTypeMapping is not null)
+			refs.UnionWith (baseTypeMapping.References);
 
-		var nsObject = new NSObject (cliName, objCName, baseNSObject, isModel, isProtocol, InDesignerFile (type, objCName),
+		var typeMapping = new TypeMapping (cliName, objCName, baseTypeMapping, isModel, isProtocol, InDesignerFile (type, objCName),
 			outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions,
 			refs.Intersect (xcSync.ApplePlatforms [targetPlatform].SupportedFrameworks.Keys).ToHashSet ());
 
-		cliTypes.Add (nsObject.CliType, nsObject);
-		objCTypes.Add (nsObject.ObjCType, nsObject);
+		cliTypes.Add (typeMapping.CliType, typeMapping);
+		objCTypes.Add (typeMapping.ObjCType, typeMapping);
 
-		return nsObject;
+		return typeMapping;
 	}
 
 	public bool InDesignerFile (ITypeSymbol type, string objCName)
@@ -142,7 +144,7 @@ static class Extensions {
 	public static string? GetObjCType (this ITypeSymbol symbol, NSProject nsProject)
 	{
 		nsProject.cliTypes.TryGetValue (symbol.MetadataName, out var nsType);
-		return nsType?.ObjCType ?? nsProject.ConvertToNSObject (symbol)?.ObjCType;
+		return nsType?.ObjCType ?? nsProject.ConvertToTypeMapping (symbol)?.ObjCType;
 	}
 
 	public static (string objcName, string []? @params) GetInfo (this IMethodSymbol method, string? actionAttributeName)

@@ -14,18 +14,18 @@
 // ------------------------------------------------------------------------------
 
 
-#import "<#= nsObject.ObjCType #>.h"
+#import "<#= typeMapping.ObjCType #>.h"
 
-@implementation <#= nsObject.ObjCType #>
+@implementation <#= typeMapping.ObjCType #>
 
-<# if (nsObject.Outlets is not null) { #>
-<# foreach (var prop in nsObject.Outlets) { #>
+<# if (typeMapping.Outlets is not null) { #>
+<# foreach (var prop in typeMapping.Outlets) { #>
 @synthesize <#= prop.ObjCName #> = _<#= prop.ObjCName #>;
 
 <# } #>
 <# } #>
-<# if (nsObject.Actions is not null) { #>
-<# foreach (var act in nsObject.Actions) { #>
+<# if (typeMapping.Actions is not null) { #>
+<# foreach (var act in typeMapping.Actions) { #>
 - (IBAction)<#= act.ObjCName #>:(id)sender {
 }
 

@@ -168,4 +168,10 @@
 		<value>An error occurred while monitoring file changes in {0}.</value>
 		<comment>{0} is the path to the project folder</comment>
 	</data>
+
+    <!-- Type Service Messages -->
+    <data name="TypeService.DuplicateType" xml:space="preserve">
+        <value>Type '{0}' already exists in project.</value>
+        <comment>{0} is the name of the type</comment>
+    </data>
 </root>
