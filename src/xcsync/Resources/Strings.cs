@@ -76,4 +76,7 @@ static class Strings {
 		internal static string ErrorWhileMonitoring (string path) => string.Format (Resources.Strings.Watch_ErrorMonitoringProjectFiles, path);
 	}
 
+	internal static class TypeService {
+		internal static string DuplicateType (string type) => string.Format (Resources.Strings.TypeService_DuplicateType, type);
+	}
 }
