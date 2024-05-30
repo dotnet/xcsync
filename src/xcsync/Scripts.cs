@@ -8,16 +8,22 @@ namespace xcsync;
 
 static partial class Scripts {
 
-	static string SelectXcode ()
+	static Execution ExecuteCommand (string command, string [] args, TimeSpan timeout)
 	{
-		var exec = Execution.RunAsync ("xcode-select", new List<string> { "-p" }, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
+		var exec = Execution.RunAsync (command, args, mergeOutput: true, timeout: timeout).Result;
 
 		if (exec.TimedOut)
-			throw new TimeoutException ("'xcode-select -p' took > 60 seconds, process has timed out");
+			throw new TimeoutException ($"'{command} {exec.Arguments}' execution took > {timeout.TotalSeconds} seconds, process has timed out");
 
 		if (exec.ExitCode != 0)
-			throw new InvalidOperationException ($"'xcode-select -p' failed with exit code '{exec.ExitCode}'");
+			throw new InvalidOperationException ($"'{command} {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
 
+		return exec;
+	}
+
+	static string SelectXcode ()
+	{
+		var exec = ExecuteCommand ("xcode-select", new [] { "-p" }, TimeSpan.FromMinutes (1));
 		return $"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..";
 	}
 
@@ -25,13 +31,8 @@ static partial class Scripts {
 	{
 		var resultFile = fileSystem.Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" };
-		var exec = Execution.RunAsync ("dotnet", args, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
 
-		if (exec.TimedOut)
-			throw new TimeoutException ($"'dotnet {exec.Arguments}' execution took > 60 seconds, process has timed out");
-
-		if (exec.ExitCode != 0)
-			throw new InvalidOperationException ($"'dotnet {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
+		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
 
 		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
 
@@ -58,14 +59,7 @@ static partial class Scripts {
 	public static string Run (string script)
 	{
 		var args = new [] { "-e", script };
-		var exec = Execution.RunAsync ("/usr/bin/osascript", args, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
-
-		if (exec.TimedOut)
-			throw new TimeoutException ($"AppleScript 'osascript {exec.Arguments}' execution took > 60 seconds, process has timed out");
-
-		if (exec.ExitCode != 0)
-			throw new InvalidOperationException ($"AppleScript: 'osascript {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
-
+		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
 		return exec.StandardOutput?.ToString ()?.Trim ('\n')!;
 	}
 
