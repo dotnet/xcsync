@@ -2,6 +2,7 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
+using xcsync.Projects;
 
 namespace xcsync.Commands;
 
@@ -13,7 +14,7 @@ class SyncCommand : BaseCommand<SyncCommand> {
 
 	public async Task Execute ()
 	{
-		var sync = new SyncContext (SyncDirection.FromXcode, ProjectPath, TargetPath, Tfm, Logger!);
+		var sync = new SyncContext (fileSystem, new TypeService(), SyncDirection.FromXcode, ProjectPath, TargetPath, Tfm, Logger!);
 		await sync.SyncAsync ().ConfigureAwait (false);
 	}
 }
