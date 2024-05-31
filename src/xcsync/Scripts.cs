@@ -56,6 +56,21 @@ static partial class Scripts {
 		return tfms;
 	}
 
+	public static string GetSupportedOSVersion (IFileSystem fileSystem, string projPath, string tfm)
+	{
+		var resultFile = fileSystem.Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}"};
+		var exec = Execution.RunAsync ("dotnet", args, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
+
+		if (exec.TimedOut)
+			throw new TimeoutException ($"'dotnet {exec.Arguments}' execution took > 60 seconds, process has timed out");
+
+		if (exec.ExitCode != 0)
+			throw new InvalidOperationException ($"'dotnet {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
+
+		return fileSystem.File.ReadAllText (resultFile).Trim ('\n');
+	}
+
 	public static string Run (string script)
 	{
 		var args = new [] { "-e", script };
