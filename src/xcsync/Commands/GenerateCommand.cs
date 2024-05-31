@@ -232,6 +232,8 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		};
 		xcodeObjects.Add (pbxFrameworksBuildPhase.Token, pbxFrameworksBuildPhase);
 
+		var supportedOSVersion = Scripts.GetSupportedOSVersion (fileSystem, ProjectPath, Tfm);
+
 		var debugBuildConfiguration = new XCBuildConfiguration {
 			Isa = "XCBuildConfiguration",
 			BuildSettings = new Dictionary<string, IList<string>> {
@@ -278,7 +280,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 				{"GCC_WARN_UNINITIALIZED_AUTOS", new List<string> {"YES_AGGRESSIVE"}},
 				{"GCC_WARN_UNUSED_FUNCTION", new List<string> {"YES"}},
 				{"GCC_WARN_UNUSED_VARIABLE", new List<string> {"YES"}},
-				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {"14.0"}},
+				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {supportedOSVersion}},
 				{"MTL_ENABLE_DEBUG_INFO", new List<string> {"YES"}},
 				{"ONLY_ACTIVE_ARCH", new List<string> {"YES"}},
 				{"SDKROOT", new List<string> {sdkroot}},
@@ -330,7 +332,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 				{"GCC_WARN_UNINITIALIZED_AUTOS", new List<string> {"YES_AGGRESSIVE"}},
 				{"GCC_WARN_UNUSED_FUNCTION", new List<string> {"YES"}},
 				{"GCC_WARN_UNUSED_VARIABLE", new List<string> {"YES"}},
-				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {"14.0"}},
+				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {supportedOSVersion}},
 				{"MTL_ENABLE_DEBUG_INFO", new List<string> {"NO"}},
 				{"SDKROOT", new List<string> {sdkroot}},
 				{"VALIDATE_PRODUCT", new List<string> {"YES"}},
