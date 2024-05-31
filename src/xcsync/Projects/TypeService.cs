@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Microsoft.CodeAnalysis;
 using Serilog;
 
 namespace xcsync.Projects;
@@ -28,10 +29,10 @@ class TypeService : ITypeService {
 		return newType;
 	}
 
-	public TypeMapping? AddType (string CliType, string ObjCType, TypeMapping? BaseType, bool IsModel, bool IsProtocol,
-		bool InDesigner, List<IBOutlet>? Outlets, List<IBAction>? Actions, HashSet<string> References)
+	public TypeMapping? AddType (INamedTypeSymbol typeSymbol, string cliType, string objCType, TypeMapping? baseType, bool isModel, bool isProtocol,
+		bool inDesigner, List<IBOutlet>? outlets, List<IBAction>? actions, HashSet<string> references)
 	{
-		var newType = new TypeMapping(CliType, ObjCType, BaseType, IsModel, IsProtocol, InDesigner, Outlets, Actions, References);
+		var newType = new TypeMapping(typeSymbol, cliType, objCType, baseType, isModel, isProtocol, inDesigner, outlets, actions, references);
 		return AddType(newType);
 	}
 
