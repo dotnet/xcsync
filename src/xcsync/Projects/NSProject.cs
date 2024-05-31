@@ -24,7 +24,7 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 			}
 		}
 	}
-	public TypeMapping? ConvertToTypeMapping (ITypeSymbol type)
+	public TypeMapping? ConvertToTypeMapping (INamedTypeSymbol type)
 	{
 		// TypeMapping bridges the gap between the .net + objc worlds
 		// extracts the necessary info from the roslyn detected type for objc .h and .m file generation
@@ -80,7 +80,7 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 					cliName: property.Name,
 					objcName: outletAttribute.GetName () ?? property.Name,
 					cliType: property.Type.MetadataName,
-					objcType: property.Type.GetObjCType (this),
+					objcType: (property.Type as INamedTypeSymbol)?.GetObjCType (this),
 					isCollection: property.Type.TypeKind == TypeKind.Array));
 
 				refs.Add (property.ContainingNamespace.Name);
@@ -100,7 +100,7 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 
 				var index = 0;
 				foreach (var param in method.Parameters) {
-					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, param.Type.GetObjCType (this)));
+					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, (param.Type as INamedTypeSymbol)?.GetObjCType (this)));
 					index++;
 					refs.Add (param.ContainingNamespace.Name);
 				}
@@ -114,7 +114,7 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 		if (baseTypeMapping is not null)
 			refs.UnionWith (baseTypeMapping.References);
 
-		var typeMapping = new TypeMapping (cliName, objCName, baseTypeMapping, isModel, isProtocol, InDesignerFile (type, objCName),
+		var typeMapping = new TypeMapping (type, cliName, objCName, baseTypeMapping, isModel, isProtocol, InDesignerFile (type, objCName),
 			outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions,
 			refs.Intersect (xcSync.ApplePlatforms [targetPlatform].SupportedFrameworks.Keys).ToHashSet ());
 
@@ -141,7 +141,7 @@ static class Extensions {
 	public static string? GetName (this AttributeData attribute) =>
 		attribute.ConstructorArguments.FirstOrDefault ().Value?.ToString ();
 
-	public static string? GetObjCType (this ITypeSymbol symbol, NSProject nsProject)
+	public static string? GetObjCType (this INamedTypeSymbol symbol, NSProject nsProject)
 	{
 		nsProject.cliTypes.TryGetValue (symbol.MetadataName, out var nsType);
 		return nsType?.ObjCType ?? nsProject.ConvertToTypeMapping (symbol)?.ObjCType;

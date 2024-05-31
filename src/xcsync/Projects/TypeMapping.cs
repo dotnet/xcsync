@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using Microsoft.CodeAnalysis;
+
 namespace xcsync.Projects;
 
-record TypeMapping (string CliType, string ObjCType, TypeMapping? BaseType, bool IsModel, bool IsProtocol,
+record TypeMapping (INamedTypeSymbol TypeSymbol, string CliType, string ObjCType, TypeMapping? BaseType, bool IsModel, bool IsProtocol,
 	bool InDesigner, List<IBOutlet>? Outlets, List<IBAction>? Actions, HashSet<string> References);
 
 class IBOutlet (string cliName, string objcName, string cliType, string? objcType, bool isCollection) {
