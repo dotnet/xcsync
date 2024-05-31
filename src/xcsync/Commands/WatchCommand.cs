@@ -2,6 +2,7 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
+using xcsync.Projects;
 
 namespace xcsync.Commands;
 
@@ -25,7 +26,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 		LogInformation ("Continuously syncing files between project '{projectPath}' and target '{targetPath} for '{tfm}' platform, press [ESC] to end.", ProjectPath, TargetPath, Tfm);
 		using var cts = new CancellationTokenSource ();
 
-		var sync = new ContinuousSyncContext (ProjectPath, TargetPath, Tfm, Logger!);
+		var sync = new ContinuousSyncContext (fileSystem, new TypeService(), ProjectPath, TargetPath, Tfm, Logger!);
 
 		// Start an asynchronous task
 		var task = Task.Run (async () => {

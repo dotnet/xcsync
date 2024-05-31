@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
 using Serilog;
+using xcsync.Projects;
 
 namespace xcsync;
 
-class SyncContext (SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger)
-	: SyncContextBase (projectPath, targetDir, framework, logger) {
+class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger)
+	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	protected SyncDirection SyncDirection { get; } = Direction;
 
