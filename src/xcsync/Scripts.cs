@@ -21,11 +21,13 @@ static partial class Scripts {
 		return exec;
 	}
 
-	static string SelectXcode ()
+#pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
+	public static string SelectXcode ()
 	{
-		var exec = ExecuteCommand ("xcode-select", new [] { "-p" }, TimeSpan.FromMinutes (1));
-		return $"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..";
+		var exec = ExecuteCommand ("xcode-select", ["-p"], TimeSpan.FromMinutes (1));
+		return Path.GetFullPath($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
 	}
+#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 
 	public static List<string> GetTfms (IFileSystem fileSystem, string projPath)
 	{
