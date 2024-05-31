@@ -1,17 +1,18 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using System.IO.Abstractions;
 using Serilog;
 using xcsync.Projects;
 
 namespace xcsync;
 
-class ContinuousSyncContext (string projectPath, string targetDir, string framework, ILogger logger)
-	: SyncContextBase (projectPath, targetDir, framework, logger) {
+class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger)
+	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public async Task SyncAsync (CancellationToken token = default)
 	{
 		// Generate initial Xcode project
-		await new SyncContext (SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
+		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
 		// TODO: Initialize projects
 		var ClrProject = new Dotnet (ProjectPath, Framework);
