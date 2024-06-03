@@ -16,7 +16,7 @@ class XcodeProject {
 
 	[JsonConverter (typeof (XcodeProjectObjectsJsonConverter))]
 	[JsonPropertyName ("objects")]
-	public IDictionary<string, XcodeObject>? Objects { get; set; }
+	public IDictionary<string, XcodeObject> Objects { get; set; } = new Dictionary<string, XcodeObject> ();
 
 	[JsonPropertyName ("rootObject")]
 	public string? RootObject { get; set; }
@@ -172,7 +172,7 @@ class PBXGroup : XcodeObject {
 	public string? Name { get; set; }
 
 	[JsonPropertyName ("children")]
-	public List<string>? Children { get; set; }
+	public List<string> Children { get; set; } = [];
 
 	[JsonPropertyName ("sourceTree")]
 	public string SourceTree { get; set; } = "<group>";
