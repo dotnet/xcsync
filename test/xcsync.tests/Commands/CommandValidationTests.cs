@@ -38,13 +38,13 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("maui", "net8.0-maccatalyst", "obj/xcode", "")]
 	[InlineData ("maui", "net8.0-macos", "obj/xcode", "Target framework is not supported by current .NET project.")]
 	[InlineData ("maui", "net8.0-ios", "{Directory}/xcode", "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
-	public void BaseCommandValidation_SingleProject (string projectType, string tfm, string targetPath, string expectedError)
+	public async void BaseCommandValidation_SingleProject (string projectType, string tfm, string targetPath, string expectedError)
 	{
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
 		var fileSystem = new FileSystem ();
-		DotnetNew (TestOutput, projectType, tmpDir, "");
+		await DotnetNew (TestOutput, projectType, tmpDir, "");
 		Assert.True (Directory.Exists (tmpDir));
 		var fullProjectPath = Path.Combine (tmpDir, $"{projectName}.csproj");
 
@@ -105,7 +105,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[Theory]
 	[InlineData ("{Directory}/xcode", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
 	[InlineData ("{Directory}/xcode", true, "")]
-	public void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
+	public async void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
 	{
 		var fileSystem = new MockFileSystem ();
 
@@ -113,7 +113,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 		Assert.True (Directory.Exists (tmpDir));
 
-		DotnetNew (TestOutput, "macos", tmpDir);
+		await DotnetNew (TestOutput, "macos", tmpDir);
 
 		string fullProjectPath = $"{tmpDir}{projectName}/{projectName}.csproj";
 		string tfm = "net8.0-macos";
@@ -146,7 +146,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[Theory]
 	[InlineData ("macos", new string [] { "net8.0-macos" })]
 	[InlineData ("maui", new string [] { "net8.0-android", "net8.0-ios", "net8.0-maccatalyst" })]
-	public void BaseCommandValidation_GetTFMs (string projectType, string [] expectedTfms)
+	public async void BaseCommandValidation_GetTFMs (string projectType, string [] expectedTfms)
 	{
 		var projectName = Guid.NewGuid ().ToString ();
 
@@ -154,7 +154,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var fileSystem = new FileSystem ();
 
-		DotnetNew (TestOutput, projectType, tmpDir, "");
+		await DotnetNew (TestOutput, projectType, tmpDir, "");
 		Assert.True (Directory.Exists (tmpDir));
 		var fullProjectPath = fileSystem.Path.Combine (tmpDir, $"{projectName}.csproj");
 
