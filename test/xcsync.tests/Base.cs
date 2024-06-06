@@ -13,29 +13,23 @@ public class Base {
 	protected readonly string TestProjectPath =
 		Path.Combine ("..", "..", "..", "..", "test-project", "test-project.csproj");
 
-	static void Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
+	static async Task Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
 		output.WriteLine ($"Running: {path}/{executable} {arguments}");
 		var outputWrapper = new LoggingOutputWriter (output);
-		var exec = Execution.RunAsync (
+		var exec = await Execution.RunAsync (
 				executable,
 				arguments,
 				workingDirectory: path,
 				standardOutput: outputWrapper,
 				standardError: outputWrapper
-			).Result;
+			);
 		Assert.Equal (0, exec.ExitCode);
 	}
 
-	protected static void DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "")
-	{
-		Run (output, path, "dotnet", "new", template, "-o", path, templateOptions);
-	}
+	protected static async Task DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run (output, path, "dotnet", "new", template, "-o", path, templateOptions);
 
-	protected static void Xcsync (ITestOutputHelper output, params string [] arguments)
-	{
-		Run (output, Directory.GetCurrentDirectory (), XcsyncExe, arguments);
-	}
+	protected static async Task Xcsync (ITestOutputHelper output, params string [] arguments) => await Run (output, Directory.GetCurrentDirectory (), XcsyncExe, arguments);
 
 	class LoggingOutputWriter (ITestOutputHelper helper) : TextWriter {
 
@@ -51,5 +45,4 @@ public class Base {
 			}
 		}
 	}
-
 }

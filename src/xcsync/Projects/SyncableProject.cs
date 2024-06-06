@@ -6,16 +6,45 @@ using Serilog;
 
 namespace xcsync.Projects;
 
-class SyncableProject (IFileSystem fileSystem, ILogger logger, string name, string rootPath, string framework, string [] projectFilesFilter) : ISyncableProject {
-	public string Name { get; set; } = name;
+class SyncableProject : ISyncableProject {
+	public string Name { get; init; }
 
-	public string RootPath { get; set; } = rootPath;
+	public string RootPath { get; init; }
 
-	public string [] ProjectFilesFilter { get; init; } = projectFilesFilter;
+	public string [] ProjectFilesFilter { get; init; }
 
-	protected IFileSystem FileSystem { get; init; } = fileSystem;
+	protected IFileSystem FileSystem { get; init; }
 
-	protected ILogger Logger { get; init; } = logger;
+	protected ILogger Logger { get; init; }
 
-	protected string Framework { get; set; } = framework;
+	protected string Framework { get; set; }
+
+	Task? initTask;
+
+	public SyncableProject (IFileSystem fileSystem, ILogger logger, string name, string rootPath, string framework, string [] projectFilesFilter)
+	{
+		FileSystem = fileSystem;
+		Logger = logger;
+		Name = name;
+		RootPath = rootPath;
+		Framework = framework;
+		ProjectFilesFilter = projectFilesFilter;
+
+		_ = InitAsync ();
+	}
+
+	public Task InitAsync ()
+	{
+		if (initTask == null || initTask.IsFaulted)
+			initTask = InitTask ();
+
+		return initTask;
+	}
+
+	Task InitTask () => Task.Run (InitializeAsync);
+
+	protected virtual void InitializeAsync ()
+	{
+		// Override this method to perform initialization
+	}
 }
