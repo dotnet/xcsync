@@ -331,7 +331,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("tvos", "", "net8.0-tvos", new string [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
 	[InlineData ("maui", "", "net8.0-ios", new string [] { "AppDelegate", "Info.plist" })]
 	[InlineData ("maui", "", "net8.0-maccatalyst", new string [] { "AppDelegate", "Info.plist" })]
-	public void IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
+	public async void IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
 	{
 		// testing entirety of generate command
 		// dotnet new macos > xcsync > verify
@@ -341,7 +341,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		// Run 'dotnet new macos' in temp dir
 		// DotnetNew (TestOutput, "globaljson", tmpDir, "--sdk-version 8.0.0 --roll-forward feature");
-		DotnetNew (TestOutput, projectType, tmpDir, templateOptions);
+		await DotnetNew (TestOutput, projectType, tmpDir, templateOptions);
 
 		Assert.True (Directory.Exists (tmpDir));
 
@@ -351,7 +351,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		// Run 'xcsync generate'
-		Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm);
+		await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm);
 
 		projectFiles.SelectMany (projectFile => {
 			return (IEnumerable<string>) (Path.HasExtension (projectFile) ? ([projectFile]) : ([$"{projectFile}.m", $"{projectFile}.h"]));
@@ -367,14 +367,14 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 	[Fact]
 	[Trait ("Category", "XcodeIntegration")]
-	public void IsXcodeProjectOpen ()
+	public async void IsXcodeProjectOpen ()
 	{
 		// Assert to make sure Xcode successfully opens project when --open flag used
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
 		// Run 'dotnet new macos' in temp dir
-		DotnetNew (TestOutput, "macos", tmpDir);
+		await DotnetNew (TestOutput, "macos", tmpDir);
 
 		Assert.True (Directory.Exists (Path.Combine (tmpDir)));
 
@@ -385,7 +385,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		try {
 			// Run 'xcsync generate'
-			Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "--open");
+			await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "--open");
 
 			// check if xcode has project open
 
