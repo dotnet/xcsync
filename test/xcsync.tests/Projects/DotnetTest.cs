@@ -1,5 +1,8 @@
 using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using Microsoft.CodeAnalysis;
+using Moq;
+using Serilog;
 using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
@@ -21,12 +24,11 @@ public class DotnetTest : Base {
 		if (!File.Exists (TestProjectPath))
 			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
-		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
-		// TODO: Convert this to MockFileSystem
-		var xcodeProject = new NSProject (new FileSystem (), cliProject, "macos");
+		var clrProject = new ClrProject (new MockFileSystem (), Mock.Of<ILogger> (), "TestProject", TestProjectPath, "net8.0-macos");
+		var xcodeProject = new NSProject (new MockFileSystem (), clrProject, "macos");
 
-		var project = await cliProject.OpenProject ().ConfigureAwait (false);
-		List<INamedTypeSymbol> types = await cliProject.GetNsoTypes (project).ToListAsync ().ConfigureAwait (false);
+		var project = await clrProject.OpenProject ().ConfigureAwait (false);
+		List<INamedTypeSymbol> types = await clrProject.GetNsoTypes (project).ToListAsync ().ConfigureAwait (false);
 		Assert.Equal (expectedTypes, types.Select (x => x.Name).OrderBy (x => x).ToList ());
 	}
 }

@@ -28,7 +28,7 @@ public class TypeServiceTest {
 	[Fact]
 	public void QueryExistentTypes ()
 	{
-		var type = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "NewTypeCli", "NewTypeObjC", null, false, false, false, null, null, []);
+		var type = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "NewTypeClr", "NewTypeObjC", null, false, false, false, null, null, []);
 		typeService.AddType (type);
 		var result = typeService.QueryTypes (objcType: "NewTypeObjC");
 		Assert.Single (result);
@@ -38,7 +38,7 @@ public class TypeServiceTest {
 	[Fact]
 	public void QueryNonexistentType ()
 	{
-		var result = typeService.QueryTypes (cliType: "doesNotExist");
+		var result = typeService.QueryTypes (clrType: "doesNotExist");
 		Assert.Empty (result);
 	}
 
