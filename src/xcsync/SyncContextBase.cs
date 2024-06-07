@@ -11,7 +11,7 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	protected readonly ILogger Logger = logger;
 	protected readonly IFileSystem FileSystem = fileSystem;
 
-	public ITypeService TypeService => typeService ;
+	public ITypeService TypeService => typeService;
 
 	protected string ProjectPath { get; } = projectPath;
 	protected string TargetDir { get; } = targetDir;

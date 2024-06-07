@@ -430,7 +430,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 
 		if (Open) {
 			string workspacePath = fileSystem.Path.Combine (TargetPath, projectName + ".xcodeproj", "project.xcworkspace");
-			Logger?.Information (Strings.Generate.OpenProject (Scripts.Run(Scripts.OpenXcodeProject(workspacePath))));
+			Logger?.Information (Strings.Generate.OpenProject (Scripts.Run (Scripts.OpenXcodeProject (workspacePath))));
 		}
 	}
 
