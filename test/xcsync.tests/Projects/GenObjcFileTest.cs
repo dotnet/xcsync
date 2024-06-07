@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.IO.Abstractions;
+using Moq;
+using Serilog;
 using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
@@ -33,7 +35,7 @@ public class GenObjcFileTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "AppDelegate");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "AppDelegate");
 
 		Assert.NotNull (nsType);
 
@@ -62,7 +64,7 @@ public class GenObjcFileTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "AppDelegate");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "AppDelegate");
 
 		Assert.NotNull (nsType);
 
@@ -88,7 +90,7 @@ public class GenObjcFileTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 
@@ -122,7 +124,7 @@ public class GenObjcFileTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 
@@ -147,14 +149,13 @@ public class GenObjcFileTest : Base {
 		Assert.Equal (expected, generated);
 	}
 
-	(Dotnet, NSProject) InitializeProjects ()
+	(ClrProject, NSProject) InitializeProjects ()
 	{
 		Assert.True (File.Exists (TestProjectPath));
-
-		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
 		// TODO: Convert this to MockFileSystem
-		var xcodeProject = new NSProject (new FileSystem (), cliProject, "macos");
-		return (cliProject, xcodeProject);
+		var clrProject = new ClrProject (new FileSystem (), Mock.Of<ILogger> (), "TestProject", TestProjectPath, "net8.0-macos");
+		var xcodeProject = new NSProject (new FileSystem (), clrProject, "macos");
+		return (clrProject, xcodeProject);
 	}
 
 }

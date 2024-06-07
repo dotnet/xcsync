@@ -1,4 +1,6 @@
 using System.IO.Abstractions;
+using Moq;
+using Serilog;
 using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
@@ -20,27 +22,27 @@ public class NSProjectTest : Base {
 
 		Assert.Equal (expectedTypes.Count, await xcodeProject.GetTypes ().CountAsync ());
 		await foreach (var type in xcodeProject.GetTypes ()) {
-			Assert.Contains (type.CliType, expectedTypes);
+			Assert.Contains (type.ClrType, expectedTypes);
 		}
 	}
 
 	[InlineData ("ModelVariety", "ObjectiveCModelVariety", true, false, "NSObject", "NSObject", false)]
 	[InlineData ("ViewController", "ViewController", false, true, "NSViewController", "NSViewController", false)]
 	[Theory]
-	public async Task ConvertToNSObject (string cliName, string objcName, bool isModel, bool inDesigner, string cliBaseName, string objcBaseName, bool baseIsModel)
+	public async Task ConvertToNSObject (string clrName, string objcName, bool isModel, bool inDesigner, string clrBaseName, string objcBaseName, bool baseIsModel)
 	{
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == cliName);
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == clrName);
 
 		Assert.NotNull (nsType);
 		Assert.Equal (objcName, nsType.ObjCType);
 		Assert.Equal (isModel, nsType.IsModel);
 		Assert.Equal (inDesigner, nsType.InDesigner);
-		Assert.Equal (cliBaseName, nsType?.BaseType?.CliType);
-		Assert.Equal (objcBaseName, nsType?.BaseType?.ObjCType);
-		Assert.Equal (baseIsModel, nsType?.BaseType?.IsModel);
+		Assert.Equal (clrBaseName, nsType.BaseType?.ClrType);
+		Assert.Equal (objcBaseName, nsType.BaseType?.ObjCType);
+		Assert.Equal (baseIsModel, nsType.BaseType?.IsModel);
 	}
 
 	[Fact]
@@ -49,16 +51,16 @@ public class NSProjectTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 		var outlets = nsType.Outlets;
 
 		Assert.NotNull (outlets);
 		Assert.Single (outlets);
-		Assert.Equal ("FileLabel", outlets [0].CliName);
+		Assert.Equal ("FileLabel", outlets [0].ClrName);
 		Assert.Equal ("FileLabel", outlets [0].ObjCName);
-		Assert.Equal ("NSTextField", outlets [0].CliType);
+		Assert.Equal ("NSTextField", outlets [0].ClrType);
 		Assert.Equal ("NSTextField", outlets [0].ObjCType);
 	}
 
@@ -68,21 +70,21 @@ public class NSProjectTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ViewController");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 		var actions = nsType.Actions;
 
 		Assert.NotNull (actions);
 		Assert.Single (actions);
-		Assert.Equal ("UploadButton", actions [0].CliName);
+		Assert.Equal ("UploadButton", actions [0].ClrName);
 		Assert.Equal ("UploadButton", actions [0].ObjCName);
 		Assert.Single (actions [0].Parameters);
 
-		Assert.Equal ("sender", actions [0].Parameters [0].CliName);
+		Assert.Equal ("sender", actions [0].Parameters [0].ClrName);
 		Assert.Null (actions [0].Parameters [0].ObjCName);
 
-		Assert.Equal ("NSObject", actions [0].Parameters [0].CliType);
+		Assert.Equal ("NSObject", actions [0].Parameters [0].ClrType);
 		Assert.Equal ("NSObject", actions [0].Parameters [0].ObjCType);
 	}
 
@@ -92,7 +94,7 @@ public class NSProjectTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "AppDelegate");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "AppDelegate");
 
 		Assert.NotNull (nsType);
 		Assert.Null (nsType.Outlets);
@@ -105,21 +107,20 @@ public class NSProjectTest : Base {
 		(_, NSProject xcodeProject) = InitializeProjects ();
 
 		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.CliType == "ModelVariety");
+		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ModelVariety");
 
 		Assert.NotNull (nsType);
 		Assert.Null (nsType.Outlets);
 		Assert.Null (nsType.Actions);
 	}
 
-	(Dotnet, NSProject) InitializeProjects ()
+	(ClrProject, NSProject) InitializeProjects ()
 	{
 		Assert.True (File.Exists (TestProjectPath));
-
-		var cliProject = new Dotnet (TestProjectPath, "net8.0-macos");
-		// TODO: Convert this to MockFileSystem
-		var xcodeProject = new NSProject (new FileSystem (), cliProject, "macos");
-		return (cliProject, xcodeProject);
+		// TODO: Convert this to MockFileSystem --> needs entirety of testproject mocked
+		var clrProject = new ClrProject (new FileSystem (), Mock.Of<ILogger> (), "TestProject", TestProjectPath, "net8.0-macos");
+		var xcodeProject = new NSProject (new FileSystem (), clrProject, "macos");
+		return (clrProject, xcodeProject);
 	}
 
 }

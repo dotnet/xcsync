@@ -5,18 +5,18 @@ using Microsoft.CodeAnalysis;
 
 namespace xcsync.Projects;
 
-class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) {
+class NSProject (IFileSystem fileSystem, ClrProject project, string targetPlatform) {
 
-	public Dictionary<string, TypeMapping?> cliTypes = [];
+	public Dictionary<string, TypeMapping?> clrTypes = [];
 	public Dictionary<string, TypeMapping> objCTypes = [];
-	public Dotnet DotnetProject { get; set; } = project;
+	public ClrProject ClrProject { get; set; } = project;
 
 	IFileSystem fileSystem { get; } = fileSystem;
 
 	public async IAsyncEnumerable<TypeMapping> GetTypes ()
 	{
-		var openProject = await DotnetProject.OpenProject ().ConfigureAwait (false);
-		await foreach (var type in DotnetProject.GetNsoTypes (openProject).ConfigureAwait (false)) {
+		var openProject = await ClrProject.OpenProject ().ConfigureAwait (false);
+		await foreach (var type in ClrProject.GetNsoTypes (openProject).ConfigureAwait (false)) {
 			var nsType = ConvertToTypeMapping (type);
 			if (nsType is not null && !nsType.IsProtocol) {
 				// todo: use context to add Type to the TypeService
@@ -33,16 +33,16 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 		// If the type is not a model, we handle the properties and methods for IBOutlets and IBActions handling too
 		var isModel = false;
 		var isProtocol = false;
-		var cliName = type.MetadataName;
+		var clrName = type.MetadataName;
 		var objCName = type.Name;
 		HashSet<string> refs = [];
 
-		if (cliTypes.TryGetValue (cliName, out var existingTypeMapping))
+		if (clrTypes.TryGetValue (clrName, out var existingTypeMapping))
 			return existingTypeMapping;
 
 		var baseType = type.BaseType;
 		if (baseType is null) {
-			cliTypes [cliName] = null; // this saves computing the type multiple times and failing each type
+			clrTypes [clrName] = null; // this saves computing the type multiple times and failing each type
 			return null;
 		}
 
@@ -77,9 +77,9 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 					continue;
 
 				outlets.Add (new IBOutlet (
-					cliName: property.Name,
+					clrName: property.Name,
 					objcName: outletAttribute.GetName () ?? property.Name,
-					cliType: property.Type.MetadataName,
+					clrType: property.Type.MetadataName,
 					objcType: (property.Type as INamedTypeSymbol)?.GetObjCType (this),
 					isCollection: property.Type.TypeKind == TypeKind.Array));
 
@@ -114,11 +114,11 @@ class NSProject (IFileSystem fileSystem, Dotnet project, string targetPlatform) 
 		if (baseTypeMapping is not null)
 			refs.UnionWith (baseTypeMapping.References);
 
-		var typeMapping = new TypeMapping (type, cliName, objCName, baseTypeMapping, isModel, isProtocol, InDesignerFile (type, objCName),
+		var typeMapping = new TypeMapping (type, clrName, objCName, baseTypeMapping, isModel, isProtocol, InDesignerFile (type, objCName),
 			outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions,
 			refs.Intersect (xcSync.ApplePlatforms [targetPlatform].SupportedFrameworks.Keys).ToHashSet ());
 
-		cliTypes.Add (typeMapping.CliType, typeMapping);
+		clrTypes.Add (typeMapping.ClrType, typeMapping);
 		objCTypes.Add (typeMapping.ObjCType, typeMapping);
 
 		return typeMapping;
@@ -143,7 +143,7 @@ static class Extensions {
 
 	public static string? GetObjCType (this INamedTypeSymbol symbol, NSProject nsProject)
 	{
-		nsProject.cliTypes.TryGetValue (symbol.MetadataName, out var nsType);
+		nsProject.clrTypes.TryGetValue (symbol.MetadataName, out var nsType);
 		return nsType?.ObjCType ?? nsProject.ConvertToTypeMapping (symbol)?.ObjCType;
 	}
 

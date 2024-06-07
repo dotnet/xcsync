@@ -8,21 +8,19 @@ namespace xcsync;
 
 class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
-
 	public async Task SyncAsync (CancellationToken token = default)
 	{
 		// Generate initial Xcode project
 		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
-		// TODO: Initialize projects
-		var ClrProject = new Dotnet (ProjectPath, Framework);
-		// var XcodeProject = new XcodeWorkspace (TargetDir);
 
-		// TODO: Monitor changes in the projects e.g.
-		// using var dotnetChanges = new ProjectFileChangeMonitor (ClrProject);
-		// dotnetChanges.StartMonitoring (token);
-		// using var xcodeChanges = new ProjectFileChangeMonitor (XcodeProject);
-		// xcodeChanges.StartMonitoring (token);
+		var clrProject = new ClrProject (FileSystem, Logger, "CLR Project", ProjectPath, Framework);
+		var xcodeProject = new XcodeWorkspace (FileSystem, Logger, "Xcode Project", TargetDir, Framework);
+
+		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New(), Logger);
+		clrChanges.StartMonitoring (clrProject, token);
+		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New(), Logger);
+		xcodeChanges.StartMonitoring (xcodeProject, token);
 
 		// TODO: Create new jobs for type / file changes and add them to the Queue
 		do {

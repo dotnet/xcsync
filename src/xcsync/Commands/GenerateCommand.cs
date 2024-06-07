@@ -28,8 +28,8 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		if (!TryGetTargetPlatform (Tfm, out string targetPlatform))
 			return;
 
-		var dotnet = new Dotnet (ProjectPath, Tfm);
-		var nsProject = new NSProject (fileSystem, dotnet, targetPlatform);
+		var clrProject = new ClrProject (fileSystem, Logger!, "CLR Project", ProjectPath, Tfm);
+		var nsProject = new NSProject (fileSystem, clrProject, targetPlatform);
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
