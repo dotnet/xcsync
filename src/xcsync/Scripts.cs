@@ -25,7 +25,7 @@ static partial class Scripts {
 	public static string SelectXcode ()
 	{
 		var exec = ExecuteCommand ("xcode-select", ["-p"], TimeSpan.FromMinutes (1));
-		return Path.GetFullPath($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
+		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
 	}
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 
@@ -61,7 +61,7 @@ static partial class Scripts {
 	public static string GetSupportedOSVersion (IFileSystem fileSystem, string projPath, string tfm)
 	{
 		var resultFile = fileSystem.Path.GetTempFileName ();
-		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}"};
+		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
 		var exec = Execution.RunAsync ("dotnet", args, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
 
 		if (exec.TimedOut)
