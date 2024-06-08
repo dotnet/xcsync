@@ -16,7 +16,8 @@ public class ObjCSyntaxRewriterTest {
 	[Theory]
 	[InlineData (ViewControllerObjC, ViewControllerCSharp)]
 	[InlineData (ViewControllerOutletObjC, ViewControllerOutletCSharp)]
-	public async void WriteAsync_ObjCInterfaceDecl_VisitCalledForEachChild (string inputContents, string expectedOutput)
+	[InlineData (ViewControllerActionObjC, ViewControllerActionCSharp)]
+	public async void WriteAsync_ObjCInterfaceDecl_TranslatesToCorrectValidSyntaxTree (string inputContents, string expectedOutput)
 	{
 		// Arrange
 
@@ -113,5 +114,31 @@ partial class ViewController
 		}
 	}
 }";
+	const string ViewControllerActionObjC = @"
+#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
 
+@interface ViewController : NSViewController {
+}
+
+- (IBAction)HelloWorld:(id)sender;
+
+@end
+
+@implementation ViewController
+ 
+ - (IBAction)HelloWorld:(id)sender {
+}
+@end
+";
+	const string ViewControllerActionCSharp = @"[Register(""ViewController"")]
+partial class ViewController
+{
+	[Action(""HelloWorld:"")]
+	partial void HelloWorld(Foundation.NSObject sender);
+
+	void ReleaseDesignerOutlets()
+	{
+	}
+}";
 }
