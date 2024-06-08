@@ -11,7 +11,7 @@ public class TypeServiceTest {
 	{
 		typeService = new TypeService ();
 
-		typeService.AddType (Mock.Of<INamedTypeSymbol> (),"ViewController", "ViewController", null, false, false, false, null, null, []);
+		typeService.AddType (Mock.Of<INamedTypeSymbol> (), "ViewController", "ViewController", null, false, false, false, null, null, []);
 		typeService.AddType (Mock.Of<INamedTypeSymbol> (), "AppDelegate", "AppDelegate", null, false, false, false, null, null, []);
 		typeService.AddType (Mock.Of<INamedTypeSymbol> (), "TypeExtension", "TypeExtension", null, false, false, false, null, null, []);
 	}
