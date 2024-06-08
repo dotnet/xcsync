@@ -5,6 +5,7 @@ using ClangSharp.Interop;
 using Moq;
 using Serilog;
 using xcsync.Ast;
+using xcsync.Projects;
 using static ClangSharp.Interop.CXTranslationUnit_Flags;
 
 namespace xcsync.tests.Ast;
@@ -14,6 +15,7 @@ public class ObjCSyntaxRewriterTest {
 
 	[Theory]
 	[InlineData (ViewControllerObjC, ViewControllerCSharp)]
+	[InlineData (ViewControllerOutletObjC, ViewControllerOutletCSharp)]
 	public async void WriteAsync_ObjCInterfaceDecl_VisitCalledForEachChild (string inputContents, string expectedOutput)
 	{
 		// Arrange
@@ -23,6 +25,13 @@ public class ObjCSyntaxRewriterTest {
 		// So the hardcoding of the OS Arch and target platform is acceptable
 
 		var logger = new Mock<ILogger> ();
+		var TypeService = new Mock<TypeService> ();
+		var NSTextFieldTypeMapping = new TypeMapping (null, "NSTextField", "NSTextField", null, false, false, false, null, null, []);
+
+		TypeService.Setup (
+			x => x.QueryTypes (It.IsAny<string> (), It.Is<string> (s => s == "NSTextField"))
+		).Returns ([NSTextFieldTypeMapping]);
+
 		var index = CXIndex.Create ();
 		using var unsavedFile = CXUnsavedFile.Create (DefaultInputFileName, inputContents);
 
@@ -46,12 +55,13 @@ public class ObjCSyntaxRewriterTest {
 		var decl = (ObjCInterfaceDecl) cursor;
 
 		// Act
-		var walker = new ObjCSyntaxRewriter (logger.Object);
+		var walker = new ObjCSyntaxRewriter (logger.Object, TypeService.Object);
 		var newSyntax = await walker!.WriteAsync (decl, null);
+		var actualOutput = newSyntax!.GetRoot ().ToFullString ();
 
 		// Assert
 		Assert.NotNull (newSyntax);
-		Assert.Equal (expectedOutput, newSyntax!.GetRoot().ToString ());
+		Assert.Equal (expectedOutput, actualOutput);
 	}
 
 	const string ViewControllerObjC = @"
@@ -69,8 +79,39 @@ public class ObjCSyntaxRewriterTest {
 	const string ViewControllerCSharp = @"[Register(""ViewController"")]
 partial class ViewController
 {
-    void ReleaseDesignerOutlets()
-    {
-    }
+	void ReleaseDesignerOutlets()
+	{
+	}
 }";
+	const string ViewControllerOutletObjC = @"
+#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+
+@interface ViewController : NSViewController {
+}
+
+@property (weak) IBOutlet NSTextField *Name;
+
+@end
+
+@implementation ViewController
+ 
+@end
+";
+	const string ViewControllerOutletCSharp = @"[Register(""ViewController"")]
+partial class ViewController
+{
+	[Outlet]
+	NSTextField Name { get; set; }
+
+	void ReleaseDesignerOutlets()
+	{
+		if (Name != null)
+		{
+			Name.Dispose();
+			Name = null;
+		}
+	}
+}";
+
 }

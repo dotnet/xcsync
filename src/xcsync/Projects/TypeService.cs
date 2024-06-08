@@ -32,13 +32,13 @@ class TypeService : ITypeService {
 	public TypeMapping? AddType (INamedTypeSymbol typeSymbol, string clrType, string objCType, TypeMapping? baseType, bool isModel, bool isProtocol,
 		bool inDesigner, List<IBOutlet>? outlets, List<IBAction>? actions, HashSet<string> references)
 	{
-		var newType = new TypeMapping(typeSymbol, clrType, objCType, baseType, isModel, isProtocol, inDesigner, outlets, actions, references);
-		return AddType(newType);
+		var newType = new TypeMapping (typeSymbol, clrType, objCType, baseType, isModel, isProtocol, inDesigner, outlets, actions, references);
+		return AddType (newType);
 	}
 
-	public IEnumerable<TypeMapping> QueryTypes (string? clrType = null, string? objcType = null) =>
+	public virtual IEnumerable<TypeMapping> QueryTypes (string? clrType = null, string? objcType = null) =>
 		(clrType, objcType) switch {
-			(string clr, null) => clrTypes.Values.Where (t => t.ClrType == clr),
+			(string cli, null) => clrTypes.Values.Where (t => t.ClrType == cli),
 			(null, string objc) => objCTypes.Values.Where (t => t.ObjCType == objc),
 			(string clr, string objc) => clrTypes.Values.Where (t => t.ClrType == clr && t.ObjCType == objc),
 			_ => clrTypes.Values
