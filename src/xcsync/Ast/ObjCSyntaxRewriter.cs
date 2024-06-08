@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using ClangSharp;
+using ClangSharp.Interop;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,20 +14,26 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace xcsync.Ast;
 
-class ObjCSyntaxRewriter (ILogger logger, TypeService typeService) : AstWalker {
+class ObjCSyntaxRewriter (ILogger Logger, TypeService typeService) : AstWalker {
 
 	internal async Task<SyntaxTree?> WriteAsync (ObjCInterfaceDecl objcType, SyntaxTree? syntaxTree)
 	{
-		var visitor = new Visitor (logger, typeService, syntaxTree);
+		var visitor = new Visitor (Logger, typeService, syntaxTree);
 		await WalkAsync (objcType, visitor);
 
 		// Now that we have the basic tree, lets make sure it generates pretty C# code
 		var sortedTree = SortClassMembers (visitor.SyntaxTree!);
 		var workspace = new AdhocWorkspace ();
-		var root = sortedTree!.GetRoot ();
+		var root = sortedTree!.GetRoot (); 
 		root = Formatter.Format (root, Formatter.Annotation, workspace);
 		root = Formatter.Format (root, SyntaxAnnotation.ElasticAnnotation, workspace);
 		root = root.NormalizeWhitespace ("\t", Environment.NewLine, false);
+
+		// Add a newline between each method, so that the generated code is easier to read
+		// except for the first method, which should not have a newline before it
+		root = root.ReplaceNodes (root.DescendantNodes ().OfType<MethodDeclarationSyntax> ().Skip (1), (original, rewritten) => {
+			return rewritten.WithLeadingTrivia (original.GetLeadingTrivia ().Insert (0, Whitespace (Environment.NewLine)));
+		});
 		return root.SyntaxTree;
 	}
 
@@ -52,6 +59,11 @@ class ObjCSyntaxRewriter (ILogger logger, TypeService typeService) : AstWalker {
 				var objcProperty = decl as ObjCPropertyDecl;
 				Write (objcProperty!);
 				break;
+			case CX_DeclKind_ObjCMethod:
+				var objcMethod = decl as ObjCMethodDecl;
+				Write (objcMethod!);
+				break;
+
 			};
 			return Task.CompletedTask;
 		}
@@ -84,6 +96,9 @@ class ObjCSyntaxRewriter (ILogger logger, TypeService typeService) : AstWalker {
 
 		void Write (ObjCPropertyDecl objcProperty)
 		{
+			if (objcProperty.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBOutlet) is null)
+				return;
+
 			var root = (CompilationUnitSyntax) SyntaxTree!.GetRoot ();
 
 			var firstClass = root.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
@@ -123,6 +138,36 @@ class ObjCSyntaxRewriter (ILogger logger, TypeService typeService) : AstWalker {
 			}
 
 			var newClass = firstClass.WithMembers (List (members));
+
+			var newRoot = root.ReplaceNode (firstClass, newClass);
+
+			SyntaxTree = newRoot.SyntaxTree;
+		}
+		void Write (ObjCMethodDecl objcMethod)
+		{
+			if (objcMethod.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBAction) is null)
+				return;
+
+			var root = (CompilationUnitSyntax) SyntaxTree!.GetRoot (); // TODO: Add null checks
+
+			var firstClass = root.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
+
+			var methodName = objcMethod.Name.Replace (":", string.Empty); // TODO: Need to properly convert this to a valid C# method name
+
+			var newMethod = MethodDeclaration (ParseTypeName ("void"), methodName)
+				.AddModifiers (Token (SyntaxKind.PartialKeyword))
+				.AddParameterListParameters (
+					Parameter (Identifier ("sender"))
+						.WithType (ParseTypeName ("Foundation.NSObject")))
+				.AddAttributeLists (
+					AttributeList (SingletonSeparatedList (
+						Attribute (IdentifierName ("Action"),
+							AttributeArgumentList (SingletonSeparatedList (
+								AttributeArgument (LiteralExpression (SyntaxKind.StringLiteralExpression, Literal ($"{methodName}:")))))))))
+				.WithSemicolonToken (Token (SyntaxKind.SemicolonToken));
+
+			var newClass = firstClass.AddMembers (newMethod);
+
 			var newRoot = root.ReplaceNode (firstClass, newClass);
 
 			SyntaxTree = newRoot.SyntaxTree;
