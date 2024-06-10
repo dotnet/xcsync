@@ -40,15 +40,13 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 			yield break;
 
 		foreach (var ns in namespaces) {
-			foreach (var type in ns.GetTypeMembers ().Where (type => type.IsNsoDerived ())) {
+			foreach (var type in ns.GetTypeMembers ().Where (IsNsoDerived)) {
 				yield return type;
 			}
 		}
 	}
-}
 
-public static class ClrExtensions {
-	public static bool IsNsoDerived (this INamedTypeSymbol? type)
+	static bool IsNsoDerived (INamedTypeSymbol? type)
 	{
 		var registerAttribute = type?.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == "RegisterAttribute");
 		var skipAttribute = registerAttribute?.NamedArguments.FirstOrDefault (x => x.Key == "SkipRegistration");
@@ -59,3 +57,4 @@ public static class ClrExtensions {
 		return registerAttribute is not null;
 	}
 }
+
