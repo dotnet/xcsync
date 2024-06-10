@@ -8,10 +8,8 @@ using Serilog;
 
 namespace xcsync.Projects;
 
-class ClrProject : SyncableProject {
-	public ClrProject (IFileSystem fileSystem, ILogger logger, string name, string projectPath, string framework)
-		: base (fileSystem, logger, name, projectPath, framework, new [] { "*.cs", "*.csproj", "*.sln" }) {
-	}
+class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework)
+	: SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, ["*.cs", "*.csproj", "*.sln"]) {
 
 	public async Task<Project> OpenProject ()
 	{
