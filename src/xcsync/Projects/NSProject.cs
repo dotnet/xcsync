@@ -58,7 +58,7 @@ class NSProject (IFileSystem fileSystem, ClrProject project, string targetPlatfo
 				break;
 			case "RegisterAttribute":
 				objCName = a.ConstructorArguments.Length > 0
-					? a.GetName () ?? objCName
+					? GetName (a) ?? objCName
 					: objCName;
 				break;
 			}
@@ -71,16 +71,16 @@ class NSProject (IFileSystem fileSystem, ClrProject project, string targetPlatfo
 
 			foreach (var property in type.GetMembers ().OfType<IPropertySymbol> ()) {
 
-				var outletAttribute = property.GetAttribute ("OutletAttribute");
+				var outletAttribute = GetAttribute (property, "OutletAttribute");
 
 				if (outletAttribute is null)
 					continue;
 
 				outlets.Add (new IBOutlet (
 					clrName: property.Name,
-					objcName: outletAttribute.GetName () ?? property.Name,
+					objcName: GetName (outletAttribute) ?? property.Name,
 					clrType: property.Type.MetadataName,
-					objcType: (property.Type as INamedTypeSymbol)?.GetObjCType (this),
+					objcType: GetObjCType ((property.Type as INamedTypeSymbol)!, this),
 					isCollection: property.Type.TypeKind == TypeKind.Array));
 
 				refs.Add (property.ContainingNamespace.Name);
@@ -88,19 +88,19 @@ class NSProject (IFileSystem fileSystem, ClrProject project, string targetPlatfo
 
 			foreach (var method in type.GetMembers ().OfType<IMethodSymbol> ()) {
 
-				var actionAttribute = method.GetAttribute ("ActionAttribute");
+				var actionAttribute = GetAttribute (method, "ActionAttribute");
 
 				if (actionAttribute is null)
 					continue;
 
-				var actionName = actionAttribute.GetName ();
-				(string? objcName, string []? strings) = method.GetInfo (actionName);
+				var actionName = GetName (actionAttribute);
+				(string? objcName, string []? strings) = GetInfo (method, actionName);
 
 				List<IBActionParameter> parameters = new (method.Parameters.Length);
 
 				var index = 0;
 				foreach (var param in method.Parameters) {
-					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, (param.Type as INamedTypeSymbol)?.GetObjCType (this)));
+					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, GetObjCType ((param.Type as INamedTypeSymbol)!, this)));
 					index++;
 					refs.Add (param.ContainingNamespace.Name);
 				}
@@ -124,30 +124,26 @@ class NSProject (IFileSystem fileSystem, ClrProject project, string targetPlatfo
 		return typeMapping;
 	}
 
-	public bool InDesignerFile (ITypeSymbol type, string objCName)
+	bool InDesignerFile (ITypeSymbol type, string objCName)
 	{
 		var source = type.Locations.FirstOrDefault ()?.SourceTree;
 		var sourceDir = fileSystem.Path.GetDirectoryName (source?.FilePath) ?? string.Empty;
 		return fileSystem.File.Exists (fileSystem.Path.Combine (sourceDir, $"{objCName}.designer.cs"));
 	}
 
-}
-
-static class Extensions {
-
-	public static AttributeData? GetAttribute (this ISymbol symbol, string attributeName) =>
+	static AttributeData? GetAttribute (ISymbol symbol, string attributeName) =>
 		symbol.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == attributeName);
 
-	public static string? GetName (this AttributeData attribute) =>
+	static string? GetName (AttributeData attribute) =>
 		attribute.ConstructorArguments.FirstOrDefault ().Value?.ToString ();
 
-	public static string? GetObjCType (this INamedTypeSymbol symbol, NSProject nsProject)
+	static string? GetObjCType (INamedTypeSymbol symbol, NSProject nsProject)
 	{
 		nsProject.clrTypes.TryGetValue (symbol.MetadataName, out var nsType);
 		return nsType?.ObjCType ?? nsProject.ConvertToTypeMapping (symbol)?.ObjCType;
 	}
 
-	public static (string objcName, string []? @params) GetInfo (this IMethodSymbol method, string? actionAttributeName)
+	static (string objcName, string []? @params) GetInfo (IMethodSymbol method, string? actionAttributeName)
 	{
 		if (actionAttributeName is null)
 			return (method.Name, null);
