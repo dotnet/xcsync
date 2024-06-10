@@ -14,7 +14,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace xcsync.Ast;
 
-class ObjCSyntaxRewriter (ILogger Logger, TypeService typeService) : AstWalker {
+class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService) : AstWalker {
 
 	internal async Task<SyntaxTree?> WriteAsync (ObjCInterfaceDecl objcType, SyntaxTree? syntaxTree)
 	{
@@ -37,15 +37,9 @@ class ObjCSyntaxRewriter (ILogger Logger, TypeService typeService) : AstWalker {
 		return root.SyntaxTree;
 	}
 
-	class Visitor (ILogger logger, TypeService typeService, SyntaxTree? syntaxTree) : AstVisitor {
+	class Visitor (ILogger logger, ITypeService typeService, SyntaxTree? syntaxTree) : AstVisitor {
 
 		public SyntaxTree? SyntaxTree { get; private set; } = syntaxTree;
-
-		protected override Task VisitAttrAsync (Attr attr)
-		{
-			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Visiting {{Kind}}", attr.KindSpelling);
-			return Task.CompletedTask;
-		}
 
 		protected override Task VisitDeclAsync (Decl decl)
 		{
@@ -171,6 +165,12 @@ class ObjCSyntaxRewriter (ILogger Logger, TypeService typeService) : AstWalker {
 			var newRoot = root.ReplaceNode (firstClass, newClass);
 
 			SyntaxTree = newRoot.SyntaxTree;
+		}
+
+		protected override Task VisitAttrAsync (Attr attr)
+		{
+			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Visiting {{Kind}}", attr.KindSpelling);
+			return Task.CompletedTask;
 		}
 
 		protected override Task VisitRefAsync (Ref @ref)

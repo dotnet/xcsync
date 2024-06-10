@@ -14,8 +14,8 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
 
-		var clrProject = new ClrProject (FileSystem, Logger, "CLR Project", ProjectPath, Framework);
-		var xcodeProject = new XcodeWorkspace (FileSystem, Logger, "Xcode Project", TargetDir, Framework);
+		var clrProject = new ClrProject (FileSystem, Logger, TypeService,  "CLR Project", ProjectPath, Framework);
+		var xcodeProject = new XcodeWorkspace (FileSystem, Logger, TypeService, "Xcode Project", TargetDir, Framework);
 
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New(), Logger);
 		clrChanges.StartMonitoring (clrProject, token);

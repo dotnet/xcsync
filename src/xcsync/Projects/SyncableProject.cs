@@ -17,14 +17,17 @@ class SyncableProject : ISyncableProject {
 
 	protected ILogger Logger { get; init; }
 
+	protected ITypeService TypeService { get; init; }
+
 	protected string Framework { get; set; }
 
 	Task? initTask;
 
-	public SyncableProject (IFileSystem fileSystem, ILogger logger, string name, string rootPath, string framework, string [] projectFilesFilter)
+	public SyncableProject (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string rootPath, string framework, string [] projectFilesFilter)
 	{
 		FileSystem = fileSystem;
 		Logger = logger;
+		TypeService = typeService;
 		Name = name;
 		RootPath = rootPath;
 		Framework = framework;
