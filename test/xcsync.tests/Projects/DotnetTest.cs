@@ -24,7 +24,7 @@ public class DotnetTest : Base {
 		if (!File.Exists (TestProjectPath))
 			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
-		var clrProject = new ClrProject (new MockFileSystem (), Mock.Of<ILogger> (), "TestProject", TestProjectPath, "net8.0-macos");
+		var clrProject = new ClrProject (new MockFileSystem (), Mock.Of<ILogger> (), new TypeService (), "TestProject", TestProjectPath, "net8.0-macos");
 		var xcodeProject = new NSProject (new MockFileSystem (), clrProject, "macos");
 
 		var project = await clrProject.OpenProject ().ConfigureAwait (false);

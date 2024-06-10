@@ -9,6 +9,7 @@ using xcsync.Projects.Xcode;
 namespace xcsync.Commands;
 
 class GenerateCommand : XcodeCommand<GenerateCommand> {
+
 	public GenerateCommand (IFileSystem fileSystem) : base (fileSystem, "generate",
 			"generate a Xcode project at the path specified by --target from the project identified by --project")
 	{
@@ -22,13 +23,13 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		// TODO: Move the implementation from this method to the SyncContext.SyncToXcode method and uncomment the following lines
 		//       When moving this code over, create Tasks for each file, then Task.WaitAll to ensure all files are generated before exiting.
 		//
-		// var sync = new SyncContext (SyncDirection.ToXcode, ProjectPath, TargetPath, Tfm, Logger!);
+		// var sync = new SyncContext (fileSystem, new TypeService (), SyncDirection.ToXcode, ProjectPath, TargetPath, Tfm, Logger!);
 		// await sync.SyncAsync ().ConfigureAwait (false);
 
 		if (!TryGetTargetPlatform (Tfm, out string targetPlatform))
 			return;
 
-		var clrProject = new ClrProject (fileSystem, Logger!, "CLR Project", ProjectPath, Tfm);
+		var clrProject = new ClrProject (fileSystem, Logger!, new TypeService(), "CLR Project", ProjectPath, Tfm);
 		var nsProject = new NSProject (fileSystem, clrProject, targetPlatform);
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 

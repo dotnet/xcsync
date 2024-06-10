@@ -12,6 +12,7 @@ using ClangSharp.Interop;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Serilog;
+using xcsync.Ast;
 using xcsync.Projects.Xcode;
 using static ClangSharp.Interop.CXDiagnosticDisplayOptions;
 using static ClangSharp.Interop.CXDiagnosticSeverity;
@@ -19,8 +20,8 @@ using static ClangSharp.Interop.CXErrorCode;
 using static ClangSharp.Interop.CXTranslationUnit_Flags;
 namespace xcsync.Projects;
 
-partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, string name, string projectPath, string framework) :
-	SyncableProject (fileSystem, logger, name, projectPath, framework, ["*.xcodeproj", "*.xcworkspace", "*.m", "*.h", "*.storyboard"]) {
+partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework) :
+	SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, ["*.xcodeproj", "*.xcworkspace", "*.m", "*.h", "*.storyboard"]) {
 
 	static CXIndex cxIndex = CXIndex.Create ();
 
@@ -117,19 +118,50 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, string nam
 		visitor.ObjCTypes.CollectionChanged -= ProcessObjCTypes;
 	}
 
-	void ProcessObjCTypes (object? sender, NotifyCollectionChangedEventArgs e)
+	internal async void ProcessObjCTypes (object? sender, NotifyCollectionChangedEventArgs e)
 	{
+		List<Task> processObjCTypeTasks = [];
+
 		var items = e.NewItems ?? throw new ArgumentNullException (nameof (e));
 
 		foreach (var type in items) {
 			if (type is ObjCImplementationDecl objcType) { // This should always be true, but just in case
 				Logger.Information ("Processing ObjCImplementationDecl: {objcType}", objcType.Name);
-				// TODO : Update INamedSymbol of TypeMapping to match the ObjCImplementationDecl
-				//		  Where the TypeMapping.ObjCType is the ObjCImplementationDecl.Name
+				var types = TypeService.QueryTypes (null, objcType.Name);
+				if (!types.Any ()) {
+					Logger.Warning ("No types found for {objcType}", objcType.Name);
+				} else if (types.Count() > 1) {
+					Logger.Warning ("Multiple types found for {objcType}", objcType.Name);
+				} else {
+					var typeMap = types.First ();
+					processObjCTypeTasks.Add(UpdateRoslynType (typeMap, objcType)); 
+				}
+
 			} else {
 				Logger.Warning ("Unexpected type found: {type}", type);
 			}
 		}
+
+		await Task.WhenAll (processObjCTypeTasks);
+	}
+
+	internal async Task UpdateRoslynType (TypeMapping typeMap, ObjCImplementationDecl objcType)
+	{
+		SyntaxTree? syntaxTree = null;
+		foreach (var syntaxRef in typeMap.TypeSymbol!.DeclaringSyntaxReferences) {
+			if (syntaxRef.SyntaxTree.FilePath.EndsWith ("designer.cs")) {
+				syntaxTree = syntaxRef.SyntaxTree;
+				break;
+			}
+		}
+		if (syntaxTree is null) return;
+
+		var rewriter = new ObjCSyntaxRewriter (Logger, TypeService);
+
+		var newClass = await rewriter.WriteAsync (objcType.ClassInterface, syntaxTree);
+
+		typeMap = typeMap with { TypeSymbol = (INamedTypeSymbol) newClass! };
+		TypeService.AddType (typeMap);
 	}
 
 	internal async Task LoadObjCTypesFromFilesAsync (IEnumerable<string> filePaths, AstVisitor visitor, CancellationToken cancellationToken = default)
