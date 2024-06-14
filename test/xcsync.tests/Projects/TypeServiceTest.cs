@@ -50,7 +50,7 @@ public class TypeServiceTest {
 	}
 
 	[Fact]
-	public void AddDuplicateType ()
+	public void AddDuplicateClrType_ReturnsNull()
 	{
 		var viewControllerDupe = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "ViewController", "ViewController", null, false, false, false, null, null, []);
 		typeService.AddType (viewControllerDupe);
@@ -59,11 +59,39 @@ public class TypeServiceTest {
 	}
 
 	[Fact]
-	public void AddDuplicateObjCType ()
+	public void AddDuplicateObjCType_ReturnsNull ()
 	{
 		var appDelegateDupe = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "NewAppDelegate", "AppDelegate", null, false, false, false, null, null, []);
 		typeService.AddType (appDelegateDupe);
 		var result = typeService.AddType (appDelegateDupe);
 		Assert.Null (result);
+	}
+
+	[Fact]
+	public void UpdateMapping_TypesDoNotMatch_Fails ()
+	{
+		// Arrange
+		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ();
+		var newMapping = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "NewAppDelegate", "AppDelegate", null, false, false, false, null, null, []);
+
+		// Act
+		var result = typeService.TryUpdateMapping (oldMapping, newMapping);
+
+		// Assert
+		Assert.False (result);
+	}
+
+	[Fact]
+	public void UpdateMapping_TypesDoNotExist_Fails ()
+	{
+		// Arrange
+		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ();
+		var newMapping = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "DoesNotExist", "AppDelegate", null, false, false, false, null, null, []);
+
+		// Act
+		var result = typeService.TryUpdateMapping (oldMapping, newMapping);
+
+		// Assert
+		Assert.False (result);
 	}
 }
