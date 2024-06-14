@@ -41,6 +41,7 @@
         that directly references types in the Microsoft.Build namespace has been called. This dependency arises 
         from when a method is just-in-time compiled, so it breaks even if the reference to a Microsoft.Build type 
         has not been executed.-->
+    <PackageReference Include="Marille" Version="0.3.8" />
     <PackageReference Include="Microsoft.Build" Version="17.9.5" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Framework" Version="17.9.5" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
@@ -57,7 +58,7 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="TestableIO.System.IO.Abstractions" Version="21.0.2" />
     <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="21.0.2" />
-    <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers" Version="2022.0.0" >
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers" Version="2022.0.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
