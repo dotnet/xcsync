@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.IO.Abstractions;
+using Marille;
 using Serilog;
 using xcsync.Projects;
 
@@ -17,5 +18,9 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	protected string TargetDir { get; } = targetDir;
 	protected string Framework { get; } = framework;
 
+	public Hub hub = new ();
+	// hub needs to be created, registered to a specific topic, published
+	public TopicConfiguration configuration = new ();
+	private readonly CancellationTokenSource cancellationTokenSource = new();
 }
 
