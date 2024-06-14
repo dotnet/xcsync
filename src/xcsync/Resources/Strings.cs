@@ -1,4 +1,5 @@
 
+
 namespace xcsync;
 
 static class Strings {
@@ -78,5 +79,8 @@ static class Strings {
 
 	internal static class TypeService {
 		internal static string DuplicateType (string type) => string.Format (Resources.Strings.TypeService_DuplicateType, type);
+		internal static string MappingMismatch (string oldClrType, string oldObjCType, string newClrType, string newObjCType) => string.Format (Resources.Strings.TypeService_MappingMismatch, oldClrType, oldObjCType, newClrType, newObjCType);
+		internal static string MappingNotFound (string clrType, string objCType) => string.Format (Resources.Strings.TypeService_MappingNotFound, clrType, objCType);
+		internal static string MappingUpdateFailed (string clrType, string objCType) => string.Format (Resources.Strings.TypeService_MappingUpdateFailed, clrType, objCType);
 	}
 }
