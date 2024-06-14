@@ -36,6 +36,30 @@ class TypeService : ITypeService {
 		return AddType (newType);
 	}
 
+	public bool TryUpdateMapping (TypeMapping oldMapping, TypeMapping newMapping)
+	{
+		if (oldMapping.ClrType != newMapping.ClrType || oldMapping.ObjCType != newMapping.ObjCType) {
+			Logger?.Error (Strings.TypeService.MappingMismatch (oldMapping.ClrType, oldMapping.ObjCType, newMapping.ClrType, newMapping.ObjCType));
+			return false;
+		}
+		bool success = clrTypes.TryGetValue (oldMapping.ClrType, out var existingClrMapping);
+		success &= objCTypes.TryGetValue (oldMapping.ObjCType, out var existingObjCMapping);
+
+		if (!success || existingClrMapping is null || existingObjCMapping is null) {
+			Logger?.Error (Strings.TypeService.MappingNotFound (oldMapping.ClrType, oldMapping.ObjCType));
+			return false;
+		}
+
+		if (clrTypes.TryUpdate (oldMapping.ClrType, newMapping, existingClrMapping)) {
+			if (!objCTypes.TryUpdate (oldMapping.ObjCType, newMapping, existingObjCMapping)) {
+				Logger?.Error (Strings.TypeService.MappingUpdateFailed (oldMapping.ClrType, oldMapping.ObjCType));
+				clrTypes.TryUpdate (oldMapping.ClrType, existingClrMapping, newMapping);
+				return false;
+			}
+		};
+		return true;
+	}
+
 	public virtual IEnumerable<TypeMapping> QueryTypes (string? clrType = null, string? objcType = null) =>
 		(clrType, objcType) switch {
 			(string cli, null) => clrTypes.Values.Where (t => t.ClrType == cli),

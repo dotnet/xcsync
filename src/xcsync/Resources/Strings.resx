@@ -174,4 +174,16 @@
         <value>Type '{0}' already exists in project.</value>
         <comment>{0} is the name of the type</comment>
     </data>
+    <data name="TypeService.MappingMismatch" xml:space="preserve">
+        <value>Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.</value>
+        <comment>{0}, {1}, {2}, {3} are names of types</comment>
+    </data>
+    <data name="TypeService.MappingNotFound" xml:space="preserve">
+        <value>Mapping from of '{0}' to '{1}' already exists.</value>
+        <comment>{0}, {1} are names of types</comment>
+    </data>
+    <data name="TypeService.MappingUpdateFailed" xml:space="preserve">
+        <value>Failed to updated mapping of '{0}' to '{1}'.</value>
+        <comment>{0}, {1} are names of types</comment>
+    </data>
 </root>
