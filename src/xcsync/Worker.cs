@@ -2,68 +2,63 @@ using Marille;
 
 namespace xcsync;
 
-public interface IBasicMessage { // prolly not necessary...
-	string Id { get; set; }
-	string Path { get; set; }
-}
-
-public struct BasicMessage : IBasicMessage {
+public struct ChangeMessage {
 	public string Id { get; set; }
 	public string Path { get; set; }
-}
-
-public struct SyncMessage : IBasicMessage {
-	public string Id { get; set; }
-	public string Path { get; set; }
-	public string ChangeType { get; set; } // eh
+	public object Payload { get; set; }
 	
-	public SyncMessage (string id, string path, string changeType)
+	public ChangeMessage (string id, string path, object payload)
 	{
 		Id = id;
 		Path = path;
-		ChangeType = changeType;
+		Payload = payload;
 	}
 }
 
-public struct ErrorMessage : IBasicMessage {
-	public string Id { get; set; }
-	public string Path { get; set; }
-	public Exception Ex { get; set; }
-	
-	public ErrorMessage (string id, string path, Exception ex)
-	{
-		Id = id;
-		Path = path;
-		Ex = ex;
-	}
-}
-
-public class BasicWorker : IWorker<BasicMessage> {
+public class ChangeWorker : IWorker<ChangeMessage> {
 	public string Id { get; set; } = string.Empty;
 	public TaskCompletionSource<bool> Completion { get; set; } = new();
 	
-	public BasicWorker (string id, TaskCompletionSource<bool> tcs)
+	public ChangeWorker (string id, TaskCompletionSource<bool> tcs)
 	{
 		Id = id;
 		Completion = tcs;
 	}
 
-	// impl default change logic here?
-	public Task ConsumeAsync (BasicMessage message, CancellationToken cancellationToken = default)
-		=> Task.FromResult (Completion.TrySetResult(true));
+	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
+	{
+		// todo: impl per load
+		return message.Payload switch {
+			SyncLoad => Task.FromResult (Completion.TrySetResult(true)),
+			ErrorLoad => Task.FromResult (Completion.TrySetResult(true)),
+			RenameLoad => Task.FromResult (Completion.TrySetResult(true)),
+			_ => Task.FromResult (Completion.TrySetResult (true))
+		};
+	}
 }
-public class SyncWorker : BasicWorker {
-	public SyncWorker (string id, TaskCompletionSource<bool> tcs) : base(id, tcs) {}
 
-	//todo: sync changes impl
-	public Task ConsumeAsync (SyncMessage message, CancellationToken cancellationToken = default)
-		=> Task.FromResult (Completion.TrySetResult(true));
+public struct SyncLoad {
+	//todo: fine tune payload
+	public object ChangeDetected { get; set; }
+	public SyncLoad (object changeDetected)
+	{
+		ChangeDetected = changeDetected;
+	}
+}
+public struct ErrorLoad {
+	//todo: fine tune payload
+	public Exception Ex { get; set; }
+	public ErrorLoad (Exception ex)
+	{
+		Ex = ex;
+	}
 }
 
-public class ErrorWorker : BasicWorker {
-	public ErrorWorker (string id, TaskCompletionSource<bool> tcs) : base(id, tcs) {}
-	
-	//todo: impl error handling logic here
-	public Task ConsumeAsync (ErrorMessage message, CancellationToken cancellationToken = default)
-		=> Task.FromResult (Completion.TrySetResult(true));
+public struct RenameLoad {
+	//todo: fine tune payload
+	public object ChangeDetected { get; set; }
+	public RenameLoad (object changeDetected)
+	{
+		ChangeDetected = changeDetected;
+	}
 }
