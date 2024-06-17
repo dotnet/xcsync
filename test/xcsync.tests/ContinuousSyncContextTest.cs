@@ -14,20 +14,30 @@ public class ContinuousSyncContextTest {
 		"targetDir", "framework", Mock.Of<ILogger> ());
 
 	[Fact]
-	public async Task SyncChannel_AddsSyncWorkerToWorkersList()
+	public async Task ChangeWorker_Sync()
 	{
-		await context.SyncChannel("Sync", mockHub.Object);
-		Assert.Contains (context.workers, w => w.Item1 is SyncWorker);
-		mockHub.Verify(h => h.RegisterAsync(It.IsAny<string>(), It.IsAny<SyncWorker>()), Times.Once);
-		mockHub.Verify(h => h.Publish(It.IsAny<string>(), It.IsAny<SyncMessage>()), Times.Once);
+		await context.SyncChange("path", mockHub.Object);
+		Assert.Contains (context.workers, w => w.Item1 is ChangeWorker);
+		mockHub.Verify(h => h.RegisterAsync(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.IsAny<ChangeWorker>()), Times.Once);
+		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Payload is SyncLoad)), Times.Once);
 	}
 	
 	[Fact]
-	public async Task ErrorChannel_AddsErrorWorkerToWorkersList()
+	public async Task ChangeWorker_Error()
 	{
-		await context.ErrorChannel("Error", new Exception(), mockHub.Object);
-		Assert.Contains (context.workers, w => w.Item1 is ErrorWorker);
-		mockHub.Verify(h => h.RegisterAsync(It.IsAny<string>(), It.IsAny<ErrorWorker>()), Times.Once);
-		mockHub.Verify(h => h.Publish(It.IsAny<string>(), It.IsAny<ErrorMessage>()), Times.Once);
+		// can't make this a theory cuz of diff # of params :/
+		await context.SyncError("path", new Exception(), mockHub.Object);
+		Assert.Contains (context.workers, w => w.Item1 is ChangeWorker);
+		mockHub.Verify(h => h.RegisterAsync(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.IsAny<ChangeWorker>()), Times.Once);
+		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Payload is ErrorLoad)), Times.Once);
+	}
+
+	[Fact]
+	public async Task ChangeWorker_Rename()
+	{
+		await context.SyncRename("path", mockHub.Object);
+		Assert.Contains (context.workers, w => w.Item1 is ChangeWorker);
+		mockHub.Verify(h => h.RegisterAsync(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.IsAny<ChangeWorker>()), Times.Once);
+		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Payload is RenameLoad)), Times.Once);
 	}
 }
