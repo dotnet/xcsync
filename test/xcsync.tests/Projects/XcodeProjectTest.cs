@@ -325,14 +325,15 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData ("macos", "", "net8.0-macos", new string [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
-	[InlineData ("maccatalyst", "", "net8.0-maccatalyst", new string [] { "AppDelegate", "Info.plist", "SceneDelegate" })]
-	[InlineData ("ios", "", "net8.0-ios", new string [] { "AppDelegate", "Info.plist", "LaunchScreen.storyboard", "SceneDelegate" })]
-	[InlineData ("tvos", "", "net8.0-tvos", new string [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
-	[InlineData ("maui", "", "net8.0-ios", new string [] { "AppDelegate", "Info.plist" })]
-	[InlineData ("maui", "", "net8.0-maccatalyst", new string [] { "AppDelegate", "Info.plist" })]
-	public async void IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
+	[InlineData ("macos", "", "net8.0-macos", new [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
+	[InlineData ("maccatalyst", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Info.plist", "SceneDelegate" })]
+	[InlineData ("ios", "", "net8.0-ios", new [] { "AppDelegate", "Info.plist", "LaunchScreen.storyboard", "SceneDelegate" })]
+	[InlineData ("tvos", "", "net8.0-tvos", new [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
+	[InlineData ("maui", "", "net8.0-ios", new [] { "AppDelegate", "Info.plist" })]
+	[InlineData ("maui", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Info.plist" })]
+	public async Task IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
 	{
+		// todo: test for copying over assets.xcassets?
 		// testing entirety of generate command
 		// dotnet new macos > xcsync > verify
 

@@ -130,11 +130,11 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 				var types = TypeService.QueryTypes (null, objcType.Name);
 				if (!types.Any ()) {
 					Logger.Warning ("No types found for {objcType}", objcType.Name);
-				} else if (types.Count() > 1) {
+				} else if (types.Count () > 1) {
 					Logger.Warning ("Multiple types found for {objcType}", objcType.Name);
 				} else {
 					var typeMap = types.First ();
-					processObjCTypeTasks.Add(UpdateRoslynType (typeMap, objcType)); 
+					processObjCTypeTasks.Add (UpdateRoslynType (typeMap, objcType));
 				}
 
 			} else {
