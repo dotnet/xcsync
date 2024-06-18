@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.IO.Abstractions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xamarin.Utils;
 
 namespace xcsync;
 
-static partial class Scripts {
+static class Scripts {
 
 	static Execution ExecuteCommand (string command, string [] args, TimeSpan timeout)
 	{
@@ -62,15 +63,41 @@ static partial class Scripts {
 	{
 		var resultFile = fileSystem.Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		var exec = Execution.RunAsync ("dotnet", args, mergeOutput: true, timeout: TimeSpan.FromMinutes (1)).Result;
-
-		if (exec.TimedOut)
-			throw new TimeoutException ($"'dotnet {exec.Arguments}' execution took > 60 seconds, process has timed out");
-
-		if (exec.ExitCode != 0)
-			throw new InvalidOperationException ($"'dotnet {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
+		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
 
 		return fileSystem.File.ReadAllText (resultFile).Trim ('\n');
+	}
+
+	public static HashSet<string> GetAssets (IFileSystem fileSystem, string projPath, string tfm)
+	{
+		var resultFile = fileSystem.Path.GetTempFileName ();
+		//maybe add support for ImageAsset? But right now doesn't seem v necessary? (Default is BundleResource)
+		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
+
+		Console.WriteLine (fileSystem.File.ReadAllText (resultFile));
+		// dynamic cuz don't wanna create a whole class to rep the incoming json
+		dynamic data = JsonConvert.DeserializeObject (fileSystem.File.ReadAllText (resultFile))!;
+		var bundleResources = data.Items.BundleResource;
+		HashSet<string> assetPaths = new ();
+
+		// iterate through bundle resources , specific to tfm, and compute the appropriate asset paths
+		foreach (var item in bundleResources) {
+			var id = item.Identity.ToString ().Replace ('\\', '/');
+			if (id.Contains ("Assets.xcassets")) {
+				if (!fileSystem.Path.IsPathRooted (id))
+					// Combine with the project path if it's not a full path
+					id = fileSystem.Path.Combine(fileSystem.Path.GetDirectoryName (projPath), id);
+
+				// Strip off anything after ".xcassets"
+				var index = id.IndexOf(".xcassets", StringComparison.Ordinal);
+				if (index > -1)
+					id = id.Substring(0, index + ".xcassets".Length);
+
+				assetPaths.Add (id);
+			}
+		}
+		return assetPaths;
 	}
 
 	public static string Run (string script)
