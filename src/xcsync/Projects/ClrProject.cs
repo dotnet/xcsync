@@ -28,7 +28,7 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 	public async IAsyncEnumerable<INamedTypeSymbol> GetNsoTypes (Project project)
 	{
 		var compilation = await project.GetCompilationAsync ().ConfigureAwait (false) ??
-		                  throw new InvalidOperationException ("Could not get compilation for project '{project}'");
+						  throw new InvalidOperationException ("Could not get compilation for project '{project}'");
 
 		// limit scope of namespaces to project, do not include referenced assemblies, etc.
 		var namespaces = compilation.GlobalNamespace.GetNamespaceMembers ()

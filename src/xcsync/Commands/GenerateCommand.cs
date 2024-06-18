@@ -29,7 +29,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		if (!TryGetTargetPlatform (Tfm, out string targetPlatform))
 			return;
 
-		var clrProject = new ClrProject (fileSystem, Logger!, new TypeService(), "CLR Project", ProjectPath, Tfm);
+		var clrProject = new ClrProject (fileSystem, Logger!, new TypeService (), "CLR Project", ProjectPath, Tfm);
 		var nsProject = new NSProject (fileSystem, clrProject, targetPlatform);
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
@@ -76,6 +76,18 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 
 		foreach (var file in appleFiles) {
 			fileSystem.File.Copy (file, fileSystem.Path.Combine (TargetPath, fileSystem.Path.GetFileName (file)), true);
+		}
+
+		// copy assets
+		// single plat project support
+		var assetsFolder = fileSystem.Directory
+			.EnumerateDirectories (appleDirectory, "*.xcassets", SearchOption.TopDirectoryOnly).FirstOrDefault ();
+		if (assetsFolder is not null)
+			CopyDirectory (assetsFolder, fileSystem.Path.Combine (TargetPath, fileSystem.Path.GetFileName (assetsFolder)), true);
+
+		// maui support
+		foreach (var asset in Scripts.GetAssets (fileSystem, ProjectPath, Tfm)) {
+			CopyDirectory (asset, fileSystem.Path.Combine (TargetPath, "Assets.xcassets"), true);
 		}
 
 		// create in memory representation of Xcode assets

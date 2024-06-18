@@ -24,7 +24,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService) : AstWalker 
 		// Now that we have the basic tree, lets make sure it generates pretty C# code
 		var sortedTree = SortClassMembers (visitor.SyntaxTree!);
 		var workspace = new AdhocWorkspace ();
-		var root = sortedTree!.GetRoot (); 
+		var root = sortedTree!.GetRoot ();
 		root = Formatter.Format (root, Formatter.Annotation, workspace);
 		root = Formatter.Format (root, SyntaxAnnotation.ElasticAnnotation, workspace);
 		root = root.NormalizeWhitespace ("\t", Environment.NewLine, false);
@@ -220,18 +220,18 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService) : AstWalker 
 		public int Compare (MemberDeclarationSyntax? x, MemberDeclarationSyntax? y)
 		{
 			return x switch {
-				FieldDeclarationSyntax xField when y is FieldDeclarationSyntax yField => 
-					string.CompareOrdinal (xField.Declaration.Variables.First ().Identifier.ValueText, 
+				FieldDeclarationSyntax xField when y is FieldDeclarationSyntax yField =>
+					string.CompareOrdinal (xField.Declaration.Variables.First ().Identifier.ValueText,
 										   yField.Declaration.Variables.First ().Identifier.ValueText),
 				FieldDeclarationSyntax => -1,
-				PropertyDeclarationSyntax xProperty when y is PropertyDeclarationSyntax yProperty => 
+				PropertyDeclarationSyntax xProperty when y is PropertyDeclarationSyntax yProperty =>
 					string.CompareOrdinal (xProperty.Identifier.ValueText, yProperty.Identifier.ValueText),
 				PropertyDeclarationSyntax => y is FieldDeclarationSyntax ? 1 : -1,
-				ConstructorDeclarationSyntax xConstructor when y is ConstructorDeclarationSyntax yConstructor => 
+				ConstructorDeclarationSyntax xConstructor when y is ConstructorDeclarationSyntax yConstructor =>
 					xConstructor.ParameterList.Parameters.Count.CompareTo (yConstructor.ParameterList.Parameters.Count),
 				ConstructorDeclarationSyntax => y is FieldDeclarationSyntax || y is PropertyDeclarationSyntax ? 1 : -1,
 				MethodDeclarationSyntax xMethod when xMethod.Modifiers.Any (m => m.ValueText == "partial") => y switch {
-					MethodDeclarationSyntax yMethod when yMethod.Modifiers.Any (m => m.ValueText == "partial") => 
+					MethodDeclarationSyntax yMethod when yMethod.Modifiers.Any (m => m.ValueText == "partial") =>
 						string.CompareOrdinal (xMethod.Identifier.ValueText, yMethod.Identifier.ValueText),
 					_ => -1,
 				},

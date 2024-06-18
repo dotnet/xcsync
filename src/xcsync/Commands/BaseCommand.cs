@@ -224,6 +224,35 @@ class BaseCommand<T> : Command {
 		return isValid;
 	}
 
+	protected void CopyDirectory (string sourceDir, string destinationDir, bool recursive)
+	{
+		// Get information about the source directory
+		var dir = fileSystem.DirectoryInfo.New (sourceDir);
+		// Check if the source directory exists
+		if (!dir.Exists)
+			throw new DirectoryNotFoundException ($"Source directory not found: {dir.FullName}");
+
+		// Cache directories before we start copying
+		var dirs = dir.GetDirectories ();
+
+		// Create the destination directory
+		Directory.CreateDirectory (destinationDir);
+
+		// Get the files in the source directory and copy to the destination directory
+		foreach (var file in dir.GetFiles ()) {
+			string targetFilePath = fileSystem.Path.Combine (destinationDir, file.Name);
+			file.CopyTo (targetFilePath);
+		}
+
+		// If recursive and copying subdirectories, recursively call this method
+		if (recursive) {
+			foreach (var subDir in dirs) {
+				string newDestinationDir = fileSystem.Path.Combine (destinationDir, subDir.Name);
+				CopyDirectory (subDir.FullName, newDestinationDir, true);
+			}
+		}
+	}
+
 	static protected void LogVerbose (string messageTemplate, params object? []? properyValues) => Logger?.Verbose (messageTemplate, properyValues);
 	static protected void LogDebug (string messageTemplate, params object? []? properyValues) => Logger?.Debug (messageTemplate, properyValues);
 	static protected void LogInformation (string messageTemplate, params object? []? properyValues) => Logger?.Information (messageTemplate, properyValues);

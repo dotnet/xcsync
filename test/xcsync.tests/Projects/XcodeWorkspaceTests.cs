@@ -89,7 +89,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		File.WriteAllText (modulePath, objCModule);
 
 		var typeService = new TypeService ();
-		
+
 		var dotNetProject = new ClrProject (fileSystem, testLogger, typeService, projectName, csproj, tfm);
 		var nsProject = new NSProject (fileSystem, dotNetProject, tfm.Split ("-").Last ());
 
@@ -130,7 +130,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		projectName = projectName.Replace ("-", "_");
 		projectName = projectName.Replace (" ", "_");
 
-		return NormalizeWhitespace(projectName);
+		return NormalizeWhitespace (projectName);
 	}
 
 	[GeneratedRegex (@"\s")]

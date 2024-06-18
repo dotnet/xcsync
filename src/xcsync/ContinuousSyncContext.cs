@@ -26,9 +26,15 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Different changes will be processed differently based on unique payload
 		await hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
 
-		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New(), Logger);
+		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
+		// Hub creates a topic channel w message type template
+		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
+		// Different changes will be processed differently based on unique payload
+		await hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
+
+		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (clrProject, token);
-		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New(), Logger);
+		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		xcodeChanges.StartMonitoring (xcodeProject, token);
 		
 		clrChanges.OnFileChanged = async path => {
