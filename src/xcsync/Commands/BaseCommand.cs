@@ -14,10 +14,25 @@ class BaseCommand<T> : Command {
 	protected const string DefaultXcodeOutputFolder = "obj/xcode";
 	protected static ILogger? Logger { get; private set; }
 
+	/// <summary>
+	/// Path to the source .NET .csproj
+	/// </summary>
 	protected string ProjectPath { get; private set; } = string.Empty;
+
+	/// <summary>
+	/// Path to the target Xcode project
+	/// </summary>
 	protected string TargetPath { get; private set; } = string.Empty;
+
+	/// <summary>
+	/// Target Framework Moniker (ex: net8.0-ios)
+	/// </summary>
 	protected string Tfm { get; private set; } = string.Empty;
 
+	/// <summary>
+	/// Target Apple Platform (ex: ios)
+	/// </summary>
+	protected string TargetPlatform => TryGetTargetPlatform (Tfm, out string targetPlatform) ? targetPlatform : string.Empty;
 	protected readonly IFileSystem fileSystem;
 
 	protected Option<string> project = new (
@@ -222,6 +237,21 @@ class BaseCommand<T> : Command {
 
 		var isValid = Regex.IsMatch (tfm, regexMatch);
 		return isValid;
+	}
+
+	static bool TryGetTargetPlatform (string tfm, [NotNullWhen (true)] out string targetPlatform)
+	{
+		targetPlatform = string.Empty;
+
+		foreach (var platform in xcSync.ApplePlatforms) {
+			if (tfm.Contains (platform.Key)) {
+				targetPlatform = platform.Key;
+				return true;
+			}
+		}
+
+		Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
+		return false;
 	}
 
 	protected void CopyDirectory (string sourceDir, string destinationDir, bool recursive)
