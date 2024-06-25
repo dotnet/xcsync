@@ -26,11 +26,13 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		// var sync = new SyncContext (fileSystem, new TypeService (), SyncDirection.ToXcode, ProjectPath, TargetPath, Tfm, Logger!);
 		// await sync.SyncAsync ().ConfigureAwait (false);
 
-		if (!TryGetTargetPlatform (Tfm, out string targetPlatform))
+		if (string.IsNullOrEmpty (TargetPlatform)) {
+			Logger?.Information ($"Valid target platform could not be identified from tfm {Tfm}.", Tfm);
 			return;
+		}
 
 		var clrProject = new ClrProject (fileSystem, Logger!, new TypeService (), "CLR Project", ProjectPath, Tfm);
-		var nsProject = new NSProject (fileSystem, clrProject, targetPlatform);
+		var nsProject = new NSProject (fileSystem, clrProject, TargetPlatform);
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
@@ -62,7 +64,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 		var ext = new List<string> { "storyboard", "plist" };
 
 		// support for maui apps
-		string altPath = targetPlatform switch {
+		string altPath = TargetPlatform switch {
 			"ios" => fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (ProjectPath)!, "Platforms", "iOS"),
 			"maccatalyst" => fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (ProjectPath)!, "Platforms", "MacCatalyst"),
 			_ => ""
@@ -445,20 +447,5 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 			string workspacePath = fileSystem.Path.Combine (TargetPath, projectName + ".xcodeproj", "project.xcworkspace");
 			Logger?.Information (Strings.Generate.OpenProject (Scripts.Run (Scripts.OpenXcodeProject (workspacePath))));
 		}
-	}
-
-	static bool TryGetTargetPlatform (string tfm, /* List<string> supportedTfms, */ [NotNullWhen (true)] out string targetPlatform)
-	{
-		targetPlatform = string.Empty;
-
-		foreach (var platform in xcSync.ApplePlatforms) {
-			if (tfm.Contains (platform.Key)) {
-				targetPlatform = platform.Key;
-				return true;
-			}
-		}
-
-		Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
-		return false;
 	}
 }
