@@ -11,6 +11,7 @@ using ClangSharp;
 using ClangSharp.Interop;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Serilog;
 using xcsync.Ast;
 using xcsync.Projects.Xcode;
@@ -160,7 +161,16 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 		var newClass = await rewriter.WriteAsync (objcType.ClassInterface, syntaxTree);
 
-		typeMap = typeMap with { TypeSymbol = (INamedTypeSymbol) newClass! };
+		var root = (CompilationUnitSyntax) newClass!.GetRoot ();
+
+		var type = root.DescendantNodes ().OfType<INamedTypeSymbol> ().FirstOrDefault ();
+
+		if (type is null) {
+			Logger.Warning ($"No type found in the syntax tree for {objcType}", objcType.Name);
+			return;
+		}
+
+		typeMap = typeMap with { TypeSymbol = type };
 		TypeService.AddType (typeMap);
 	}
 
