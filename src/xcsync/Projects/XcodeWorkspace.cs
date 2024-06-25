@@ -113,10 +113,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 						where headerReference.Path!.EndsWith (".h") && moduleReference.Path!.EndsWith (".m")
 						select moduleReference.Path;
 
-		var visitor = new ObjCImplementationDeclVisitor (Logger);
-		visitor.ObjCTypes.CollectionChanged += ProcessObjCTypes;
-		await LoadObjCTypesFromFilesAsync (filePaths, visitor, cancellationToken);
-		visitor.ObjCTypes.CollectionChanged -= ProcessObjCTypes;
+	    await new SyncableFiles (this, filePaths, Logger, cancellationToken).ExecuteAsync ();
 	}
 
 	internal async void ProcessObjCTypes (object? sender, NotifyCollectionChangedEventArgs e)
