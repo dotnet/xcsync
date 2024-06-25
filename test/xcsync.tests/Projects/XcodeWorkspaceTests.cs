@@ -63,7 +63,6 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		// Arrange
 		var fileSystem = new FileSystem ();
-		var visitor = new ObjCImplementationDeclVisitor (testLogger);
 
 		var projectName = Guid.NewGuid ().ToString ();
 
@@ -100,8 +99,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var xcodeWorkspace = new XcodeWorkspace (fileSystem, testLogger, typeService, projectName, xcodeDir, tfm);
 
 		// Act
-		visitor.ObjCTypes.CollectionChanged += xcodeWorkspace.ProcessObjCTypes;
-		await xcodeWorkspace.LoadObjCTypesFromFilesAsync ([Path.Combine (xcodeDir, "ViewController.m")], visitor);
+		await new SyncableFiles (xcodeWorkspace, [Path.Combine (xcodeDir, "ViewController.m")], testLogger).ExecuteAsync ();
 
 		// Assert
 		var typeSymbol = typeService.QueryTypes (null, "ViewController").First ().TypeSymbol!;
