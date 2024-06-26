@@ -2,28 +2,15 @@ using Marille;
 
 namespace xcsync;
 
-public struct ChangeMessage {
-	public string Id { get; set; }
-	public string Path { get; set; }
-	public object Payload { get; set; }
-	
-	public ChangeMessage (string id, string path, object payload)
-	{
-		Id = id;
-		Path = path;
-		Payload = payload;
-	}
+public struct ChangeMessage (string id, string path, object payload) {
+	public string Id { get; set; } = id;
+	public string Path { get; set; } = path;
+	public object Payload { get; set; } = payload;
 }
 
-public class ChangeWorker : IWorker<ChangeMessage> {
-	public string Id { get; set; } = string.Empty;
-	public TaskCompletionSource<bool> Completion { get; set; } = new();
-	
-	public ChangeWorker (string id, TaskCompletionSource<bool> tcs)
-	{
-		Id = id;
-		Completion = tcs;
-	}
+public class ChangeWorker (string id, TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
+	public string Id { get; set; } = id;
+	public TaskCompletionSource<bool> Completion { get; set; } = tcs;
 
 	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
@@ -37,28 +24,8 @@ public class ChangeWorker : IWorker<ChangeMessage> {
 	}
 }
 
-public struct SyncLoad {
-	//todo: fine tune payload
-	public object ChangeDetected { get; set; }
-	public SyncLoad (object changeDetected)
-	{
-		ChangeDetected = changeDetected;
-	}
-}
-public struct ErrorLoad {
-	//todo: fine tune payload
-	public Exception Ex { get; set; }
-	public ErrorLoad (Exception ex)
-	{
-		Ex = ex;
-	}
-}
+readonly record struct SyncLoad (object ChangeDetected);
 
-public struct RenameLoad {
-	//todo: fine tune payload
-	public object ChangeDetected { get; set; }
-	public RenameLoad (object changeDetected)
-	{
-		ChangeDetected = changeDetected;
-	}
-}
+readonly record struct ErrorLoad (Exception Ex);
+
+readonly record struct RenameLoad (object ChangeDetected);
