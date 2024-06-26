@@ -26,12 +26,6 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Different changes will be processed differently based on unique payload
 		await hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
 
-		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
-		// Hub creates a topic channel w message type template
-		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
-		// Different changes will be processed differently based on unique payload
-		await hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
-
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (clrProject, token);
 		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
@@ -89,21 +83,21 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 	{
 		var workerId = await RegisterChangeWorker (hub);
 		// Hub will publish the message to the channel, will be received by worker (who will enact consumeAsync)
-		SyncLoad syncLoad = new SyncLoad (new object ());
+		var syncLoad = new SyncLoad (new object ());
 		await hub.Publish (ChangeChannel, new ChangeMessage (workerId, path, syncLoad));
 	}
 
 	public async Task SyncError (string path, Exception ex, IHub hub)
 	{
 		var workerId = await RegisterChangeWorker (hub);
-		ErrorLoad errorLoad = new ErrorLoad (ex);
+		var errorLoad = new ErrorLoad (ex);
 		await hub.Publish (ChangeChannel, new ChangeMessage (workerId, path, errorLoad));
 	}
 	
 	public async Task SyncRename (string path, IHub hub)
 	{
 		var workerId = await RegisterChangeWorker (hub);
-		RenameLoad renameLoad = new RenameLoad (new object ());
+		var renameLoad = new RenameLoad (new object ());
 		await hub.Publish (ChangeChannel, new ChangeMessage (workerId, path, renameLoad));
 	}
 	

@@ -28,7 +28,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var filesToWrite = new List<Task> ();
 		Logger.Debug ("Generating Xcode project files...");
 
-		if (!TryGetTargetPlatform (Framework, out string targetPlatform))
+		if (!TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
 			return;
 
 		var clrProject = new ClrProject (FileSystem, Logger!, new TypeService (), "CLR Project", ProjectPath, Framework);
@@ -458,7 +458,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger.Debug ("Synchronizing changes from Xcode project...");
 	}
 
-	static bool TryGetTargetPlatform (string tfm, /* List<string> supportedTfms, */ [NotNullWhen (true)] out string targetPlatform)
+	static bool TryGetTargetPlatform (ILogger Logger, string tfm, [NotNullWhen (true)] out string targetPlatform)
 	{
 		targetPlatform = string.Empty;
 
@@ -469,8 +469,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			}
 		}
 
-		//TODO: fix logger instance..
-		// Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
+		Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
 		return false;
 	}
 }
