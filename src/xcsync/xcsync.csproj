@@ -100,6 +100,10 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Workers/" />
+  </ItemGroup>
+
   <Target Name="TextTemplateTransform" BeforeTargets="BeforeBuild" Inputs="@(TextTemplate)" Outputs="$(T4GeneratedFilesOutputPath)/%(TextTemplate.Filename).g.cs">
     <ItemGroup>
       <T4GeneratedFiles Include="@(TextTemplate)">
