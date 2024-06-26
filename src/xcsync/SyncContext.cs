@@ -3,13 +3,17 @@
 using System.IO.Abstractions;
 using Serilog;
 using xcsync.Projects;
+using xcsync.Workers;
 using xcsync.Projects.Xcode;
 using System.Diagnostics.CodeAnalysis;
+using Marille;
 
 namespace xcsync;
 
 class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool Open = false)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
+
+	public const string FileChannel = "Files";
 
 	protected SyncDirection SyncDirection { get; } = Direction;
 
@@ -25,7 +29,11 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	async Task SyncToXcodeAsync (CancellationToken token)
 	{
-		var filesToWrite = new List<Task> ();
+		// use marille channel hub mechanism for better async file creation
+		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
+		await hub.CreateAsync<FileMessage> (FileChannel, configuration);
+		await CreateFileWorker ();
+		
 		Logger.Debug ("Generating Xcode project files...");
 
 		if (!TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
@@ -47,10 +55,10 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		await foreach (var t in nsProject.GetTypes ()) {
 			// all NSObjects get a corresponding .h + .m file generated
 			var gen = new GenObjcH (t).TransformText ();
-			filesToWrite.Add(FileSystem.File.WriteAllTextAsync (FileSystem.Path.Combine (TargetDir, t.ObjCType + ".h"), gen));
+			await WriteFile (FileSystem.Path.Combine (TargetDir, t.ObjCType + ".h"), gen);
 
 			var genM = new GenObjcM (t).TransformText ();
-			filesToWrite.Add(FileSystem.File.WriteAllTextAsync (FileSystem.Path.Combine (TargetDir, t.ObjCType + ".m"), genM));
+			await WriteFile (FileSystem.Path.Combine (TargetDir, t.ObjCType + ".m"), genM);
 
 			// add references for framework resolution at project level
 			foreach (var r in t.References) {
@@ -100,10 +108,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var pbxGroupFiles = new List<string> ();
 
 		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
-
-
-		// ensure all necessary ObjC files are written before creating file references
-		Task.WaitAll ([.. filesToWrite], token);
 
 		// for each file in target directory create FileReference and add to PBXResourcesBuildPhase
 		foreach (var file in FileSystem.Directory.GetFiles (TargetDir)) {
@@ -472,4 +476,17 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
 		return false;
 	}
+
+	public async Task CreateFileWorker () {
+		var tcs = new TaskCompletionSource<bool> ();
+		var worker = new FileWorker (Logger, tcs, FileSystem);
+		await hub.RegisterAsync (FileChannel, worker);
+	}
+
+	public async Task WriteFile (string path, string content) =>
+		await hub.Publish (FileChannel, new FileMessage {
+			Id = Guid.NewGuid ().ToString (),
+			Path = path,
+			Content = content
+		});
 }

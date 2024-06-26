@@ -5,6 +5,7 @@ using Marille;
 using Moq;
 using Serilog;
 using xcsync.Projects;
+using xcsync.Workers;
 
 namespace xcsync.tests; 
 
