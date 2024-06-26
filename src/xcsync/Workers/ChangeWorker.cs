@@ -1,6 +1,8 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using Marille;
 
-namespace xcsync;
+namespace xcsync.Workers;
 
 public struct ChangeMessage (string id, string path, object payload) {
 	public string Id { get; set; } = id;
@@ -8,7 +10,7 @@ public struct ChangeMessage (string id, string path, object payload) {
 	public object Payload { get; set; } = payload;
 }
 
-public class ChangeWorker (string id, TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
+class ChangeWorker (string id, TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
 	public string Id { get; set; } = id;
 	public TaskCompletionSource<bool> Completion { get; set; } = tcs;
 
@@ -25,8 +27,5 @@ public class ChangeWorker (string id, TaskCompletionSource<bool> tcs) : IWorker<
 }
 
 readonly record struct SyncLoad (object ChangeDetected);
-
 readonly record struct ErrorLoad (Exception Ex);
-
 readonly record struct RenameLoad (object ChangeDetected);
-
