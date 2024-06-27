@@ -1,0 +1,15 @@
+{
+	"Projects": [
+		{
+			"LanguageSet": "VS_Main_Languages",
+			"LocItems": [
+				{
+					"SourceFile": "tools\\xcsync\\xcsync\\Resources\\Strings.resx",
+					"LclFile": "loc\\{Lang}\\tools\\xcsync\\xcsync\\Resources\\Strings.resx.lcl",
+					"CopyOption": "LangIDOnName",
+					"OutputPath": "tools\\xcsync\\xcsync\\Resources"
+				}
+			]
+		}
+	]
+}
