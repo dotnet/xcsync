@@ -22,39 +22,18 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 			{"TargetFrameworks", Framework}
 		});
 
-		return await workspace.OpenProjectAsync (RootPath).ConfigureAwait (false);
-	}
+		var project =  await workspace.OpenProjectAsync (RootPath).ConfigureAwait (false);
 
-	public async IAsyncEnumerable<INamedTypeSymbol> GetNsoTypes (Project project)
-	{
 		var compilation = await project.GetCompilationAsync ().ConfigureAwait (false) ??
 						  throw new InvalidOperationException ("Could not get compilation for project '{project}'");
 
-		// limit scope of namespaces to project, do not include referenced assemblies, etc.
-		var namespaces = compilation.GlobalNamespace.GetNamespaceMembers ()
-			.Where (ns => ns.GetMembers ()
-				.Any (member => member.Locations
-					.Any (location => location.IsInSource)));
+		if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
+			return project;
 
-		if (namespaces is null)
-			yield break;
+		TypeService.AddCompilation (targetPlatform, compilation);
 
-		foreach (var ns in namespaces) {
-			foreach (var type in ns.GetTypeMembers ().Where (IsNsoDerived)) {
-				yield return type;
-			}
-		}
+		return project;
 	}
 
-	static bool IsNsoDerived (INamedTypeSymbol? type)
-	{
-		var registerAttribute = type?.GetAttributes ().FirstOrDefault (a => a.AttributeClass?.Name == "RegisterAttribute");
-		var skipAttribute = registerAttribute?.NamedArguments.FirstOrDefault (x => x.Key == "SkipRegistration");
-
-		if (skipAttribute?.Value.Value is true)
-			return false;
-
-		return registerAttribute is not null;
-	}
 }
 
