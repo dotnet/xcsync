@@ -1,0 +1,386 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LCX SchemaVersion="6.0" Name="D:\a\_work\1\s\tools\xcsync\xcsync\Resources\Strings.resx" PsrId="211" SrcCul="en-US" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx" TgtCul="pt-BR">
+  <OwnedComments>
+    <Cmt Name="Dev" />
+    <Cmt Name="LcxAdmin" />
+    <Cmt Name="Rccx" />
+  </OwnedComments>
+  <Item ItemId=";Strings.resx" ItemType="0" PsrId="211" Leaf="false">
+    <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" />
+    <Item ItemId=";Strings" ItemType="0" PsrId="211" Leaf="false">
+      <Disp Icon="Str" Disp="true" LocTbl="false" />
+      <Item ItemId=";Base.CreateDefaultTarget" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Target path '{0}' does not exist, but is the default location, creating.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to target project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Base.EstablishDefaultTarget" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Target path is the default location or empty, prefixing with '{0}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Base.FoundProjectFile" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Found .csproj file '{0}' in path '{1}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Base.ProjectTfms" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Project target frameworks: '{0}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is list of TFMs the selected project supports]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Base.SearchForProjectFiles" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA['{0}' is not a .csproj file, searching for .csproj files in directory]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Base.UseDefaultTfm" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No target framework moniker specified, using the first one found in the project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Commands.Generate.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[generate a Xcode project at the path specified by --target from the project identified by --project]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Commands.Sync.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[used after the generate command to synchronize changes from the generated Xcode project back to the .NET project]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Commands.Watch.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[syncs changes between the .NET project and Xcode project automatically]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Errors.CsprojNotFound" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find a .csproj file in path '{0}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the file or directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Errors.InvalidOption" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Invalid option '{0}' provided: {1}]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is name of the command line options, {1} is the value of the option provided by the user]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Errors.MultipleProjectFilesFound" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Multiple .csproj files found in '{0}', please specify which project file to use via the [--project, -p]5D; option: {1}]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Errors.MultipleTfmsFound" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm]5D; option.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Errors.TargetPlatformNotFound" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Target platform not found]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Errors.TfmNotSupported" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Target framework is not supported by current .NET project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Errors.Validation.InvalidTargetFramework" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Invalid TFM: Target framework '{0}' does not target an Apple platform]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is name of the target frameworks, e.g net8-ios, net8-windows]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Errors.Validation.MissingValidTargetFrameworkInPath" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the file or directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Errors.Validation.PathDoesNotContainCsproj" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA['{0}' is not a valid path to a .NET project or a directory.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the file or directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Errors.Validation.PathDoesNotExist" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Path '{0}' does not exist]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the file or directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Errors.Validation.PathNameIsEmpty" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Path name is empty]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Errors.Validation.TargetDoesNotExist" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Target path '{0}' does not exist, will create directory if [--force, -f]5D; is set.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the file or directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Errors.Validation.TargetIsNotEmpty" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The target path '{0}' already exists and is not empty. Use [--force, -f]5D; to overwrite the existing project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the directory]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Generate.GeneratedFiles" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Generated Xcode header and implementation files]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Generate.GeneratedProject" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Generated Xcode project at '{0}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the generated Xcode project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Generate.HeaderInformation" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Generating files from project '{0}' to target '{1}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the project file, {1} is the path to the target project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Generate.OpenProject" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA['{0}' is open in Xcode]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the opened project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Options.Force.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Force overwrite of an existing Xcode project]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.Open.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Open the generated project in Xcode]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.Project.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Path to the source .NET .csproj]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.Target.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Path to the target Xcode project]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.Tfm.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specify the target framework moniker]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.Verbosity.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Set the verbosity level]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ProgramHeader" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[xcSync v{0}, (c) Microsoft Corporation. All rights reserved.]D;]A;		]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is a numerical based string containing the version number for the command line tool]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Sync.HeaderInformation" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Syncing files from project '{0}' to target '{1}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the project file, {1} is the path to the target project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";TypeService.DuplicateCompilation" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The compilation for {0} has already been added, ignoring this instance.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the name of the assembly]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";TypeService.DuplicateType" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Type '{0}' already exists in project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the name of the type]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";TypeService.MappingMismatch" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0}, {1}, {2}, {3} are names of types]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";TypeService.MappingNotFound" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Mapping from of '{0}' to '{1}' already exists.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0}, {1} are names of types]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";TypeService.MappingUpdateFailed" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Failed to updated mapping of '{0}' to '{1}'.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0}, {1} are names of types]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";TypeService.MissingAssemblyName" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Watch.ErrorMonitoringProjectFiles" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[An error occurred while monitoring file changes in {0}.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the project folder]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Watch.FileChangeDetected" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Changes detected for {0} in {1} project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the file that changed, {1} is the name of the project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Watch.FileChangeFilter" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Filtering file changes to files that match {0}.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is a regex string used to filter files.]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Watch.FileRenameDetected" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[File renamed from {0} to {1} in {2} project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} and {1} are the old and new paths to the file that was renamed, {2} is the name of the project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Watch.HeaderInformation" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Syncing changes between project '{0}' and '{1}'.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the project file, {1} is the path to the target project]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Watch.StartMonitoringProject" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Monitoring project file changes in {0} started.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the project file]]></Cmt>
+        </Cmts>
+      </Item>
+      <Item ItemId=";Watch.StopMonitoringProject" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Monitoring project file changes in {0} stopped.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+        <Cmts>
+          <Cmt Name="Dev"><![CDATA[{0} is the path to the project file]]></Cmt>
+        </Cmts>
+      </Item>
+    </Item>
+  </Item>
+</LCX>
