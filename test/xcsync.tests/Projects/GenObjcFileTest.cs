@@ -30,12 +30,12 @@ public class GenObjcFileTest : Base {
 		""";
 
 	[Fact]
-	public async Task GenerateAppDelegateHFile ()
+	public void GenerateAppDelegateHFile ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "AppDelegate");
+		var types = typeService.QueryTypes ().ToList ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "AppDelegate");
 
 		Assert.NotNull (nsType);
 
@@ -59,12 +59,12 @@ public class GenObjcFileTest : Base {
 	}
 
 	[Fact]
-	public async Task GenerateAppDelegateMFile ()
+	public void GenerateAppDelegateMFile ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "AppDelegate");
+		var types = typeService.QueryTypes ().ToList ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "AppDelegate");
 
 		Assert.NotNull (nsType);
 
@@ -85,16 +85,16 @@ public class GenObjcFileTest : Base {
 	}
 
 	[Fact]
-	public async Task GenerateViewControllerHFile ()
+	public void GenerateViewControllerHFile ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
+		var types = typeService.QueryTypes ().ToList ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 
-		var generated = (new GenObjcH (nsType) as ITextTemplate).TransformText ();
+		var generated = new GenObjcH (nsType).TransformText ();
 
 		const string expected =
 			warning +
@@ -119,16 +119,16 @@ public class GenObjcFileTest : Base {
 	}
 
 	[Fact]
-	public async Task GenerateViewControllerMFile ()
+	public void GenerateViewControllerMFile ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
+		var types = typeService.QueryTypes ().ToList ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 
-		var generated = (new GenObjcM (nsType) as ITextTemplate).TransformText ();
+		var generated = new GenObjcM (nsType).TransformText ();
 
 		const string expected =
 			warning +
@@ -149,13 +149,14 @@ public class GenObjcFileTest : Base {
 		Assert.Equal (expected, generated);
 	}
 
-	(ClrProject, NSProject) InitializeProjects ()
+	(ClrProject, ITypeService) InitializeProjects ()
 	{
 		Assert.True (File.Exists (TestProjectPath));
 		// TODO: Convert this to MockFileSystem
-		var clrProject = new ClrProject (new FileSystem (), Mock.Of<ILogger> (), new TypeService (), "TestProject", TestProjectPath, "net8.0-macos");
-		var xcodeProject = new NSProject (new FileSystem (), clrProject, "macos");
-		return (clrProject, xcodeProject);
+		var typeService = new TypeService ();
+		var clrProject = new ClrProject (new FileSystem (), Mock.Of<ILogger> (), typeService, "TestProject", TestProjectPath, "net8.0-macos");
+		clrProject.OpenProject ().Wait ();
+		return (clrProject, typeService);
 	}
 
 }

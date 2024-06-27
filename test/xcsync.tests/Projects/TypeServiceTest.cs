@@ -71,7 +71,7 @@ public class TypeServiceTest {
 	public void UpdateMapping_TypesDoNotMatch_Fails ()
 	{
 		// Arrange
-		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ();
+		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ()!;
 		var newMapping = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "NewAppDelegate", "AppDelegate", null, false, false, false, null, null, []);
 
 		// Act
@@ -85,7 +85,7 @@ public class TypeServiceTest {
 	public void UpdateMapping_TypesDoNotExist_Fails ()
 	{
 		// Arrange
-		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ();
+		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ()!;
 		var newMapping = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "DoesNotExist", "AppDelegate", null, false, false, false, null, null, []);
 
 		// Act
