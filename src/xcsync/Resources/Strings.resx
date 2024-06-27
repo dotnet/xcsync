@@ -186,4 +186,11 @@
         <value>Failed to updated mapping of '{0}' to '{1}'.</value>
         <comment>{0}, {1} are names of types</comment>
     </data>
+    <data name="TypeService.MissingAssemblyName" xml:space="preserve">
+        <value>The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</value>
+    </data>
+    <data name="TypeService.DuplicateCompilation" xml:space="preserve">
+        <value>The compilation for {0} has already been added, ignoring this instance.</value>
+        <comment>{0} is the name of the assembly</comment>
+    </data>
 </root>

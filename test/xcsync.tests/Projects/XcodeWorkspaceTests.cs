@@ -30,7 +30,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		// Arrange
 		var fileSystem = new FileSystem ();
 		var visitor = new ObjCImplementationDeclVisitor (testLogger);
-		var typeService = Mock.Of<TypeService> ();
+		var typeService = new TypeService ();
 
 		var projectName = Guid.NewGuid ().ToString ();
 
@@ -46,6 +46,9 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		// Run 'xcsync generate'
 		await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm);
+
+		var dotNetProject = new ClrProject (fileSystem, testLogger, typeService, projectName, csproj, tfm);
+		await dotNetProject.OpenProject ();
 
 		var xcodeWorkspace = new XcodeWorkspace (fileSystem, testLogger, typeService, projectName, xcodeDir, tfm);
 
@@ -90,11 +93,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var typeService = new TypeService ();
 
 		var dotNetProject = new ClrProject (fileSystem, testLogger, typeService, projectName, csproj, tfm);
-		var nsProject = new NSProject (fileSystem, dotNetProject, tfm.Split ("-").Last ());
-
-		await foreach (var type in nsProject.GetTypes ()) {
-			typeService.AddType (type);
-		}
+		await dotNetProject.OpenProject ();
 
 		var xcodeWorkspace = new XcodeWorkspace (fileSystem, testLogger, typeService, projectName, xcodeDir, tfm);
 
@@ -102,7 +101,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		await new SyncableFiles (xcodeWorkspace, [Path.Combine (xcodeDir, "ViewController.m")], testLogger).ExecuteAsync ();
 
 		// Assert
-		var typeSymbol = typeService.QueryTypes (null, "ViewController").First ().TypeSymbol!;
+		var typeSymbol = typeService.QueryTypes (null, "ViewController").First ()?.TypeSymbol!;
 		SyntaxTree? syntaxTree = null;
 		foreach (var syntaxRef in typeSymbol.DeclaringSyntaxReferences) {
 			if (syntaxRef.SyntaxTree.FilePath.EndsWith ("designer.cs")) {

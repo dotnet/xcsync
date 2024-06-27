@@ -5,7 +5,6 @@ using Serilog;
 using xcsync.Projects;
 using xcsync.Workers;
 using xcsync.Projects.Xcode;
-using System.Diagnostics.CodeAnalysis;
 using Marille;
 
 namespace xcsync;
@@ -36,11 +35,13 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		
 		Logger.Debug ("Generating Xcode project files...");
 
-		if (!TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
+		if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
 			return;
 
-		var clrProject = new ClrProject (FileSystem, Logger!, new TypeService (), "CLR Project", ProjectPath, Framework);
-		var nsProject = new NSProject (FileSystem, clrProject, targetPlatform);
+		var typeService = new TypeService ();
+		var clrProject = new ClrProject (FileSystem, Logger!, typeService, "CLR Project", ProjectPath, Framework);
+		await clrProject.OpenProject ();
+
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
@@ -52,10 +53,13 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			_ => ("", ""),
 		};
 
-		await foreach (var t in nsProject.GetTypes ()) {
+		foreach (var t in typeService.QueryTypes ()) {
+			if (t is null) continue;
+
 			// all NSObjects get a corresponding .h + .m file generated
-			var gen = new GenObjcH (t).TransformText ();
-			await WriteFile (FileSystem.Path.Combine (TargetDir, t.ObjCType + ".h"), gen);
+			var genH = new GenObjcH (t).TransformText ();
+
+			await WriteFile (FileSystem.Path.Combine (TargetDir, t.ObjCType + ".h"), genH);
 
 			var genM = new GenObjcM (t).TransformText ();
 			await WriteFile (FileSystem.Path.Combine (TargetDir, t.ObjCType + ".m"), genM);
@@ -453,6 +457,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			string workspacePath = FileSystem.Path.Combine (TargetDir, projectName + ".xcodeproj", "project.xcworkspace");
 			Logger?.Information (Strings.Generate.OpenProject (Scripts.Run (Scripts.OpenXcodeProject (workspacePath))));
 		}
+		return;
 	}
 
 	async Task SyncFromXcodeAsync (CancellationToken token)
@@ -460,21 +465,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		// TODO : Add code to Generate CLR changes from Xcode project 
 		await Task.Delay (1000, token);
 		Logger.Debug ("Synchronizing changes from Xcode project...");
-	}
-
-	static bool TryGetTargetPlatform (ILogger Logger, string tfm, [NotNullWhen (true)] out string targetPlatform)
-	{
-		targetPlatform = string.Empty;
-
-		foreach (var platform in xcSync.ApplePlatforms) {
-			if (tfm.Contains (platform.Key)) {
-				targetPlatform = platform.Key;
-				return true;
-			}
-		}
-
-		Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
-		return false;
 	}
 
 	public async Task CreateFileWorker () {

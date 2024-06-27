@@ -8,7 +8,7 @@ namespace xcsync.tests.Projects;
 public class NSProjectTest : Base {
 
 	[Fact]
-	public async Task GetTypes ()
+	public void QueryTypes ()
 	{
 		var expectedTypes = new List<string> {
 			"AlsoNoSkip",
@@ -18,23 +18,20 @@ public class NSProjectTest : Base {
 			"ViewController",
 		};
 
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		Assert.Equal (expectedTypes.Count, await xcodeProject.GetTypes ().CountAsync ());
-		await foreach (var type in xcodeProject.GetTypes ()) {
-			Assert.Contains (type.ClrType, expectedTypes);
-		}
+		Assert.Equal (expectedTypes , typeService.QueryTypes ().ToList ().Where(t => t?.ClrType is not null && !t.IsProtocol).Select(t => t?.ClrType).OrderBy(t => t));
 	}
 
 	[InlineData ("ModelVariety", "ObjectiveCModelVariety", true, false, "NSObject", "NSObject", false)]
 	[InlineData ("ViewController", "ViewController", false, true, "NSViewController", "NSViewController", false)]
 	[Theory]
-	public async Task ConvertToNSObject (string clrName, string objcName, bool isModel, bool inDesigner, string clrBaseName, string objcBaseName, bool baseIsModel)
+	public void ConvertToNSObject (string clrName, string objcName, bool isModel, bool inDesigner, string clrBaseName, string objcBaseName, bool baseIsModel)
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == clrName);
+		var types = typeService.QueryTypes ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == clrName);
 
 		Assert.NotNull (nsType);
 		Assert.Equal (objcName, nsType.ObjCType);
@@ -46,12 +43,12 @@ public class NSProjectTest : Base {
 	}
 
 	[Fact]
-	public async Task ViewControllerOutlets ()
+	public void ViewControllerOutlets ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
+		var types = typeService.QueryTypes ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 		var outlets = nsType.Outlets;
@@ -65,12 +62,12 @@ public class NSProjectTest : Base {
 	}
 
 	[Fact]
-	public async Task ViewControllerActions ()
+	public void ViewControllerActions ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ViewController");
+		var types = typeService.QueryTypes ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "ViewController");
 
 		Assert.NotNull (nsType);
 		var actions = nsType.Actions;
@@ -89,12 +86,12 @@ public class NSProjectTest : Base {
 	}
 
 	[Fact]
-	public async Task NoOutletActionAttribute ()
+	public void NoOutletActionAttribute ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "AppDelegate");
+		var types = typeService.QueryTypes ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "AppDelegate");
 
 		Assert.NotNull (nsType);
 		Assert.Null (nsType.Outlets);
@@ -102,25 +99,25 @@ public class NSProjectTest : Base {
 	}
 
 	[Fact]
-	public async Task ModelOutletAndAction ()
+	public void ModelOutletAndAction ()
 	{
-		(_, NSProject xcodeProject) = InitializeProjects ();
+		(_, ITypeService typeService) = InitializeProjects ();
 
-		var types = await xcodeProject.GetTypes ().ToListAsync ().ConfigureAwait (false);
-		var nsType = types.Select (x => x).FirstOrDefault (x => x.ClrType == "ModelVariety");
+		var types = typeService.QueryTypes ();
+		var nsType = types.Select (x => x).FirstOrDefault (x => x?.ClrType == "ModelVariety");
 
 		Assert.NotNull (nsType);
 		Assert.Null (nsType.Outlets);
 		Assert.Null (nsType.Actions);
 	}
 
-	(ClrProject, NSProject) InitializeProjects ()
+	(ClrProject, ITypeService) InitializeProjects ()
 	{
 		Assert.True (File.Exists (TestProjectPath));
 		// TODO: Convert this to MockFileSystem --> needs entirety of testproject mocked
-		var clrProject = new ClrProject (new FileSystem (), Mock.Of<ILogger> (), new TypeService (), "TestProject", TestProjectPath, "net8.0-macos");
-		var xcodeProject = new NSProject (new FileSystem (), clrProject, "macos");
-		return (clrProject, xcodeProject);
+		var typeService = new TypeService ();
+		var clrProject = new ClrProject (new FileSystem (), Mock.Of<ILogger> (), typeService, "TestProject", TestProjectPath, "net8.0-macos");
+		clrProject.OpenProject ().Wait ();
+		return (clrProject, typeService);
 	}
-
 }

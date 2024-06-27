@@ -12,7 +12,7 @@ public class DotnetTest : Base {
 	[Fact]
 	public async Task GetTypes ()
 	{
-		var expectedTypes = new List<string> {
+		var expectedTypes = new List<string?> {
 			"AlsoNoSkip",
 			"AppDelegate",
 			"ModelVariety",
@@ -24,11 +24,11 @@ public class DotnetTest : Base {
 		if (!File.Exists (TestProjectPath))
 			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
-		var clrProject = new ClrProject (new MockFileSystem (), Mock.Of<ILogger> (), new TypeService (), "TestProject", TestProjectPath, "net8.0-macos");
-		var xcodeProject = new NSProject (new MockFileSystem (), clrProject, "macos");
+		var typeService = new TypeService ();
+		var clrProject = new ClrProject (new MockFileSystem (), Mock.Of<ILogger> (), typeService, "TestProject", TestProjectPath, "net8.0-macos");
 
 		var project = await clrProject.OpenProject ().ConfigureAwait (false);
-		List<INamedTypeSymbol> types = await clrProject.GetNsoTypes (project).ToListAsync ().ConfigureAwait (false);
-		Assert.Equal (expectedTypes, types.Select (x => x.Name).OrderBy (x => x).ToList ());
+		var types = typeService.QueryTypes ().ToList ();
+		Assert.Equal (expectedTypes, [.. types.Where (x => x?.ClrType is not null).Select (x => x?.ClrType).OrderBy (x => x)]);
 	}
 }
