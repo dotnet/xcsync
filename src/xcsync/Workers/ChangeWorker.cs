@@ -7,7 +7,7 @@ namespace xcsync.Workers;
 public struct ChangeMessage (string id, string path, object payload) {
 	public string Id { get; set; } = id;
 	public string Path { get; set; } = path;
-	public object Payload { get; set; } = payload;
+	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
 }
 
 class ChangeWorker (TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
@@ -16,7 +16,7 @@ class ChangeWorker (TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
 	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
 		// todo: impl per load
-		return message.Payload switch {
+		return message.Change switch {
 			SyncLoad => Task.FromResult (Completion.TrySetResult(true)),
 			ErrorLoad => Task.FromResult (Completion.TrySetResult(true)),
 			RenameLoad => Task.FromResult (Completion.TrySetResult(true)),
@@ -25,6 +25,10 @@ class ChangeWorker (TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
 	}
 }
 
-readonly record struct SyncLoad (object ChangeDetected);
-readonly record struct ErrorLoad (Exception Ex);
-readonly record struct RenameLoad (object ChangeDetected);
+public interface ChangeLoad {
+	object ChangeDetected { get; }
+}
+
+readonly record struct SyncLoad (object ChangeDetected) : ChangeLoad;
+readonly record struct ErrorLoad (object ChangeDetected) : ChangeLoad;
+readonly record struct RenameLoad (object ChangeDetected) : ChangeLoad;
