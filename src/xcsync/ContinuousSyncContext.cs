@@ -11,7 +11,6 @@ namespace xcsync;
 class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
-	public List<(ChangeWorker, TaskCompletionSource<bool>)> workers = new();
 	public const string ChangeChannel = "Changes";
 	public async Task SyncAsync (CancellationToken token = default)
 	{
@@ -26,6 +25,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
 		// Different changes will be processed differently based on unique payload
 		await hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
+		await RegisterChangeWorker (hub);
 
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (clrProject, token);
@@ -72,9 +72,6 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			// TODO:  Use a FIFO queue to process the jobs
 			// Keep executing sync jobs until the user presses the esc sequence [CTRL-Q]
 			Logger.Debug ("Checking for changes in the projects...");
-			var result = await Task.WhenAll (workers.Select (x => x.Item2.Task));
-			// when all in result are true ==> all changes synced!
-			// maybe add logging for status?
 		} while (token.IsCancellationRequested == false);
 		
 		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
@@ -82,35 +79,29 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 	public async Task SyncChange (string path, IHub hub)
 	{
-		var workerId = await RegisterChangeWorker (hub);
 		// Hub will publish the message to the channel, will be received by worker (who will enact consumeAsync)
 		var syncLoad = new SyncLoad (new object ());
-		await hub.Publish (ChangeChannel, new ChangeMessage (workerId, path, syncLoad));
+		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, syncLoad));
 	}
 
 	public async Task SyncError (string path, Exception ex, IHub hub)
 	{
-		var workerId = await RegisterChangeWorker (hub);
 		var errorLoad = new ErrorLoad (ex);
-		await hub.Publish (ChangeChannel, new ChangeMessage (workerId, path, errorLoad));
+		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, errorLoad));
 	}
 	
 	public async Task SyncRename (string path, IHub hub)
 	{
-		var workerId = await RegisterChangeWorker (hub);
 		var renameLoad = new RenameLoad (new object ());
-		await hub.Publish (ChangeChannel, new ChangeMessage (workerId, path, renameLoad));
+		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid().ToString(), path, renameLoad));
 	}
 	
-	public async Task<string> RegisterChangeWorker (IHub hub)
+	public async Task RegisterChangeWorker (IHub hub)
 	{
-		var correlationId = Guid.NewGuid ();
 		var tcs = new TaskCompletionSource<bool> ();
-		var worker = new ChangeWorker ($"{correlationId}", tcs);
-		workers.Add ((worker, tcs));
+		var worker = new ChangeWorker (tcs);
 		await hub.RegisterAsync (ChangeChannel, worker); 
 		// worker now knows to pick up any and all change-related events from the channel in hub
-		return worker.Id;
 	}
 }
 
