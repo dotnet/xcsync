@@ -10,8 +10,7 @@ public struct ChangeMessage (string id, string path, object payload) {
 	public object Payload { get; set; } = payload;
 }
 
-class ChangeWorker (string id, TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
-	public string Id { get; set; } = id;
+class ChangeWorker (TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
 	public TaskCompletionSource<bool> Completion { get; set; } = tcs;
 
 	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
