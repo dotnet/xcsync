@@ -17,6 +17,25 @@
     <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>
   </PropertyGroup>
 
+  <PropertyGroup Label="nuget pkg">
+    <Title>xcsync</Title>
+    <PackageId>xcsync</PackageId>
+    <Authors>Microsoft</Authors>
+    <Owners>Microsoft</Owners>
+    <Company>Microsoft</Company>
+    <Copyright>Microsoft Corporation</Copyright>
+    <PackageReadmeFile>../README.md</PackageReadmeFile>
+    <IsPackable>true</IsPackable>
+    <PackageId>Microsoft.Tools.xcsync</PackageId>
+    <!-- <GeneratePackageOnBuild>true</GeneratePackageOnBuild> -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <Description>xcsync is a closed source internal tool used provide Xcode storyboard editing support.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
     <T4GeneratedFilesOutputPath>$(BaseIntermediateOutputPath)generated/t4</T4GeneratedFilesOutputPath>

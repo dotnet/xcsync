@@ -18,7 +18,7 @@ public class ContinuousSyncContextTest {
 	public async Task ChangeWorker_Sync()
 	{
 		await context.SyncChange("path", mockHub.Object);
-		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Payload is SyncLoad)), Times.Once);
+		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Change is SyncLoad)), Times.Once);
 	}
 	
 	[Fact]
@@ -26,13 +26,13 @@ public class ContinuousSyncContextTest {
 	{
 		// can't make this a theory cuz of diff # of params :/
 		await context.SyncError("path", new Exception(), mockHub.Object);
-		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Payload is ErrorLoad)), Times.Once);
+		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Change is ErrorLoad)), Times.Once);
 	}
 
 	[Fact]
 	public async Task ChangeWorker_Rename()
 	{
 		await context.SyncRename("path", mockHub.Object);
-		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Payload is RenameLoad)), Times.Once);
+		mockHub.Verify(h => h.Publish(It.Is<string>(s => s == ContinuousSyncContext.ChangeChannel), It.Is<ChangeMessage>(m => m.Change is RenameLoad)), Times.Once);
 	}
 }
