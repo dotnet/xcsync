@@ -15,7 +15,7 @@ public class Base {
 
 	static async Task Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
-		output.WriteLine ($"Running: {path}/{executable} {arguments}");
+		output.WriteLine ($"\rRunning: {path}/{executable} {arguments}");
 		var outputWrapper = new LoggingOutputWriter (output);
 		var exec = await Execution.RunAsync (
 				executable,
@@ -36,7 +36,7 @@ public class Base {
 		public override void WriteLine (string? value)
 		{
 			if (value is not null)
-				helper.WriteLine (value?.ToString ());
+				helper.WriteLine ($"\r{value?.ToString ()}");
 		}
 
 		public override Encoding Encoding {
