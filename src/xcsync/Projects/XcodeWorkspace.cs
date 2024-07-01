@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO.Abstractions;
@@ -19,6 +18,7 @@ using static ClangSharp.Interop.CXDiagnosticDisplayOptions;
 using static ClangSharp.Interop.CXDiagnosticSeverity;
 using static ClangSharp.Interop.CXErrorCode;
 using static ClangSharp.Interop.CXTranslationUnit_Flags;
+
 namespace xcsync.Projects;
 
 partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework) :
@@ -42,17 +42,16 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 	string SdkRoot { get; set; } = string.Empty;
 
 	readonly ConcurrentBag<ISyncableItem> syncableItems = [];
-	readonly ObservableCollection<ObjCImplementationDecl> objcTypes = [];
 
-	protected override async void InitializeAsync ()
-	{
-		await LoadAsync ();
-	}
+	// protected override async void InitializeAsync ()
+	// {
+	// 	await LoadAsync ().ConfigureAwait (false);
+	// }
 
 	public async Task LoadAsync (CancellationToken cancellationToken = default)
 	{
 		// Load the project files
-		Project = await LoadProjectAsync (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"), cancellationToken);
+		Project = await LoadProjectAsync (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"), cancellationToken).ConfigureAwait (false);
 
 		if (Project is null) {
 			Logger.Error ("Failed to load the Xcode project file at {ProjectPath}", FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"));
@@ -98,7 +97,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			FileSystem.Path.Combine (Scripts.SelectXcode (), "Contents", "Developer", "Platforms", $"{SdkRoot}.platform", "Developer", "SDKs", $"{SdkRoot}.sdk"),
 		]);
 
-		await LoadSyncableItemsAsync (fileReferences, syncableItems, cancellationToken);
+		await LoadSyncableItemsAsync (fileReferences, syncableItems, cancellationToken).ConfigureAwait (false);
 	}
 
 	async Task LoadSyncableItemsAsync (IEnumerable<PBXFileReference> fileReferences, ConcurrentBag<ISyncableItem> syncableItems, CancellationToken cancellationToken = default)
@@ -113,10 +112,10 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 						where headerReference.Path!.EndsWith (".h") && moduleReference.Path!.EndsWith (".m")
 						select moduleReference.Path;
 
-	    await new SyncableFiles (this, filePaths, Logger, cancellationToken).ExecuteAsync ();
+		await new SyncableFiles (this, filePaths, Logger, cancellationToken).ExecuteAsync ().ConfigureAwait (false);
 	}
 
-	internal async void ProcessObjCTypes (object? sender, NotifyCollectionChangedEventArgs e)
+	internal void ProcessObjCTypes (object? sender, NotifyCollectionChangedEventArgs e)
 	{
 		List<Task> processObjCTypeTasks = [];
 
@@ -141,47 +140,51 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			}
 		}
 
-		await Task.WhenAll (processObjCTypeTasks);
+		Task.WaitAll ([.. processObjCTypeTasks]);
 	}
 
 	internal async Task UpdateRoslynType (TypeMapping typeMap, ObjCImplementationDecl objcType)
 	{
-		SyntaxTree? syntaxTree = null;
-		foreach (var syntaxRef in typeMap.TypeSymbol!.DeclaringSyntaxReferences) {
-			if (syntaxRef.SyntaxTree.FilePath.EndsWith ("designer.cs")) {
-				syntaxTree = syntaxRef.SyntaxTree;
-				break;
+		try {
+			SyntaxTree? syntaxTree = null;
+			foreach (var syntaxRef in typeMap.TypeSymbol!.DeclaringSyntaxReferences) {
+				if (!typeMap.InDesigner) {
+					syntaxTree = syntaxRef.SyntaxTree;
+					break;
+				} else if (syntaxRef.SyntaxTree.FilePath.EndsWith ("designer.cs")) {
+					syntaxTree = syntaxRef.SyntaxTree;
+					break;
+				}
 			}
+			if (syntaxTree is null) return;
+
+			var rewriter = new ObjCSyntaxRewriter (Logger, TypeService, new AdhocWorkspace ());
+
+			var newClass = await rewriter.WriteAsync (objcType.ClassInterface, syntaxTree);
+
+			var root = (CSharpSyntaxNode) syntaxTree!.GetRoot ();
+
+			var oldClassNode = root!.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
+			var newClassNode = newClass!.GetRoot ().DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
+
+			var newRoot = root.ReplaceNode (oldClassNode!, newClassNode!);
+			newRoot = root.WithLeadingTrivia (SyntaxFactory.Whitespace (Environment.NewLine));
+
+			await TypeService.TryUpdateMappingAsync (typeMap, newRoot).ConfigureAwait (false);
+		} catch (Exception e) {
+			Logger.Error (e, "{Function} : Error '{type}' : {exception}\n{stacktrace}", nameof(UpdateRoslynType), typeMap.ObjCType, e.Message, e.StackTrace);
 		}
-		if (syntaxTree is null) return;
-
-		var rewriter = new ObjCSyntaxRewriter (Logger, TypeService);
-
-		var newClass = await rewriter.WriteAsync (objcType.ClassInterface, syntaxTree);
-
-		var root = (CompilationUnitSyntax) newClass!.GetRoot ();
-
-		var type = root.DescendantNodes ().OfType<INamedTypeSymbol> ().FirstOrDefault ();
-
-		if (type is null) {
-			Logger.Warning ($"No type found in the syntax tree for {objcType}", objcType.Name);
-			return;
-		}
-
-		typeMap = typeMap with { TypeSymbol = type };
-		TypeService.AddType (typeMap);
 	}
 
-	internal async Task LoadObjCTypesFromFilesAsync (IEnumerable<string> filePaths, AstVisitor visitor, CancellationToken cancellationToken = default)
+	internal void LoadObjCTypesFromFiles (IEnumerable<string> filePaths, AstVisitor visitor, CancellationToken cancellationToken = default)
 	{
 		List<Task> loadTypesFromFileTasks = [];
 
-		ConcurrentBag<ObjCImplementationDecl> types = [];
 		foreach (var filePath in filePaths) {
-			loadTypesFromFileTasks.Add (LoadObjCTypesFromFileAsync (filePath, visitor, cancellationToken));
+			loadTypesFromFileTasks.Add (LoadObjCTypesFromFileAsync (FileSystem.Path.Combine (RootPath, filePath), visitor, cancellationToken));
 		}
 
-		await Task.WhenAll (loadTypesFromFileTasks);
+		Task.WaitAll (loadTypesFromFileTasks.ToArray (), cancellationToken);
 	}
 
 	async Task LoadObjCTypesFromFileAsync (string filePath, AstVisitor visitor, CancellationToken cancellationToken = default)
@@ -221,10 +224,10 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			var walker = new AstWalker ();
 			await walker.WalkAsync (translationUnit.TranslationUnitDecl, visitor, (cursor) => {
 				return !cursor.Location.IsInSystemHeader;
-			});
+			}).ConfigureAwait (false);
 
 		} catch (Exception e) {
-			Logger.Error (e, "Error processing '{filePath}'", filePath);
+			Logger.Error (e, "Error processing '{filePath}' : {exception}\n{stacktrace}", filePath, e.Message, e.StackTrace);
 		}
 	}
 
@@ -232,14 +235,13 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 	{
 		using var json = FileSystem.File.OpenWrite (path);
 
-		await JsonSerializer.SerializeAsync (json, Project, jsonOptions, cancellationToken);
+		await JsonSerializer.SerializeAsync (json, Project, jsonOptions, cancellationToken).ConfigureAwait (false);
 	}
 
 	public async Task<XcodeProject?> LoadProjectAsync (string path, CancellationToken cancellationToken = default)
 	{
 		using var json = FileSystem.File.Open (path, FileMode.Open);
 
-		return await JsonSerializer.DeserializeAsync<XcodeProject> (json, jsonOptions, cancellationToken);
+		return await JsonSerializer.DeserializeAsync<XcodeProject> (json, jsonOptions, cancellationToken).ConfigureAwait (false);
 	}
-
 }

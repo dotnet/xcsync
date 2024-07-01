@@ -24,8 +24,9 @@ public class DotnetTest : Base {
 		if (!File.Exists (TestProjectPath))
 			throw new FileNotFoundException ($"Test project not found at '{TestProjectPath}'");
 
-		var typeService = new TypeService ();
-		var clrProject = new ClrProject (new MockFileSystem (), Mock.Of<ILogger> (), typeService, "TestProject", TestProjectPath, "net8.0-macos");
+		var logger = Mock.Of<ILogger> ();
+		var typeService = new TypeService (logger);
+		var clrProject = new ClrProject (new MockFileSystem (), logger, typeService, "TestProject", TestProjectPath, "net8.0-macos");
 
 		var project = await clrProject.OpenProject ().ConfigureAwait (false);
 		var types = typeService.QueryTypes ().ToList ();

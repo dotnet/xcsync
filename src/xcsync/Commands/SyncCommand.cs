@@ -14,7 +14,7 @@ class SyncCommand : BaseCommand<SyncCommand> {
 
 	public async Task Execute ()
 	{
-		var sync = new SyncContext (fileSystem, new TypeService (), SyncDirection.FromXcode, ProjectPath, TargetPath, Tfm, Logger!);
+		var sync = new SyncContext (fileSystem, new TypeService (Logger!), SyncDirection.FromXcode, ProjectPath, TargetPath, Tfm, Logger!);
 		await sync.SyncAsync ().ConfigureAwait (false);
 	}
 }

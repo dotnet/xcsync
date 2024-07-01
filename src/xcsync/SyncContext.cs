@@ -6,6 +6,7 @@ using xcsync.Projects;
 using xcsync.Workers;
 using xcsync.Projects.Xcode;
 using Marille;
+using Microsoft.CodeAnalysis;
 
 namespace xcsync;
 
@@ -18,28 +19,27 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	public async Task SyncAsync (CancellationToken token = default)
 	{
+		// use marille channel hub mechanism for better async file creation
+		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
+		await Hub.CreateAsync<FileMessage> (FileChannel, configuration);
+		await CreateFileWorker ();
+		
 		if (SyncDirection == SyncDirection.ToXcode)
-			await SyncToXcodeAsync (token);
+			await SyncToXcodeAsync (token).ConfigureAwait (false);
 		else
-			await SyncFromXcodeAsync (token);
+			await SyncFromXcodeAsync (token).ConfigureAwait (false);
 
 		Logger.Debug ("Synchronization complete.");
 	}
 
 	async Task SyncToXcodeAsync (CancellationToken token)
 	{
-		// use marille channel hub mechanism for better async file creation
-		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
-		await hub.CreateAsync<FileMessage> (FileChannel, configuration);
-		await CreateFileWorker ();
-		
 		Logger.Debug ("Generating Xcode project files...");
 
 		if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
 			return;
 
-		var typeService = new TypeService ();
-		var clrProject = new ClrProject (FileSystem, Logger!, typeService, "CLR Project", ProjectPath, Framework);
+		var clrProject = new ClrProject (FileSystem, Logger!, TypeService, "CLR Project", ProjectPath, Framework);
 		await clrProject.OpenProject ();
 
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
@@ -53,7 +53,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			_ => ("", ""),
 		};
 
-		foreach (var t in typeService.QueryTypes ()) {
+		foreach (var t in TypeService.QueryTypes ()) {
 			if (t is null) continue;
 
 			// all NSObjects get a corresponding .h + .m file generated
@@ -462,19 +462,49 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	async Task SyncFromXcodeAsync (CancellationToken token)
 	{
-		// TODO : Add code to Generate CLR changes from Xcode project 
-		await Task.Delay (1000, token);
-		Logger.Debug ("Synchronizing changes from Xcode project...");
+		Logger.Information (Strings.Sync.HeaderInformation, TargetDir, ProjectPath);
+
+		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
+
+		var dotNetProject = new ClrProject (FileSystem, Logger, TypeService, projectName, ProjectPath, Framework);
+		await dotNetProject.OpenProject ().ConfigureAwait (false);
+
+		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework);
+
+		// TODO: After this executes the TypeService has been updated with new SyntaxTrees
+		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
+
+		var typesToWrite = TypeService.QueryTypes (null, null) // All Types
+			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files
+
+		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
+		foreach (var type in typesToWrite) {
+			Logger.Information ("Processing type {Type}", type?.ClrType);
+
+			// This gets the SyntaxTree from the *.designer.cs portion of the type
+			var typeSymbol = type?.TypeSymbol!;
+			SyntaxTree? syntaxTree = null;
+			foreach (var syntaxRef in typeSymbol.DeclaringSyntaxReferences) {
+				if (syntaxRef.SyntaxTree.FilePath.EndsWith ("designer.cs")) {
+					syntaxTree = syntaxRef.SyntaxTree;
+					break;
+				}
+			}
+
+			// Write out the file
+			// TODO: This should probably be extracted to a different class, like SyncableFile/Type
+			await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).ToFullString () ?? string.Empty);
+		}
 	}
 
 	public async Task CreateFileWorker () {
 		var tcs = new TaskCompletionSource<bool> ();
 		var worker = new FileWorker (Logger, tcs, FileSystem);
-		await hub.RegisterAsync (FileChannel, worker);
+		await Hub.RegisterAsync (FileChannel, worker);
 	}
 
 	public async Task WriteFile (string path, string content) =>
-		await hub.Publish (FileChannel, new FileMessage {
+		await Hub.Publish (FileChannel, new FileMessage {
 			Id = Guid.NewGuid ().ToString (),
 			Path = path,
 			Content = content
