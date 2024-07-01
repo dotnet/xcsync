@@ -15,13 +15,13 @@ abstract class AstVisitor : IVisitor<Cursor> {
 	public virtual async Task VisitAsync (Cursor cursor)
 	{
 		if (cursor is Attr attr) {
-			await VisitAttrAsync (attr);
+			await VisitAttrAsync (attr).ConfigureAwait (false);
 		} else if (cursor is Decl decl) {
-			await VisitDeclAsync (decl);
+			await VisitDeclAsync (decl).ConfigureAwait (false);
 		} else if (cursor is Ref @ref) {
-			await VisitRefAsync (@ref);
+			await VisitRefAsync (@ref).ConfigureAwait (false);
 		} else if (cursor is Stmt stmt) {
-			await VisitStmtAsync (stmt);
+			await VisitStmtAsync (stmt).ConfigureAwait (false);
 		}
 	}
 

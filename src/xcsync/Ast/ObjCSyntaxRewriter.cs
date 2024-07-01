@@ -14,16 +14,15 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace xcsync.Ast;
 
-class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService) : AstWalker {
+class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace workspace) : AstWalker {
 
 	internal async Task<SyntaxTree?> WriteAsync (ObjCInterfaceDecl objcType, SyntaxTree? syntaxTree)
 	{
 		var visitor = new Visitor (Logger, typeService, syntaxTree);
-		await WalkAsync (objcType, visitor);
+		await WalkAsync (objcType, visitor).ConfigureAwait (false);
 
 		// Now that we have the basic tree, lets make sure it generates pretty C# code
 		var sortedTree = SortClassMembers (visitor.SyntaxTree!);
-		var workspace = new AdhocWorkspace ();
 		var root = sortedTree!.GetRoot ();
 		root = Formatter.Format (root, Formatter.Annotation, workspace);
 		root = Formatter.Format (root, SyntaxAnnotation.ElasticAnnotation, workspace);

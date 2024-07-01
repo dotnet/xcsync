@@ -30,7 +30,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		// Arrange
 		var fileSystem = new FileSystem ();
 		var visitor = new ObjCImplementationDeclVisitor (testLogger);
-		var typeService = new TypeService ();
+		var typeService = new TypeService (testLogger);
 
 		var projectName = Guid.NewGuid ().ToString ();
 
@@ -53,7 +53,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var xcodeWorkspace = new XcodeWorkspace (fileSystem, testLogger, typeService, projectName, xcodeDir, tfm);
 
 		// Act
-		await xcodeWorkspace.LoadObjCTypesFromFilesAsync ([Path.Combine (xcodeDir, fileToParse)], visitor);
+		xcodeWorkspace.LoadObjCTypesFromFiles ([Path.Combine (xcodeDir, fileToParse)], visitor);
 
 		// Assert
 		Assert.Equal (expectedTypes, visitor.ObjCTypes.Select (t => t.Name).ToArray ());
@@ -90,7 +90,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		File.WriteAllText (headerPath, objCHeader);
 		File.WriteAllText (modulePath, objCModule);
 
-		var typeService = new TypeService ();
+		var typeService = new TypeService (testLogger);
 
 		var dotNetProject = new ClrProject (fileSystem, testLogger, typeService, projectName, csproj, tfm);
 		await dotNetProject.OpenProject ();

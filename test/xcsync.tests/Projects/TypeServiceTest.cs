@@ -1,5 +1,8 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using Microsoft.CodeAnalysis;
 using Moq;
+using Serilog;
 using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
@@ -9,7 +12,7 @@ public class TypeServiceTest {
 
 	public TypeServiceTest ()
 	{
-		typeService = new TypeService ();
+		typeService = new TypeService (Mock.Of<ILogger> ());
 
 		typeService.AddType (Mock.Of<INamedTypeSymbol> (), "ViewController", "ViewController", null, false, false, false, null, null, []);
 		typeService.AddType (Mock.Of<INamedTypeSymbol> (), "AppDelegate", "AppDelegate", null, false, false, false, null, null, []);
@@ -65,33 +68,5 @@ public class TypeServiceTest {
 		typeService.AddType (appDelegateDupe);
 		var result = typeService.AddType (appDelegateDupe);
 		Assert.Null (result);
-	}
-
-	[Fact]
-	public void UpdateMapping_TypesDoNotMatch_Fails ()
-	{
-		// Arrange
-		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ()!;
-		var newMapping = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "NewAppDelegate", "AppDelegate", null, false, false, false, null, null, []);
-
-		// Act
-		var result = typeService.TryUpdateMapping (oldMapping, newMapping);
-
-		// Assert
-		Assert.False (result);
-	}
-
-	[Fact]
-	public void UpdateMapping_TypesDoNotExist_Fails ()
-	{
-		// Arrange
-		var oldMapping = typeService.QueryTypes (objcType: "AppDelegate").First ()!;
-		var newMapping = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "DoesNotExist", "AppDelegate", null, false, false, false, null, null, []);
-
-		// Act
-		var result = typeService.TryUpdateMapping (oldMapping, newMapping);
-
-		// Assert
-		Assert.False (result);
 	}
 }

@@ -1,5 +1,4 @@
-
-
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 
 namespace xcsync;
 
@@ -86,5 +85,9 @@ static class Strings {
 		internal static string MappingUpdateFailed (string clrType, string objCType) => string.Format (Resources.Strings.TypeService_MappingUpdateFailed, clrType, objCType);
 		internal static string MissingAssemblyName => Resources.Strings.TypeService_MissingAssemblyName;
 		internal static string DuplicateCompilation (string assemblyName) => string.Format (Resources.Strings.TypeService_DuplicateCompilation, assemblyName);
+		internal static string CompilationNotFound (string assemblyName) => string.Format (Resources.Strings.TypeService_CompilationNotFound, assemblyName);
+		internal static string TypeNotFound (string typeName) => string.Format (Resources.Strings.TypeService_TypeNotFound, typeName);
+		internal static string SyntaxRootNotFound (string typeName) => string.Format (Resources.Strings.TypeService_SyntaxRootNotFound, typeName);
+
 	}
 }

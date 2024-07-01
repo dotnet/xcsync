@@ -309,5 +309,17 @@
     <data name="TypeService.DuplicateCompilation" xml:space="preserve">
         <value>The compilation for {0} has already been added, ignoring this instance.</value>
         <comment>{0} is the name of the assembly</comment>
+    </data>	
+    <data name="TypeService.TypeNotFound" xml:space="preserve">
+        <value>The {0} type could not be located for synchronization.</value>
+        <comment>{0} is the name of the type</comment>
+    </data>
+    <data name="TypeService.CompilationNotFound" xml:space="preserve">
+        <value>The compilation for {0} could not be located for synchronization.</value>
+        <comment>{0} is the name of the assembly</comment>
+    </data>
+    <data name="TypeService.SyntaxRootNotFound" xml:space="preserve">
+        <value>The {0} type could not be synchronized due to missing symbol information.</value>
+        <comment>{0} is the name of the type</comment>
     </data>
 </root>

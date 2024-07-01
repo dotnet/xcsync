@@ -2,6 +2,7 @@
 
 using ClangSharp;
 using ClangSharp.Interop;
+using Microsoft.CodeAnalysis;
 using Moq;
 using Serilog;
 using xcsync.Ast;
@@ -26,7 +27,7 @@ public class ObjCSyntaxRewriterTest {
 		// So the hardcoding of the OS Arch and target platform is acceptable
 
 		var logger = new Mock<ILogger> ();
-		var TypeService = new Mock<TypeService> ();
+		var TypeService = new Mock<TypeService> (logger.Object);
 		var NSTextFieldTypeMapping = new TypeMapping (null, "NSTextField", "NSTextField", null, false, false, false, null, null, []);
 
 		TypeService.Setup (
@@ -56,7 +57,7 @@ public class ObjCSyntaxRewriterTest {
 		var decl = (ObjCInterfaceDecl) cursor;
 
 		// Act
-		var walker = new ObjCSyntaxRewriter (logger.Object, TypeService.Object);
+		var walker = new ObjCSyntaxRewriter (logger.Object, TypeService.Object, new AdhocWorkspace ());
 		var newSyntax = await walker!.WriteAsync (decl, null);
 		var actualOutput = newSyntax!.GetRoot ().ToFullString ();
 

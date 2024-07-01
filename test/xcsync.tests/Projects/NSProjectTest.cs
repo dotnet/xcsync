@@ -115,7 +115,7 @@ public class NSProjectTest : Base {
 	{
 		Assert.True (File.Exists (TestProjectPath));
 		// TODO: Convert this to MockFileSystem --> needs entirety of testproject mocked
-		var typeService = new TypeService ();
+		var typeService = new TypeService (Mock.Of<ILogger> ());
 		var clrProject = new ClrProject (new FileSystem (), Mock.Of<ILogger> (), typeService, "TestProject", TestProjectPath, "net8.0-macos");
 		clrProject.OpenProject ().Wait ();
 		return (clrProject, typeService);
