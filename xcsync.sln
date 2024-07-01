@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcsync.tests", "xcsync.test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test-project", "test-project\test-project.csproj", "{62CAC7A6-A010-4121-B958-751D2B47FB1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcsync.e2e.tests", "xcsync.e2e.tests\xcsync.e2e.tests.csproj", "{D177A0C6-FB31-4AE9-B8EF-126553B13714}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,5 +30,9 @@ Global
 		{79589277-6D1A-462E-85A1-47DAA58012DD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{62CAC7A6-A010-4121-B958-751D2B47FB1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{62CAC7A6-A010-4121-B958-751D2B47FB1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D177A0C6-FB31-4AE9-B8EF-126553B13714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D177A0C6-FB31-4AE9-B8EF-126553B13714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D177A0C6-FB31-4AE9-B8EF-126553B13714}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D177A0C6-FB31-4AE9-B8EF-126553B13714}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

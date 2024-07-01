@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using System.Collections.Concurrent;
 using System.IO.Abstractions;
 using Microsoft.CodeAnalysis;
@@ -6,8 +8,7 @@ using Serilog;
 namespace xcsync.Projects;
 
 // Type system bridge between .NET and Xcode
-class TypeService : ITypeService {
-	static ILogger Logger { get; set; } = Log.Logger;
+class TypeService (ILogger Logger) : ITypeService {
 	static IFileSystem FileSystem { get; set; } = new FileSystem ();
 	
 	// Init
@@ -40,8 +41,17 @@ class TypeService : ITypeService {
 		return AddType (newType);
 	}
 
-	public bool TryUpdateMapping (TypeMapping oldMapping, TypeMapping newMapping)
+	public async Task<bool> TryUpdateMappingAsync (TypeMapping oldMapping, SyntaxNode newSyntax)
 	{
+		var compilation = await UpdateCompilation (oldMapping.TypeSymbol!, newSyntax).ConfigureAwait (false);
+
+		TypeMapping? newMapping = UpdateMappingFromCompilation (oldMapping, compilation);
+
+		if (newMapping is null) {
+			Logger.Error (Strings.TypeService.TypeNotFound (oldMapping.ClrType));
+			return false;
+		}
+
 		if (oldMapping.ClrType != newMapping.ClrType || oldMapping.ObjCType != newMapping.ObjCType) {
 			Logger.Error (Strings.TypeService.MappingMismatch (oldMapping.ClrType, oldMapping.ObjCType, newMapping.ClrType, newMapping.ObjCType));
 			return false;
@@ -64,6 +74,25 @@ class TypeService : ITypeService {
 		return true;
 	}
 
+	TypeMapping? UpdateMappingFromCompilation (TypeMapping oldMapping, Compilation compilation)
+	{
+		var namespaces = compilation!.GlobalNamespace.GetNamespaceMembers ()
+			.Where (ns => ns.GetMembers ()
+				.Any (member => member.Locations
+					.Any (location => location.IsInSource)));
+
+		var newMapping = compilation.GlobalNamespace.GetNamespaceMembers ()
+			.Where (ns => ns.GetMembers ()
+				.Any (member => member.Locations
+					.Any (location => location.IsInSource)))
+			.SelectMany (ns => ns.GetTypeMembers ())
+			.Where (type => xcSync.IsNsoDerived (type) && type.Name == oldMapping.ClrType)
+			.Select (type => oldMapping with { TypeSymbol = type, HasChanges = true })
+			.FirstOrDefault ();
+			
+		return newMapping;
+	}
+
 	public virtual IEnumerable<TypeMapping?> QueryTypes (string? clrType = null, string? objcType = null) =>
 		(clrType, objcType) switch {
 			(string cli, null) => clrTypes.Values.Where (t => t?.ClrType == cli),
@@ -84,6 +113,41 @@ class TypeService : ITypeService {
 		};
 
 		AddTypesFromCompilation (targetPlatform, compilation);
+	}
+
+	async Task<Compilation> UpdateCompilation (INamedTypeSymbol typeSymbol, SyntaxNode newSyntax)
+	{
+		if (!compilations.TryGetValue (typeSymbol.ContainingAssembly.Name, out var compilation)) {
+			Logger.Error (Strings.TypeService.CompilationNotFound (typeSymbol.ContainingAssembly.Name));
+			throw new InvalidOperationException (Strings.TypeService.CompilationNotFound (typeSymbol.ContainingAssembly.Name));
+		}
+
+		var root = await compilation.SyntaxTrees.First (st => st.FilePath == newSyntax.SyntaxTree.FilePath).GetRootAsync ();
+		if (root is null) {
+			Logger.Error (Strings.TypeService.SyntaxRootNotFound (typeSymbol.Name));
+			return compilation;
+		}
+
+		var newModel = compilation.ReplaceSyntaxTree (root.SyntaxTree, newSyntax.SyntaxTree);
+
+		if (newModel.GetDiagnostics ().Any (diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)) {
+			Logger.Error ("{Assembly}: Compilation errors found", newModel.AssemblyName);
+			foreach (var diagnostic in newModel.GetDiagnostics ()) {
+				if (diagnostic.Severity == DiagnosticSeverity.Error) {
+					Logger.Error ("{Assembly}: {Diagnostic}", newModel.AssemblyName, diagnostic);
+				}
+			}
+		}
+
+		if (newModel.AssemblyName is null) {
+			Logger.Error (Strings.TypeService.MissingAssemblyName);
+			return compilation;
+		}
+
+		if (!compilations.TryUpdate (newModel.AssemblyName, newModel, compilation))
+			Logger.Error ("{Assembly}: Failed to cache new compilation within type system, changes are not preserved.", compilation.AssemblyName);
+
+		return newModel;
 	}
 
 	void AddTypesFromCompilation (string targetPlatform, Compilation compilation)

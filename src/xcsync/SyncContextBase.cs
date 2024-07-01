@@ -18,9 +18,9 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	protected string TargetDir { get; } = targetDir;
 	protected string Framework { get; } = framework;
 
-	public Hub hub = new ();
+	protected Hub Hub = new ();
 	// hub needs to be created, registered to a specific topic, published
-	public TopicConfiguration configuration = new ();
-	private readonly CancellationTokenSource cancellationTokenSource = new();
+	protected TopicConfiguration configuration = new ();
+	readonly CancellationTokenSource cancellationTokenSource = new ();
 }
 

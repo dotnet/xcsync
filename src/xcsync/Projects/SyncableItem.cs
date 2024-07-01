@@ -21,10 +21,12 @@ class SyncableType (TypeMapping typeMap) : ISyncableItem {
 }
 
 class SyncableFiles (XcodeWorkspace xcodeWorkspace, IEnumerable<string> paths, ILogger logger, CancellationToken cancellationToken = default) : ISyncableItem {
-	internal async Task ExecuteAsync () {
+	internal Task ExecuteAsync ()
+	{
 		var visitor = new ObjCImplementationDeclVisitor (logger);
 		visitor.ObjCTypes.CollectionChanged += xcodeWorkspace.ProcessObjCTypes;
-		await xcodeWorkspace.LoadObjCTypesFromFilesAsync (paths, visitor, cancellationToken);
+		xcodeWorkspace.LoadObjCTypesFromFiles (paths, visitor, cancellationToken);
 		visitor.ObjCTypes.CollectionChanged -= xcodeWorkspace.ProcessObjCTypes;
+		return Task.CompletedTask;
 	}
 }

@@ -24,8 +24,8 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Hub creates a topic channel w message type template
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
 		// Different changes will be processed differently based on unique payload
-		await hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
-		await RegisterChangeWorker (hub);
+		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
+		await RegisterChangeWorker (Hub);
 
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (clrProject, token);
@@ -34,18 +34,18 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		
 		clrChanges.OnFileChanged = async path => {
 			Logger.Debug ($"CLR Project file {path} changed");
-			await SyncChange (path, hub);
+			await SyncChange (path, Hub);
 		};
 		
 		xcodeChanges.OnFileChanged = async path => {
 			Logger.Debug ($"Xcode Project file {path} changed");
-			await SyncChange (path, hub);
+			await SyncChange (path, Hub);
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"CLR Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, hub);
+			await SyncRename (oldPath, Hub);
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
@@ -53,19 +53,19 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, hub);
+			await SyncRename (oldPath, Hub);
 		}
 		
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
 		
 		clrChanges.OnError = async ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in CLR Project file change monitor");
-			await SyncError (ProjectPath, ex, hub);
+			await SyncError (ProjectPath, ex, Hub);
 		};
 		
 		xcodeChanges.OnError = async ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in Xcode Project file change monitor");
-			await SyncError (TargetDir, ex, hub);
+			await SyncError (TargetDir, ex, Hub);
 		};
 
 		do {
