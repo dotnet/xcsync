@@ -41,9 +41,9 @@ public partial class GenerateThenSyncWithNoChangesTests(ITestOutputHelper testOu
 		await Xcsync (TestOutput, "sync", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false);
 
 		// Assert
-
-		var changesPresent = await Git (TestOutput, "-C", tmpDir, "diff-index", "--quiet", "HEAD", "--exit-code", "--").ConfigureAwait (false);
+		var commandOutput = new CaptureOutput(TestOutput);
+		var changesPresent = await Git (commandOutput, "-C", tmpDir, "diff", "--word-diff-regex='[^[:space:]]'", "--exit-code", "--").ConfigureAwait (false);
 		if (changesPresent == 1)
-			Assert.Fail ("Git diff-index failed, there are changes in the source files.");
+			Assert.Fail ($"Git diff-index failed, there are changes in the source files.\n{commandOutput.Output}");
 	}
 }
