@@ -52,4 +52,23 @@ public class Base(ITestOutputHelper testOutput)
 
 		public override Encoding Encoding => Encoding.UTF8;
 	}
+
+	protected class CaptureOutput (ITestOutputHelper helper) : ITestOutputHelper {
+		StringBuilder outputBuilder = new ();
+		public string Output { get { return outputBuilder.ToString (); } }
+
+		public void WriteLine (string message)
+		{
+			outputBuilder.Append (message);
+			helper.WriteLine (message);
+		}
+
+		public void WriteLine (string format, params object [] args)
+		{
+			outputBuilder.Append (string.Format (format, args));
+			outputBuilder.Append (Environment.NewLine);
+			helper.WriteLine (format, args);
+		}
+	}
+
 }
