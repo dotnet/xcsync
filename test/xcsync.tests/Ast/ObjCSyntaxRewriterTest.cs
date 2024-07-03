@@ -81,9 +81,9 @@ public class ObjCSyntaxRewriterTest {
 	const string ViewControllerCSharp = @"[Register(""ViewController"")]
 partial class ViewController
 {
-	void ReleaseDesignerOutlets()
-	{
-	}
+    void ReleaseDesignerOutlets()
+    {
+    }
 }";
 	const string ViewControllerOutletObjC = @"
 #import <AppKit/AppKit.h>
@@ -103,17 +103,17 @@ partial class ViewController
 	const string ViewControllerOutletCSharp = @"[Register(""ViewController"")]
 partial class ViewController
 {
-	[Outlet]
-	NSTextField Name { get; set; }
+    [Outlet]
+    NSTextField Name { get; set; }
 
-	void ReleaseDesignerOutlets()
-	{
-		if (Name != null)
-		{
-			Name.Dispose();
-			Name = null;
-		}
-	}
+    void ReleaseDesignerOutlets()
+    {
+        if (Name != null)
+        {
+            Name.Dispose();
+            Name = null;
+        }
+    }
 }";
 	const string ViewControllerActionObjC = @"
 #import <AppKit/AppKit.h>
@@ -135,11 +135,11 @@ partial class ViewController
 	const string ViewControllerActionCSharp = @"[Register(""ViewController"")]
 partial class ViewController
 {
-	[Action(""HelloWorld:"")]
-	partial void HelloWorld(Foundation.NSObject sender);
+    [Action(""HelloWorld:"")]
+    partial void HelloWorld(Foundation.NSObject sender);
 
-	void ReleaseDesignerOutlets()
-	{
-	}
+    void ReleaseDesignerOutlets()
+    {
+    }
 }";
 }

@@ -161,14 +161,13 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			var rewriter = new ObjCSyntaxRewriter (Logger, TypeService, new AdhocWorkspace ());
 
 			var newClass = await rewriter.WriteAsync (objcType.ClassInterface, syntaxTree);
-
-			var root = (CSharpSyntaxNode) syntaxTree!.GetRoot ();
+			var root = syntaxTree!.GetRoot ();
 
 			var oldClassNode = root!.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
 			var newClassNode = newClass!.GetRoot ().DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
 
-			var newRoot = root.ReplaceNode (oldClassNode!, newClassNode!);
-			newRoot = root.WithLeadingTrivia (SyntaxFactory.Whitespace (Environment.NewLine));
+			var newRoot = root.ReplaceNode (oldClassNode, newClassNode
+				.WithLeadingTrivia (SyntaxFactory.Whitespace (Environment.NewLine))); // This adds the blank line between the namespace and the class declaration
 
 			await TypeService.TryUpdateMappingAsync (typeMap, newRoot).ConfigureAwait (false);
 		} catch (Exception e) {
