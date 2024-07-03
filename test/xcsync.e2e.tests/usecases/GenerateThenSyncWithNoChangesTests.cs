@@ -8,10 +8,10 @@ namespace xcsync.e2e.tests.UseCases;
 public partial class GenerateThenSyncWithNoChangesTests(ITestOutputHelper testOutput) : Base(testOutput)
 {
 	[Theory]
-	// [InlineData("macos", "net8.0-macos")] // Failing because the generated class differs slightly from the template (missing CRLF)
+	[InlineData("macos", "net8.0-macos")] 
 	[InlineData("maccatalyst", "net8.0-maccatalyst")]
 	[InlineData("ios", "net8.0-ios")]
-	// [InlineData("tvos", "net8.0-tvos")] // Failing because the generated class differs slightly from the template (missing CRLF)
+	[InlineData("tvos", "net8.0-tvos")] 
 	[InlineData ("maui", "net8.0-ios")]
 	[InlineData("maui", "net8.0-maccatalyst")]
 	[Trait ("Category", "IntegrationTest")]
@@ -30,8 +30,11 @@ public partial class GenerateThenSyncWithNoChangesTests(ITestOutputHelper testOu
 		var csproj = Path.Combine(tmpDir, $"{projectName}.csproj");
 
 		await Git (TestOutput, "init", tmpDir).ConfigureAwait (false);
-		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty).ConfigureAwait (false);
 		await DotnetNew (TestOutput, "gitignore", tmpDir, string.Empty).ConfigureAwait (false);
+		await DotnetNew (TestOutput, "editorconfig", tmpDir, string.Empty).ConfigureAwait (false);
+		await DotnetNew (TestOutput, "nugetconfig", tmpDir, string.Empty).ConfigureAwait (false);
+		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty).ConfigureAwait (false);
+		await DotnetFormat (TestOutput, tmpDir).ConfigureAwait (false);
 		await Git (TestOutput, "-C", tmpDir, "add", ".").ConfigureAwait (false);
 		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Initial commit").ConfigureAwait (false);
 
@@ -42,8 +45,8 @@ public partial class GenerateThenSyncWithNoChangesTests(ITestOutputHelper testOu
 
 		// Assert
 		var commandOutput = new CaptureOutput(TestOutput);
-		var changesPresent = await Git (commandOutput, "-C", tmpDir, "diff", "--word-diff-regex='[^[:space:]]'", "--exit-code", "--").ConfigureAwait (false);
+		var changesPresent = await Git (commandOutput, "-C", tmpDir, "diff", "-w", "--exit-code", "--").ConfigureAwait (false);
 		if (changesPresent == 1)
-			Assert.Fail ($"Git diff-index failed, there are changes in the source files.\n{commandOutput.Output}");
+			Assert.Fail ($"Git diff failed, there are changes in the source files.\n{commandOutput.Output}");
 	}
 }

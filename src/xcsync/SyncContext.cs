@@ -493,7 +493,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 			// Write out the file
 			// TODO: This should probably be extracted to a different class, like SyncableFile/Type
-			await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).ToFullString () ?? string.Empty);
+			await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).GetText().ToString () ?? string.Empty);
 		}
 	}
 

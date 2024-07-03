@@ -19,7 +19,11 @@ public class Base(ITestOutputHelper testOutput)
 	protected static readonly string XcsyncExe = Path.Combine(Directory.GetCurrentDirectory(), "xcsync");
 	protected static readonly string GitExe = "git";
 
+	protected static async Task<int> Dotnet (ITestOutputHelper output, string path, string command = "") => await Run (output, path, "dotnet", command);
+
 	protected static async Task<int> DotnetNew(ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run(output, path, "dotnet", "new", template, "-o", path, templateOptions);
+
+	protected static async Task<int> DotnetFormat (ITestOutputHelper output, string path) => await Run (output, path, "dotnet", "format", "--include-generated", "--no-restore");
 
 	protected static async Task<int> Xcsync (ITestOutputHelper output, params string[] arguments) => await Run(output, Directory.GetCurrentDirectory(), XcsyncExe, arguments);
 
@@ -37,8 +41,6 @@ public class Base(ITestOutputHelper testOutput)
 				standardOutput: outputWrapper,
 				standardError: outputWrapper
 			).ConfigureAwait (false);
-		// if (exec.ExitCode != 0)
-		// 	throw new Exception($"{executable} {string.Join(" ", arguments)} failed with exit code {exec.ExitCode}");
 		return exec.ExitCode;
 	}
 

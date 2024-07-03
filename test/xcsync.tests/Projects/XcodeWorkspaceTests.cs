@@ -147,12 +147,12 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 	const string EmptyViewController_CS = @"namespace ##NAMESPACE##;
 
-[Register (""ViewController"")]
-partial class ViewController {
-	void ReleaseDesignerOutlets ()
-	{
-	}
-}
-";
+[Register(""ViewController"")]
+partial class ViewController
+{
+    void ReleaseDesignerOutlets()
+    {
+    }
+}";
 
 }
