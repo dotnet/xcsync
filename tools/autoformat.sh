@@ -8,8 +8,14 @@ SRC_DIR=$(pwd)
 cd ..
 
 # Start formatting!
-dotnet format "$SRC_DIR/tools/apple-doc-reader/Xamarin.AppleDocs.sln"
-dotnet format "$SRC_DIR/tools/xcsync/xcsync.sln"
+dotnet restore "$SRC_DIR/tools/apple-doc-reader/Xamarin.AppleDocs.sln"
+dotnet format "$SRC_DIR/tools/apple-doc-reader/Xamarin.AppleDocs.sln" --no-restore
+###
+# Disable xcsync until we can authenticate properly with private NuGet feeds
+###
+# dotnet restore "$SRC_DIR/tools/xcsync/xcsync.sln"
+# dotnet format "$SRC_DIR/tools/xcsync/xcsync.sln" --no-restore
+###
 
 # dotnet format "$SRC_DIR/[...]"
 # add more projects here...
