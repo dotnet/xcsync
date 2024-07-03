@@ -75,7 +75,6 @@ static class Scripts {
 		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
 		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
 
-		Console.WriteLine (fileSystem.File.ReadAllText (resultFile));
 		// dynamic cuz don't wanna create a whole class to rep the incoming json
 		dynamic data = JsonConvert.DeserializeObject (fileSystem.File.ReadAllText (resultFile))!;
 		var bundleResources = data.Items.BundleResource;
@@ -98,6 +97,23 @@ static class Scripts {
 			}
 		}
 		return assetPaths;
+	}
+
+	public static List<string> GetFiles (IFileSystem fileSystem, string projPath, string tfm, string targetPlatform)
+	{
+		var resultFile = fileSystem.Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getItem:Compile,None", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
+
+		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
+
+		// Combine the search for Compile and None tokens into one operation
+		var tokens = jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath");
+
+		return jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath")
+		   .Select (token => token.ToString ())
+		   .Where (path => !path.Contains ("Platforms") || path.Contains ($"Platforms/{targetPlatform}", StringComparison.OrdinalIgnoreCase))
+		   .ToList ();
 	}
 
 	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive)
