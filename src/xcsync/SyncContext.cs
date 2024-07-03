@@ -72,8 +72,14 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		Logger?.Debug (Strings.Generate.GeneratedFiles);
 
+		// leverage msbuild to get the list of files in the project
+		var filePaths = Scripts.GetFiles (FileSystem, ProjectPath, Framework, targetPlatform);
+
 		// copy storyboard, entitlements/info.plist files to the target directory 
-		var ext = new List<string> { "storyboard", "plist" };
+		var appleFiles = filePaths.Where (path =>
+					path.EndsWith (".plist", StringComparison.OrdinalIgnoreCase) ||
+					path.EndsWith (".storyboard", StringComparison.OrdinalIgnoreCase)
+				).ToList ();
 
 		// support for maui apps
 		string altPath = targetPlatform switch {
@@ -83,10 +89,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 
 		var appleDirectory = FileSystem.Path.Exists (altPath) ? altPath : FileSystem.Path.GetDirectoryName (ProjectPath)!;
-
-		var appleFiles = FileSystem.Directory
-			.EnumerateFiles (appleDirectory, "*.*", SearchOption.TopDirectoryOnly)
-			.Where (s => ext.Contains (FileSystem.Path.GetExtension (s).TrimStart ('.').ToLowerInvariant ()));
 
 		foreach (var file in appleFiles) {
 			FileSystem.File.Copy (file, FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (file)), true);
