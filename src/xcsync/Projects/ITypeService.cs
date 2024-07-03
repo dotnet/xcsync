@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace xcsync.Projects;
 

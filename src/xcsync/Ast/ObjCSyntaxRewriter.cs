@@ -24,16 +24,51 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 		// Now that we have the basic tree, lets make sure it generates pretty C# code
 		var sortedTree = SortClassMembers (visitor.SyntaxTree!);
 		var root = sortedTree!.GetRoot ();
-		root = Formatter.Format (root, Formatter.Annotation, workspace);
-		root = Formatter.Format (root, SyntaxAnnotation.ElasticAnnotation, workspace);
-		root = root.NormalizeWhitespace ("\t", Environment.NewLine, false);
+		// root = root.NormalizeWhitespace (eol: Environment.NewLine);
 
-		// Add a newline between each method, so that the generated code is easier to read
-		// except for the first method, which should not have a newline before it
-		root = root.ReplaceNodes (root.DescendantNodes ().OfType<MethodDeclarationSyntax> ().Skip (1), (original, rewritten) => {
-			return rewritten.WithLeadingTrivia (original.GetLeadingTrivia ().Insert (0, Whitespace (Environment.NewLine)));
-		});
+		// Add a blank line between each method, so that the generated code is easier to read
+		// except for the first method, which should not have a blank line before it
+		root = new MethodNewLineRewriter ().Visit (root);
+
+		// Format the code
+		root = Formatter.Format (root, workspace);
+
 		return root.SyntaxTree;
+	}
+
+	class MethodNewLineRewriter : CSharpSyntaxRewriter {
+		public override SyntaxNode? VisitClassDeclaration (ClassDeclarationSyntax node)
+		{
+			var methods = node.Members.OfType<MethodDeclarationSyntax> ().ToList ();
+			if (methods.Count > 1) {
+				var updatedMethods = new List<MethodDeclarationSyntax> {
+					methods.First () // Add the first method unchanged
+				};
+
+				// Add a newline before each subsequent method
+				foreach (var method in methods.Skip (1)) {
+					var leadingTrivia = method.GetLeadingTrivia ();
+					leadingTrivia = leadingTrivia.Insert (0, Whitespace(Environment.NewLine)).Insert (0, Whitespace (Environment.NewLine));
+					updatedMethods.Add (method.WithLeadingTrivia (leadingTrivia));
+				}
+
+				// Replace the old methods with the updated ones
+				foreach (var method in methods.Skip (1)) {
+					node = node.ReplaceNode (method, updatedMethods.First (m => m.Identifier.ValueText == method.Identifier.ValueText));
+					updatedMethods.Remove (updatedMethods.First (m => m.Identifier.ValueText == method.Identifier.ValueText));
+				}
+			}
+
+			return base.VisitClassDeclaration (node);
+		}
+	}
+
+	public static SyntaxTree AddNewLineBeforeMethods (SyntaxTree syntaxTree)
+	{
+		var rewriter = new MethodNewLineRewriter ();
+		var newRoot = rewriter.Visit (syntaxTree.GetRoot ());
+
+		return newRoot.SyntaxTree;
 	}
 
 	class Visitor (ILogger logger, ITypeService typeService, SyntaxTree? syntaxTree) : AstVisitor {
@@ -68,8 +103,13 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 				// .AddModifiers (Token (SyntaxKind.PublicKeyword))
 				.WithBody (Block ());
 
+			var leadingTrivia = SyntaxTree?.GetRoot ().DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ().GetLeadingTrivia () ?? new SyntaxTriviaList (Whitespace (Environment.NewLine));
+			var trailingTrivia = SyntaxTree?.GetRoot ().DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ().GetTrailingTrivia ();
+
 			// Create a new class declaration
 			var classDeclaration = ClassDeclaration (objcImpl.Name)
+				.WithLeadingTrivia (leadingTrivia)
+				.WithTrailingTrivia (trailingTrivia)
 				// .AddModifiers (Token (SyntaxKind.PublicKeyword))
 				.AddModifiers (Token (SyntaxKind.PartialKeyword))
 							.AddAttributeLists (
@@ -125,7 +165,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 				.FirstOrDefault (m => m.Identifier.Text == "ReleaseDesignerOutlets");
 
 			if (releaseDesignerOutletsMethod != null) {
-				var disposeStatement = ParseStatement ($"if ({propertyName} != null) {{ {propertyName}.Dispose (); {propertyName} = null; }}");
+				var disposeStatement = ParseStatement ($"if ({propertyName} != null)\n{{\n{propertyName}.Dispose ();\n {propertyName} = null;\n }}");
 				var newReleaseDesignerOutletsMethod = releaseDesignerOutletsMethod.AddBodyStatements (disposeStatement);
 				members [members.IndexOf (releaseDesignerOutletsMethod)] = newReleaseDesignerOutletsMethod;
 			}
@@ -136,6 +176,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 
 			SyntaxTree = newRoot.SyntaxTree;
 		}
+
 		void Write (ObjCMethodDecl objcMethod)
 		{
 			if (objcMethod.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBAction) is null)
@@ -197,7 +238,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			.OrderBy (m => m, new MemberDeclarationSyntaxComparer ())
 			.ToArray ();
 
-		var newClass = firstClass.WithMembers (SyntaxFactory.List (orderedMembers));
+		var newClass = firstClass.WithMembers (List (orderedMembers));
 		var newRoot = root.ReplaceNode (firstClass, newClass);
 
 		return newRoot.SyntaxTree;
