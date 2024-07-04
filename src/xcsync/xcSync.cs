@@ -63,7 +63,7 @@ static class xcSync {
 		logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
 		return false;
 	}
-	
+
 	public static bool IsNsoDerived (TypeMapping mapping)
 	{
 		return IsNsoDerived (mapping.TypeSymbol);

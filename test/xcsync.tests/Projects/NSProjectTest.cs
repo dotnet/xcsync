@@ -20,7 +20,7 @@ public class NSProjectTest : Base {
 
 		(_, ITypeService typeService) = InitializeProjects ();
 
-		Assert.Equal (expectedTypes , typeService.QueryTypes ().ToList ().Where(t => t?.ClrType is not null && !t.IsProtocol).Select(t => t?.ClrType).OrderBy(t => t));
+		Assert.Equal (expectedTypes, typeService.QueryTypes ().ToList ().Where (t => t?.ClrType is not null && !t.IsProtocol).Select (t => t?.ClrType).OrderBy (t => t));
 	}
 
 	[InlineData ("ModelVariety", "ObjectiveCModelVariety", true, false, "NSObject", "NSObject", false)]

@@ -31,12 +31,12 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		clrChanges.StartMonitoring (clrProject, token);
 		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		xcodeChanges.StartMonitoring (xcodeProject, token);
-		
+
 		clrChanges.OnFileChanged = async path => {
 			Logger.Debug ($"CLR Project file {path} changed");
 			await SyncChange (path, Hub);
 		};
-		
+
 		xcodeChanges.OnFileChanged = async path => {
 			Logger.Debug ($"Xcode Project file {path} changed");
 			await SyncChange (path, Hub);
@@ -49,20 +49,20 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
-		
+
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
 			await SyncRename (oldPath, Hub);
 		}
-		
+
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
-		
+
 		clrChanges.OnError = async ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in CLR Project file change monitor");
 			await SyncError (ProjectPath, ex, Hub);
 		};
-		
+
 		xcodeChanges.OnError = async ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in Xcode Project file change monitor");
 			await SyncError (TargetDir, ex, Hub);
@@ -73,7 +73,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			// Keep executing sync jobs until the user presses the esc sequence [CTRL-Q]
 			Logger.Debug ("Checking for changes in the projects...");
 		} while (token.IsCancellationRequested == false);
-		
+
 		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
 	}
 
@@ -89,18 +89,18 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		var errorLoad = new ErrorLoad (ex);
 		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, errorLoad));
 	}
-	
+
 	public async Task SyncRename (string path, IHub hub)
 	{
 		var renameLoad = new RenameLoad (new object ());
-		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid().ToString(), path, renameLoad));
+		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, renameLoad));
 	}
-	
+
 	public async Task RegisterChangeWorker (IHub hub)
 	{
 		var tcs = new TaskCompletionSource<bool> ();
 		var worker = new ChangeWorker (tcs);
-		await hub.RegisterAsync (ChangeChannel, worker); 
+		await hub.RegisterAsync (ChangeChannel, worker);
 		// worker now knows to pick up any and all change-related events from the channel in hub
 	}
 }

@@ -86,12 +86,12 @@ static class Scripts {
 			if (id.Contains ("Assets.xcassets")) {
 				if (!fileSystem.Path.IsPathRooted (id))
 					// Combine with the project path if it's not a full path
-					id = fileSystem.Path.Combine(fileSystem.Path.GetDirectoryName (projPath), id);
+					id = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projPath), id);
 
 				// Strip off anything after ".xcassets"
-				var index = id.IndexOf(".xcassets", StringComparison.Ordinal);
+				var index = id.IndexOf (".xcassets", StringComparison.Ordinal);
 				if (index > -1)
-					id = id.Substring(0, index + ".xcassets".Length);
+					id = id.Substring (0, index + ".xcassets".Length);
 
 				assetPaths.Add (id);
 			}
