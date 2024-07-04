@@ -17,9 +17,9 @@ class ChangeWorker (TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
 	{
 		// todo: impl per load
 		return message.Change switch {
-			SyncLoad => Task.FromResult (Completion.TrySetResult(true)),
-			ErrorLoad => Task.FromResult (Completion.TrySetResult(true)),
-			RenameLoad => Task.FromResult (Completion.TrySetResult(true)),
+			SyncLoad => Task.FromResult (Completion.TrySetResult (true)),
+			ErrorLoad => Task.FromResult (Completion.TrySetResult (true)),
+			RenameLoad => Task.FromResult (Completion.TrySetResult (true)),
 			_ => Task.FromResult (Completion.TrySetResult (true))
 		};
 	}

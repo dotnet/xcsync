@@ -171,7 +171,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 			await TypeService.TryUpdateMappingAsync (typeMap, newRoot).ConfigureAwait (false);
 		} catch (Exception e) {
-			Logger.Error (e, "{Function} : Error '{type}' : {exception}\n{stacktrace}", nameof(UpdateRoslynType), typeMap.ObjCType, e.Message, e.StackTrace);
+			Logger.Error (e, "{Function} : Error '{type}' : {exception}\n{stacktrace}", nameof (UpdateRoslynType), typeMap.ObjCType, e.Message, e.StackTrace);
 		}
 	}
 

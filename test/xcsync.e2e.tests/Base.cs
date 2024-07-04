@@ -7,16 +7,15 @@ using Xunit.Abstractions;
 
 namespace xcsync.e2e.tests;
 
-public class Base(ITestOutputHelper testOutput)
-{
+public class Base (ITestOutputHelper testOutput) {
 	protected readonly ITestOutputHelper TestOutput = testOutput;
 
-	protected readonly ILogger TestLogger = new LoggerConfiguration()
-		.MinimumLevel.Verbose()
-		.WriteTo.TestOutput(testOutput)
-		.CreateLogger();
+	protected readonly ILogger TestLogger = new LoggerConfiguration ()
+		.MinimumLevel.Verbose ()
+		.WriteTo.TestOutput (testOutput)
+		.CreateLogger ();
 
-	protected static readonly string XcsyncExe = Path.Combine(Directory.GetCurrentDirectory(), "xcsync");
+	protected static readonly string XcsyncExe = Path.Combine (Directory.GetCurrentDirectory (), "xcsync");
 	protected static readonly string GitExe = "git";
 
 	protected static async Task<int> Dotnet (ITestOutputHelper output, string path, string command = "") => await Run (output, path, "dotnet", command);
@@ -27,14 +26,14 @@ public class Base(ITestOutputHelper testOutput)
 
 	protected static async Task<int> Xcsync (ITestOutputHelper output, params string[] arguments) => await Run(output, Directory.GetCurrentDirectory(), XcsyncExe, arguments);
 
-	protected static async Task<int> Git (ITestOutputHelper output, params string[] arguments) => await Run(output, Directory.GetCurrentDirectory(), GitExe, arguments);
+	protected static async Task<int> Git (ITestOutputHelper output, params string [] arguments) => await Run (output, Directory.GetCurrentDirectory (), GitExe, arguments);
 
 
-	static async Task<int> Run(ITestOutputHelper output, string path, string executable, params string[] arguments)
+	static async Task<int> Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
-		output.WriteLine($"\rRunning: {path}/{executable} {string.Join(" ", arguments)}");
-		var outputWrapper = new LoggingOutputWriter(output);
-		var exec = await Execution.RunAsync(
+		output.WriteLine ($"\rRunning: {path}/{executable} {string.Join (" ", arguments)}");
+		var outputWrapper = new LoggingOutputWriter (output);
+		var exec = await Execution.RunAsync (
 				executable,
 				arguments,
 				workingDirectory: path,
@@ -44,12 +43,11 @@ public class Base(ITestOutputHelper testOutput)
 		return exec.ExitCode;
 	}
 
-	class LoggingOutputWriter(ITestOutputHelper helper) : TextWriter
-	{
-		public override void WriteLine(string? value)
+	class LoggingOutputWriter (ITestOutputHelper helper) : TextWriter {
+		public override void WriteLine (string? value)
 		{
 			if (value is not null)
-				helper.WriteLine($"\r{value?.ToString()}");
+				helper.WriteLine ($"\r{value?.ToString ()}");
 		}
 
 		public override Encoding Encoding => Encoding.UTF8;
