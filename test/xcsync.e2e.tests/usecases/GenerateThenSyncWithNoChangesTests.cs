@@ -5,29 +5,28 @@ using Xunit.Abstractions;
 
 namespace xcsync.e2e.tests.UseCases;
 
-public partial class GenerateThenSyncWithNoChangesTests(ITestOutputHelper testOutput) : Base(testOutput)
-{
+public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testOutput) : Base (testOutput) {
 	[Theory]
 	[InlineData("macos", "net8.0-macos")] 
 	[InlineData("maccatalyst", "net8.0-maccatalyst")]
 	[InlineData("ios", "net8.0-ios")]
 	[InlineData("tvos", "net8.0-tvos")] 
 	[InlineData ("maui", "net8.0-ios")]
-	[InlineData("maui", "net8.0-maccatalyst")]
+	[InlineData ("maui", "net8.0-maccatalyst")]
 	[Trait ("Category", "IntegrationTest")]
 	public async Task GenerateThenSync_WithNoChanges_GeneratesNoChangesAsync (string projectType, string tfm)
 	{
 		// Arrange
 
-		var projectName = Guid.NewGuid().ToString();
+		var projectName = Guid.NewGuid ().ToString ();
 
-		var tmpDir = Cache.CreateTemporaryDirectory(projectName);
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
-		var xcodeDir = Path.Combine(tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
 
-		Directory.CreateDirectory(xcodeDir);
+		Directory.CreateDirectory (xcodeDir);
 
-		var csproj = Path.Combine(tmpDir, $"{projectName}.csproj");
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		await Git (TestOutput, "init", tmpDir).ConfigureAwait (false);
 		await DotnetNew (TestOutput, "gitignore", tmpDir, string.Empty).ConfigureAwait (false);

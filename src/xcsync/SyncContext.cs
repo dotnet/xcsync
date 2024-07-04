@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System.IO.Abstractions;
-using Serilog;
-using xcsync.Projects;
-using xcsync.Workers;
-using xcsync.Projects.Xcode;
 using Marille;
 using Microsoft.CodeAnalysis;
+using Serilog;
+using xcsync.Projects;
+using xcsync.Projects.Xcode;
+using xcsync.Workers;
 
 namespace xcsync;
 
@@ -23,7 +23,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
 		await Hub.CreateAsync<FileMessage> (FileChannel, configuration);
 		await CreateFileWorker ();
-		
+
 		if (SyncDirection == SyncDirection.ToXcode)
 			await SyncToXcodeAsync (token).ConfigureAwait (false);
 		else
@@ -407,7 +407,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			Isa = "XCConfigurationList",
 			BuildConfigurations = [
 				debugBuildConfiguration.Token,
-				releaseBuildConfiguration.Token ],
+				releaseBuildConfiguration.Token],
 			DefaultConfigurationName = "Debug",
 			DefaultConfigurationIsVisible = "0",
 		};
@@ -499,7 +499,8 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		}
 	}
 
-	public async Task CreateFileWorker () {
+	public async Task CreateFileWorker ()
+	{
 		var tcs = new TaskCompletionSource<bool> ();
 		var worker = new FileWorker (Logger, tcs, FileSystem);
 		await Hub.RegisterAsync (FileChannel, worker);

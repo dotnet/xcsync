@@ -22,7 +22,7 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 			{"TargetFrameworks", Framework}
 		});
 
-		var project =  await workspace.OpenProjectAsync (RootPath).ConfigureAwait (false);
+		var project = await workspace.OpenProjectAsync (RootPath).ConfigureAwait (false);
 
 		var compilation = await project.GetCompilationAsync ().ConfigureAwait (false) ??
 						  throw new InvalidOperationException ("Could not get compilation for project '{project}'");

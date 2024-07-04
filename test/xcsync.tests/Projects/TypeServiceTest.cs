@@ -53,7 +53,7 @@ public class TypeServiceTest {
 	}
 
 	[Fact]
-	public void AddDuplicateClrType_ReturnsNull()
+	public void AddDuplicateClrType_ReturnsNull ()
 	{
 		var viewControllerDupe = new TypeMapping (Mock.Of<INamedTypeSymbol> (), "ViewController", "ViewController", null, false, false, false, null, null, []);
 		typeService.AddType (viewControllerDupe);

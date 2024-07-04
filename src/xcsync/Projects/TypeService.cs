@@ -10,7 +10,7 @@ namespace xcsync.Projects;
 // Type system bridge between .NET and Xcode
 class TypeService (ILogger Logger) : ITypeService {
 	static IFileSystem FileSystem { get; set; } = new FileSystem ();
-	
+
 	// Init
 	readonly ConcurrentDictionary<string, TypeMapping?> clrTypes = new ();
 	readonly ConcurrentDictionary<string, TypeMapping> objCTypes = new ();
@@ -89,7 +89,7 @@ class TypeService (ILogger Logger) : ITypeService {
 			.Where (type => xcSync.IsNsoDerived (type) && type.Name == oldMapping.ClrType)
 			.Select (type => oldMapping with { TypeSymbol = type, HasChanges = true })
 			.FirstOrDefault ();
-			
+
 		return newMapping;
 	}
 
@@ -164,7 +164,7 @@ class TypeService (ILogger Logger) : ITypeService {
 		foreach (var ns in namespaces) {
 			foreach (var type in ns.GetTypeMembers ().Where (xcSync.IsNsoDerived)) {
 				var nsType = ConvertToTypeMapping (targetPlatform, type);
-				if (nsType is not null ) {
+				if (nsType is not null) {
 					AddType (nsType with { IsInSource = true });
 				}
 			}
