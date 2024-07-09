@@ -78,7 +78,8 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		// copy storyboard, entitlements/info.plist files to the target directory 
 		var appleFiles = filePaths.Where (path =>
 					path.EndsWith (".plist", StringComparison.OrdinalIgnoreCase) ||
-					path.EndsWith (".storyboard", StringComparison.OrdinalIgnoreCase)
+					path.EndsWith (".storyboard", StringComparison.OrdinalIgnoreCase) ||
+					path.EndsWith (".xib", StringComparison.OrdinalIgnoreCase)
 				).ToList ();
 
 		// support for maui apps
