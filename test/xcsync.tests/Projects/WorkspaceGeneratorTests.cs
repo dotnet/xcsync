@@ -19,7 +19,7 @@ public class XcodeWorkspaceGeneratorTests {
 		var fileSystem = new MockFileSystem ();
 
 		// Arrange
-		string testFilePath = Path.Combine (Environment.CurrentDirectory, "..", "..", "..", "Resources", "SampleProject.json");
+		string testFilePath = Path.Combine (SolutionPathFinder.GetProjectRoot(), "xcsync.tests", "Resources", "SampleProject.json");
 		string xcodeProjectJson = File.ReadAllText (testFilePath);
 		xcodeProjectJson = xcodeProjectJson.Replace ("SampleProject", testProjectName);
 
