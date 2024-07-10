@@ -315,6 +315,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TypeService.CompilationNotFound" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The compilation for {0} could not be located for synchronization.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można zlokalizować kompilacji dla {0} na potrzeby synchronizacji.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TypeService.DuplicateCompilation" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The compilation for {0} has already been added, ignoring this instance.]]></Val>
@@ -365,6 +374,24 @@
           <Val><![CDATA[The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Kompilacja nie ma elementu AssemblyName, prawdopodobnie dlatego, że jest dynamiczna i nieobsługiwana.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TypeService.SyntaxRootNotFound" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The {0} type could not be synchronized due to missing symbol information.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można zsynchronizować typu {0} z powodu braku informacji o symbolach.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TypeService.TypeNotFound" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The {0} type could not be located for synchronization.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można zlokalizować typu {0} na potrzeby synchronizacji.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
