@@ -54,12 +54,12 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 		Project = await LoadProjectAsync (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"), cancellationToken).ConfigureAwait (false);
 
 		if (Project is null) {
-			Logger.Error ("Failed to load the Xcode project file at {ProjectPath}", FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"));
+			Logger.Error (Strings.XcodeWorkspace.FailToLoadXcodeProject (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
 			return;
 		}
 
 		if (Project.Objects is null) {
-			Logger.Error ("The Xcode project file at {ProjectPath} does not contain any objects", FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"));
+			Logger.Error (Strings.XcodeWorkspace.XcodeProjectDoesNotContainObjects (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
 			return;
 		}
 
@@ -123,12 +123,12 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 		foreach (var type in items) {
 			if (type is ObjCImplementationDecl objcType) { // This should always be true, but just in case
-				Logger.Information ("Processing ObjCImplementationDecl: {objcType}", objcType.Name);
+				Logger.Information (Strings.XcodeWorkspace.ProcessingObjCImplementation (objcType.Name));
 				var types = TypeService.QueryTypes (null, objcType.Name);
 				if (!types.Any ()) {
-					Logger.Warning ("No types found for {objcType}", objcType.Name);
+					Logger.Warning (Strings.XcodeWorkspace.NoTypesFound (objcType.Name));
 				} else if (types.Count () > 1) {
-					Logger.Warning ("Multiple types found for {objcType}", objcType.Name);
+					Logger.Warning (Strings.XcodeWorkspace.MultipleTypesFound (objcType.Name));
 				} else {
 					var typeMap = types.First ();
 					if (typeMap is not null)
@@ -136,7 +136,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 				}
 
 			} else {
-				Logger.Warning ("Unexpected type found: {type}", type);
+				Logger.Warning (Strings.XcodeWorkspace.NoTypesFound (type?.ToString () ?? "null"));
 			}
 		}
 
@@ -171,7 +171,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 			await TypeService.TryUpdateMappingAsync (typeMap, newRoot).ConfigureAwait (false);
 		} catch (Exception e) {
-			Logger.Error (e, "{Function} : Error '{type}' : {exception}\n{stacktrace}", nameof (UpdateRoslynType), typeMap.ObjCType, e.Message, e.StackTrace);
+			Logger.Error (e, Strings.XcodeWorkspace.ErrorUpdatingRoslynType (nameof (UpdateRoslynType), typeMap.ObjCType, e.Message, e.StackTrace!));
 		}
 	}
 
@@ -192,18 +192,18 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 		var skipProcessing = false;
 
 		if (translationUnitError != CXError_Success) {
-			Logger.Error ("Error: Parsing failed for '{filePath}' due to '{translationUnitError}'.", filePath, translationUnitError);
+			Logger.Error (Strings.XcodeWorkspace.ErrorParsing (filePath, translationUnitError.ToString ()));
 			skipProcessing = true;
 		} else if (handle.NumDiagnostics != 0) {
-			Logger.Warning ("Diagnostics for '{filePath}':", filePath);
+			Logger.Warning (Strings.XcodeWorkspace.FileDiagnostics (filePath));
 
 			for (uint i = 0; i < handle.NumDiagnostics; ++i) {
 				using var diagnostic = handle.GetDiagnostic (i);
 
 				if (diagnostic.Severity is CXDiagnostic_Error or CXDiagnostic_Fatal) {
-					Logger.Error ("{diagnostic}", diagnostic.Format (CXDiagnostic_DisplayOption).ToString ());
+					Logger.Error (Strings.XcodeWorkspace.DiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()));
 				} else {
-					Logger.Warning ("{diagnostic}", diagnostic.Format (CXDiagnostic_DisplayOption).ToString ());
+					Logger.Warning (Strings.XcodeWorkspace.DiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()));
 				}
 				// skipProcessing |= diagnostic.Severity == CXDiagnostic_Error;
 				// skipProcessing |= diagnostic.Severity == CXDiagnostic_Fatal;
@@ -211,14 +211,14 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 		}
 
 		if (skipProcessing) {
-			Logger.Warning ("Skipping '{filePath}' due to one or more errors listed above.", filePath);
+			Logger.Warning (Strings.XcodeWorkspace.SkipProcessing (filePath));
 			return;
 		}
 		try {
 			using var translationUnit = TranslationUnit.GetOrCreate (handle);
 			Debug.Assert (translationUnit is not null);
 
-			Logger.Information ("Processing '{filePath}'", filePath);
+			Logger.Information (Strings.XcodeWorkspace.ProcessingFile (filePath));
 
 			var walker = new AstWalker ();
 			await walker.WalkAsync (translationUnit.TranslationUnitDecl, visitor, (cursor) => {
@@ -226,7 +226,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			}).ConfigureAwait (false);
 
 		} catch (Exception e) {
-			Logger.Error (e, "Error processing '{filePath}' : {exception}\n{stacktrace}", filePath, e.Message, e.StackTrace);
+			Logger.Error (e, Strings.XcodeWorkspace.ErrorProcessing (filePath, e.Message, e.StackTrace!));
 		}
 	}
 

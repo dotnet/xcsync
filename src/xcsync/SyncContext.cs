@@ -29,12 +29,12 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		else
 			await SyncFromXcodeAsync (token).ConfigureAwait (false);
 
-		Logger.Debug ("Synchronization complete.");
+		Logger.Debug (Strings.SyncContext.SyncComplete);
 	}
 
 	async Task SyncToXcodeAsync (CancellationToken token)
 	{
-		Logger.Debug ("Generating Xcode project files...");
+		Logger.Debug (Strings.SyncContext.GeneratingFiles);
 
 		if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
 			return;

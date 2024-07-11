@@ -322,4 +322,78 @@
         <value>The {0} type could not be synchronized due to missing symbol information.</value>
         <comment>{0} is the name of the type</comment>
     </data>
+    <data name="TypeService.CompilationErrorsFound" xml:space="preserve">
+        <value>{0}: Compilation errors found</value>
+        <comment>{0} is the name of the Assembly</comment>
+    </data>
+    <data name="TypeService.AssemblyDiagnosticError" xml:space="preserve">
+        <value>{0}: {1}</value>
+        <comment>{0} is the name of the Assembly, {1} is the Diganostic</comment>
+    </data>
+    <data name="TypeService.AssemblyUpdateError" xml:space="preserve">
+        <value>{0}: Failed to cache new compilation within type system, changes are not preserved.</value>
+        <comment>{0} is the name of the Assembly</comment>
+    </data>
+
+    <!-- Xcode Workspace Messages -->
+    <data name="XcodeWorkspace.FailToLoadXcodeProject" xml:space="preserve">
+        <value>Failed to load the Xcode project file at {0}</value>
+        <comment>{0} is the path to the Xcode project</comment>
+    </data>
+    <data name="XcodeWorkspace.XcodeProjectDoesNotContainObjects" xml:space="preserve">
+        <value>The Xcode project file at {0} does not contain any objects</value>
+        <comment>{0} is the path to the Xcode project</comment>
+    </data>
+    <data name="XcodeWorkspace.ProcessingObjCImplementation" xml:space="preserve">
+        <value>Processing ObjCImplementationDecl: {0}</value>
+        <comment>{0} is the ObjC Type</comment>
+    </data>
+    <data name="XcodeWorkspace.NoTypesFound" xml:space="preserve">
+        <value>No types found for {0}</value>
+        <comment>{0} is the ObjC Type</comment>
+    </data>
+    <data name="XcodeWorkspace.MultipleTypesFound" xml:space="preserve">
+        <value>Multiple types found for {0}</value>
+        <comment>{0} is the ObjC Type</comment>
+    </data>
+    <data name="XcodeWorkspace.UnexpectedTypesFound" xml:space="preserve">
+        <value>Unexpected type found: {0}</value>
+        <comment>{0} is the non-ObjC type found</comment>
+    </data>
+    <data name="XcodeWorkspace.ErrorUpdatingRoslynType" xml:space="preserve">
+        <value>{0} : Error '{1}' : {2}\n{3}</value>
+        <comment>{0} is the Function, {1} is the Type, {2} is the exception message, {3} is the stack trace</comment>
+    </data>
+    <data name="XcodeWorkspace.ErrorParsing" xml:space="preserve">
+        <value>Error: Parsing failed for '{0}' due to '{1}'.</value>
+        <comment>{0} is the file path, {1} is the Translation Unit Error</comment>
+    </data>
+    <data name="XcodeWorkspace.FileDiagnostics" xml:space="preserve">
+        <value>Diagnostics for '{0}':</value>
+        <comment>{0} is the file path</comment>
+    </data>
+    <data name="XcodeWorkspace.DiagnosticIssue" xml:space="preserve">
+        <value>{0}</value>
+        <comment>{0} is the diagnostic for which there are issues</comment>
+    </data>
+    <data name="XcodeWorkspace.SkipProcessing" xml:space="preserve">
+        <value>Skipping '{0}' due to one or more errors listed above.</value>
+        <comment>{0} is the file path</comment>
+    </data>
+    <data name="XcodeWorkspace.ProcessingFile" xml:space="preserve">
+        <value>Processing '{0}'</value>
+        <comment>{0} is the file path</comment>
+    </data>
+    <data name="XcodeWorkspace.ErrorProcessing" xml:space="preserve">
+        <value>Error processing '{0}' : {1}\n{2}</value>
+        <comment>{0} is the file path, {1} is the exception, {2} is the stack trace</comment>
+    </data>
+
+    <!-- Sync Context Messages -->
+    <data name="SyncContext.SyncComplete" xml:space="preserve">
+		<value>Synchronization complete.</value>
+	</data>
+    <data name="SyncContext.GeneratingFiles" xml:space="preserve">
+		<value>Generating Xcode project files...</value>
+	</data>
 </root>
