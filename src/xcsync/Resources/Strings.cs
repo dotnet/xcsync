@@ -67,6 +67,7 @@ static class Strings {
 	internal static class Sync {
 		internal static string HeaderInformation => Resources.Strings.Sync_HeaderInformation;
 	}
+
 	internal static class Watch {
 		internal static string HeaderInformation => Resources.Strings.Watch_HeaderInformation;
 		internal static string StartMonitoringProject (string projectRootPath) => string.Format (Resources.Strings.Watch_StartMonitoringProject, projectRootPath);
@@ -88,6 +89,29 @@ static class Strings {
 		internal static string CompilationNotFound (string assemblyName) => string.Format (Resources.Strings.TypeService_CompilationNotFound, assemblyName);
 		internal static string TypeNotFound (string typeName) => string.Format (Resources.Strings.TypeService_TypeNotFound, typeName);
 		internal static string SyntaxRootNotFound (string typeName) => string.Format (Resources.Strings.TypeService_SyntaxRootNotFound, typeName);
+		internal static string CompilationErrorsFound (string assemblyName) => string.Format (Resources.Strings.TypeService_CompilationErrorsFound, assemblyName);
+		internal static string AssemblyDiagnosticError (string assemblyName, string diagnostic) => string.Format (Resources.Strings.TypeService_AssemblyDiagnosticError, assemblyName, diagnostic);
+		internal static string AssemblyUpdateError (string assemblyName) => string.Format (Resources.Strings.TypeService_AssemblyUpdateError, assemblyName);
+	}
 
+	internal static class XcodeWorkspace {
+		internal static string FailToLoadXcodeProject (string path) => string.Format (Resources.Strings.XcodeWorkspace_FailToLoadXcodeProject, path);
+		internal static string XcodeProjectDoesNotContainObjects (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectDoesNotContainObjects, path);
+		internal static string ProcessingObjCImplementation (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingObjCImplementation, objcType);
+		internal static string NoTypesFound (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_NoTypesFound, objcType);
+		internal static string MultipleTypesFound (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_MultipleTypesFound, objcType);
+		internal static string UnexpectedTypesFound (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_UnexpectedTypesFound, objcType);
+		internal static string ErrorUpdatingRoslynType (string roslynTypeName, string objCType, string exceptionMessage, string stackTrace) => string.Format (Resources.Strings.XcodeWorkspace_ErrorUpdatingRoslynType, roslynTypeName, objCType, exceptionMessage, stackTrace);
+		internal static string ErrorParsing (string path, string translationUnitError) => string.Format (Resources.Strings.XcodeWorkspace_ErrorParsing, path, translationUnitError);
+		internal static string FileDiagnostics (string path) => string.Format (Resources.Strings.XcodeWorkspace_FileDiagnostics, path);
+		internal static string DiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_DiagnosticIssue, diagnostic);
+		internal static string SkipProcessing (string path) => string.Format (Resources.Strings.XcodeWorkspace_SkipProcessing, path);
+		internal static string ProcessingFile (string path) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingFile, path);
+		internal static string ErrorProcessing (string path, string error, string stackTrace) => string.Format (Resources.Strings.XcodeWorkspace_ErrorProcessing, path, error, stackTrace);
+	}
+
+	internal static class SyncContext {
+		internal static string SyncComplete => Resources.Strings.SyncContext_SyncComplete;
+		internal static string GeneratingFiles => Resources.Strings.SyncContext_GeneratingFiles;
 	}
 }

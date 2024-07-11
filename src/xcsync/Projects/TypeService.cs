@@ -131,10 +131,10 @@ class TypeService (ILogger Logger) : ITypeService {
 		var newModel = compilation.ReplaceSyntaxTree (root.SyntaxTree, newSyntax.SyntaxTree);
 
 		if (newModel.GetDiagnostics ().Any (diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)) {
-			Logger.Error ("{Assembly}: Compilation errors found", newModel.AssemblyName);
+			Logger.Error (Strings.TypeService.CompilationErrorsFound (newModel.AssemblyName!));
 			foreach (var diagnostic in newModel.GetDiagnostics ()) {
 				if (diagnostic.Severity == DiagnosticSeverity.Error) {
-					Logger.Error ("{Assembly}: {Diagnostic}", newModel.AssemblyName, diagnostic);
+					Logger.Error (Strings.TypeService.AssemblyDiagnosticError (newModel.AssemblyName!, diagnostic.ToString ()));
 				}
 			}
 		}
@@ -145,7 +145,7 @@ class TypeService (ILogger Logger) : ITypeService {
 		}
 
 		if (!compilations.TryUpdate (newModel.AssemblyName, newModel, compilation))
-			Logger.Error ("{Assembly}: Failed to cache new compilation within type system, changes are not preserved.", compilation.AssemblyName);
+			Logger.Error (Strings.TypeService.AssemblyUpdateError (compilation.AssemblyName!));
 
 		return newModel;
 	}
