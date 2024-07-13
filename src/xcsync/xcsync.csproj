@@ -24,16 +24,15 @@
     <Owners>Microsoft</Owners>
     <Company>Microsoft</Company>
     <Copyright>Microsoft Corporation</Copyright>
-    <PackageReadmeFile>../README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsPackable>true</IsPackable>
     <PackageId>Microsoft.Tools.xcsync</PackageId>
-    <!-- <GeneratePackageOnBuild>true</GeneratePackageOnBuild> -->
     <EnablePackageValidation>true</EnablePackageValidation>
     <Description>xcsync is a closed source internal tool used provide Xcode storyboard editing support.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../README.md" Pack="true" PackagePath="/" />
+    <Content Include="../README.md" Link="README.md" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -66,11 +65,11 @@
     <PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.9.5" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.0-3.final" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.9.0-3.final" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.9.0-3.final" />
-    <PackageReference Include="Serilog" Version="3.1.1" />
-    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.2.0-dev-00756" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.10.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.10.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.10.0" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Expressions" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
