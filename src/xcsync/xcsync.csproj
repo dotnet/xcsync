@@ -28,11 +28,21 @@
     <IsPackable>true</IsPackable>
     <PackageId>Microsoft.Tools.xcsync</PackageId>
     <EnablePackageValidation>true</EnablePackageValidation>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
     <Description>xcsync is a closed source internal tool used provide Xcode storyboard editing support.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="../README.md" Link="README.md" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xcsync" Link="xcsync" Pack="true" PackagePath="bin" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin/$(Configuration)/net8.0/publish/**/*" Exclude="bin/$(Configuration)/net8.0/publish/BuildHost-*/**/*" Pack="true" PackagePath="lib" />
   </ItemGroup>
 
   <PropertyGroup>
