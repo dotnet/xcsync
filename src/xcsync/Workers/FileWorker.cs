@@ -8,6 +8,8 @@ namespace xcsync.Workers;
 
 readonly record struct FileMessage (string Id, string Path, string Content);
 
+readonly record struct CopyFileMessage (string Id, string sourcePath, string destinationPath);
+
 class FileWorker (ILogger Logger, TaskCompletionSource<bool> tcs, IFileSystem fileSystem) : IWorker<FileMessage> {
 	TaskCompletionSource<bool> Completion { get; set; } = tcs;
 

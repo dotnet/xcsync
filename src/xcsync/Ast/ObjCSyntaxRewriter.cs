@@ -48,7 +48,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 				// Add a newline before each subsequent method
 				foreach (var method in methods.Skip (1)) {
 					var leadingTrivia = method.GetLeadingTrivia ();
-					leadingTrivia = leadingTrivia.Insert (0, Whitespace(Environment.NewLine)).Insert (0, Whitespace (Environment.NewLine));
+					leadingTrivia = leadingTrivia.Insert (0, Whitespace (Environment.NewLine)).Insert (0, Whitespace (Environment.NewLine));
 					updatedMethods.Add (method.WithLeadingTrivia (leadingTrivia));
 				}
 

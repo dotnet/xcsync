@@ -11,7 +11,7 @@ public class Base {
 		Path.Combine (Directory.GetCurrentDirectory (), "xcsync");
 
 	protected readonly string TestProjectPath =
-		Path.Combine (SolutionPathFinder.GetProjectRoot(), "test-project", "test-project.csproj");
+		Path.Combine (SolutionPathFinder.GetProjectRoot (), "test-project", "test-project.csproj");
 
 	static async Task Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
