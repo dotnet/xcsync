@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+
 // WARNING
 //
 // This file has been generated automatically by Visual Studio to store outlets and
