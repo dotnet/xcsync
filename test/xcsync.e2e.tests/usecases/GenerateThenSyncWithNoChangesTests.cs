@@ -6,6 +6,7 @@ using Xunit.Abstractions;
 namespace xcsync.e2e.tests.UseCases;
 
 public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testOutput) : Base (testOutput) {
+	
 	[Theory]
 	[InlineData("macos", "net8.0-macos")] 
 	[InlineData("maccatalyst", "net8.0-maccatalyst")]

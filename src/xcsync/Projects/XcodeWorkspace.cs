@@ -4,16 +4,19 @@ using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ClangSharp;
 using ClangSharp.Interop;
+using Marille;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Serilog;
 using xcsync.Ast;
 using xcsync.Projects.Xcode;
+using xcsync.Workers;
 using static ClangSharp.Interop.CXDiagnosticDisplayOptions;
 using static ClangSharp.Interop.CXDiagnosticSeverity;
 using static ClangSharp.Interop.CXErrorCode;
@@ -42,6 +45,8 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 	string SdkRoot { get; set; } = string.Empty;
 
 	readonly ConcurrentBag<ISyncableItem> syncableItems = [];
+
+	public ConcurrentBag<ISyncableItem> Items => syncableItems;
 
 	// protected override async void InitializeAsync ()
 	// {
@@ -97,22 +102,26 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			FileSystem.Path.Combine (Scripts.SelectXcode (), "Contents", "Developer", "Platforms", $"{SdkRoot}.platform", "Developer", "SDKs", $"{SdkRoot}.sdk"),
 		]);
 
-		await LoadSyncableItemsAsync (fileReferences, syncableItems, cancellationToken).ConfigureAwait (false);
+		LoadSyncableItems (fileReferences, syncableItems);
 	}
 
-	async Task LoadSyncableItemsAsync (IEnumerable<PBXFileReference> fileReferences, ConcurrentBag<ISyncableItem> syncableItems, CancellationToken cancellationToken = default)
+	void LoadSyncableItems (IEnumerable<PBXFileReference> fileReferences, ConcurrentBag<ISyncableItem> syncableItems)
 	{
 		(from fileReference in fileReferences
 		 where fileReference.Path!.EndsWith (".storyboard")
 		 select new SyncableContent (FileSystem.Path.Combine (RootPath, fileReference.Path!)))
-	   .ToList ().ForEach (syncableItems.Add);
+	   	.ToList ().ForEach (syncableItems.Add);
 
 		var filePaths = from moduleReference in fileReferences
 						join headerReference in fileReferences on FileSystem.Path.GetFileNameWithoutExtension (moduleReference.Path) equals FileSystem.Path.GetFileNameWithoutExtension (headerReference.Path)
-						where headerReference.Path!.EndsWith (".h") && moduleReference.Path!.EndsWith (".m")
-						select moduleReference.Path;
+						where headerReference.Path is not null && moduleReference.Path is not null
+						where string.CompareOrdinal (FileSystem.Path.GetExtension (headerReference.Path)?.ToLower (), ".h") + string.CompareOrdinal (FileSystem.Path.GetExtension (moduleReference.Path)?.ToLower (), ".m") == 0
+						select FileSystem.Path.Combine (RootPath, moduleReference.Path!);
 
-		await new SyncableFiles (this, filePaths, Logger, cancellationToken).ExecuteAsync ().ConfigureAwait (false);
+		filePaths.Select ((path) => Tuple.Create (path, TypeService.QueryTypes (null, FileSystem.Path.GetFileNameWithoutExtension (path)).FirstOrDefault ()))
+				 .Where (map => map.Item2 is not null)
+				 .Select (map => new SyncableType (map.Item2!, map.Item1))
+				 .ToList ().ForEach (syncableItems.Add);
 	}
 
 	internal void ProcessObjCTypes (object? sender, NotifyCollectionChangedEventArgs e)
@@ -175,18 +184,8 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 		}
 	}
 
-	internal void LoadObjCTypesFromFiles (IEnumerable<string> filePaths, AstVisitor visitor, CancellationToken cancellationToken = default)
-	{
-		List<Task> loadTypesFromFileTasks = [];
 
-		foreach (var filePath in filePaths) {
-			loadTypesFromFileTasks.Add (LoadObjCTypesFromFileAsync (FileSystem.Path.Combine (RootPath, filePath), visitor, cancellationToken));
-		}
-
-		Task.WaitAll (loadTypesFromFileTasks.ToArray (), cancellationToken);
-	}
-
-	async Task LoadObjCTypesFromFileAsync (string filePath, AstVisitor visitor, CancellationToken cancellationToken = default)
+	internal async Task LoadTypesFromObjCFileAsync (string filePath, AstVisitor visitor, CancellationToken cancellationToken = default)
 	{
 		var translationUnitError = CXTranslationUnit.TryParse (cxIndex, filePath, clangCommandLineArgs.ToArray (), [], defaultTranslationUnitFlags, out var handle);
 		var skipProcessing = false;

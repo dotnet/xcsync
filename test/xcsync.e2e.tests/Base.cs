@@ -20,11 +20,11 @@ public class Base (ITestOutputHelper testOutput) {
 
 	protected static async Task<int> Dotnet (ITestOutputHelper output, string path, string command = "") => await Run (output, path, "dotnet", command);
 
-	protected static async Task<int> DotnetNew(ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run(output, path, "dotnet", "new", template, "-o", path, templateOptions);
+	protected static async Task<int> DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run (output, path, "dotnet", "new", template, "-o", path, templateOptions);
 
 	protected static async Task<int> DotnetFormat (ITestOutputHelper output, string path) => await Run (output, path, "dotnet", "format", "--include-generated", "--no-restore");
 
-	protected static async Task<int> Xcsync (ITestOutputHelper output, params string[] arguments) => await Run(output, Directory.GetCurrentDirectory(), XcsyncExe, arguments);
+	protected static async Task<int> Xcsync (ITestOutputHelper output, params string [] arguments) => await Run (output, Directory.GetCurrentDirectory (), XcsyncExe, arguments);
 
 	protected static async Task<int> Git (ITestOutputHelper output, params string [] arguments) => await Run (output, Directory.GetCurrentDirectory (), GitExe, arguments);
 

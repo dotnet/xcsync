@@ -8,12 +8,12 @@ namespace xcsync.e2e.tests.UseCases;
 public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOutput) : Base (testOutput) {
 	public static IEnumerable<object []> AddControlAndOutlet =>
 	[
-			["macos", "net8.0-macos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
-		// ["maccatalyst", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], 
-		["ios", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
-		// ["tvos", "net8.0-tvos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
-		["maui", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
-		// ["maui", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)]
+		["macos", "net8.0-macos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
+		// ["maccatalyst", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
+		// ["ios", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
+		["tvos", "net8.0-tvos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
+		// ["maui", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
+		// ["maui", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)] # No ViewController.cs file
 	];
 
 	[Theory]
@@ -42,14 +42,14 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 		// Act
 
 		await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false);
-		await makeChanges (tmpDir, projectType, tfm).ConfigureAwait (false);
+		await makeChanges (xcodeDir, projectType, tfm).ConfigureAwait (false);
 		await Xcsync (TestOutput, "sync", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false);
 
 		// Assert
-
-		var changesPresent = await Git (TestOutput, "-C", tmpDir, "diff-index", "--quiet", "HEAD", "--exit-code", "--").ConfigureAwait (false);
+		var commandOutput = new CaptureOutput (TestOutput);
+		var changesPresent = await Git (commandOutput, "-C", tmpDir, "diff-index", "--quiet", "HEAD", "--exit-code", "--").ConfigureAwait (false);
 		if (changesPresent == 0)
-			Assert.Fail ("Git diff-index failed, there are no changes in the source files.");
+			Assert.Fail ($"[{projectType},{tfm}] : Git diff-index failed, there are no changes in the source files.\n{commandOutput.Output}");
 	}
 
 	static async Task AddControlAndOutletChanges (string tmpDir, string projectType, string tfm)

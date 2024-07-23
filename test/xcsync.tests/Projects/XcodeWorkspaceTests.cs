@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
+using System.CommandLine.Parsing;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Moq;
 using Serilog;
 using Xamarin;
 using xcsync.Projects;
+using xcsync.Workers;
 using Xunit.Abstractions;
 
 namespace xcsync.tests.Projects;
@@ -52,8 +55,15 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		var xcodeWorkspace = new XcodeWorkspace (fileSystem, testLogger, typeService, projectName, xcodeDir, tfm);
 
+		await xcodeWorkspace.LoadAsync ();
+
 		// Act
-		xcodeWorkspace.LoadObjCTypesFromFiles ([Path.Combine (xcodeDir, fileToParse)], visitor);
+		await xcodeWorkspace.Items
+			.Where (item => item is SyncableType)
+			.Select (item => item as SyncableType)
+			.Where (item => string.CompareOrdinal (Path.GetFileName (item!.FilePath), fileToParse) == 0)
+			.Select (item => xcodeWorkspace.LoadTypesFromObjCFileAsync (item!.FilePath, visitor))
+			.First ();
 
 		// Assert
 		Assert.Equal (expectedTypes, visitor.ObjCTypes.Select (t => t.Name).ToArray ());
@@ -97,8 +107,18 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		var xcodeWorkspace = new XcodeWorkspace (fileSystem, testLogger, typeService, projectName, xcodeDir, tfm);
 
+		await xcodeWorkspace.LoadAsync ();
+
+		var loader = new ObjCTypesLoader (testLogger, new TaskCompletionSource<bool> ());
+
 		// Act
-		await new SyncableFiles (xcodeWorkspace, [Path.Combine (xcodeDir, "ViewController.m")], testLogger).ExecuteAsync ();
+		foreach (var syncItem in xcodeWorkspace.Items) {
+			Task task = syncItem switch {
+				SyncableType type => loader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem), CancellationToken.None),
+				_ => Task.CompletedTask
+			};
+			await task;
+		}
 
 		// Assert
 		var typeSymbol = typeService.QueryTypes (null, "ViewController").First ()?.TypeSymbol!;
