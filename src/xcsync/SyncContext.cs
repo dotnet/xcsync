@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
 using System.IO.Abstractions;
+using ClangSharp.Interop;
 using Marille;
 using Microsoft.CodeAnalysis;
 using Serilog;
@@ -14,6 +15,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string FileChannel = "Files";
+	public const string SyncChannel = "SyncFromXcode";
 
 	protected SyncDirection SyncDirection { get; } = Direction;
 
@@ -22,7 +24,9 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		// use marille channel hub mechanism for better async file creation
 		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
 		await Hub.CreateAsync<FileMessage> (FileChannel, configuration);
-		await CreateFileWorker ();
+		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration);
+
+		await CreateWorkers ();
 
 		if (SyncDirection == SyncDirection.ToXcode)
 			await SyncToXcodeAsync (token).ConfigureAwait (false);
@@ -465,6 +469,8 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	async Task SyncFromXcodeAsync (CancellationToken token)
 	{
+		List<Task> jobs = [];
+
 		Logger.Information (Strings.Sync.HeaderInformation, TargetDir, ProjectPath);
 
 		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
@@ -474,13 +480,25 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework);
 
-		// TODO: After this executes the TypeService has been updated with new SyntaxTrees
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
+
+		var typeLoader = new ObjCTypesLoader (Logger, new TaskCompletionSource<bool> ());
+		foreach (var syncItem in xcodeWorkspace.Items) {
+			jobs.Add(syncItem switch {
+				SyncableType type => /* Hub.Publish (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)) */
+										typeLoader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem), token),
+				_ => Task.CompletedTask
+			});
+		}
+		Task.WaitAll ([.. jobs], token);
+		jobs.Clear (); 
 
 		var typesToWrite = TypeService.QueryTypes (null, null) // All Types
 			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files
 
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
+		var fileWorker = new FileWorker (Logger, new TaskCompletionSource<bool> (), FileSystem);
+
 		foreach (var type in typesToWrite) {
 			Logger.Information ("Processing type {Type}", type?.ClrType);
 
@@ -496,15 +514,26 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 			// Write out the file
 			// TODO: This should probably be extracted to a different class, like SyncableFile/Type
-			await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).GetText().ToString () ?? string.Empty);
+			//await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).GetText ().ToString () ?? string.Empty);
+
+			jobs.Add (fileWorker.ConsumeAsync (new FileMessage {
+				Id = Guid.NewGuid ().ToString (),
+				Path = syntaxTree!.FilePath,
+				Content = syntaxTree?.GetRoot (token).GetText ().ToString () ?? string.Empty
+			}, token));
 		}
+		Task.WaitAll ([.. jobs], token);
+		jobs.Clear ();
 	}
 
-	public async Task CreateFileWorker ()
+	public async Task CreateWorkers ()
 	{
 		var tcs = new TaskCompletionSource<bool> ();
-		var worker = new FileWorker (Logger, tcs, FileSystem);
-		await Hub.RegisterAsync (FileChannel, worker);
+		var fileWorker = new FileWorker (Logger, tcs, FileSystem);
+		await Hub.RegisterAsync (FileChannel, fileWorker);
+
+		var otlWorker = new ObjCTypesLoader (Logger, tcs);
+		await Hub.RegisterAsync (FileChannel, otlWorker);
 	}
 
 	public async Task WriteFile (string path, string content) =>

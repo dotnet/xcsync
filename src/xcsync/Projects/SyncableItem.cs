@@ -12,21 +12,12 @@ class SyncableContent (string filePath) : ISyncableItem {
 	string FilePath => filePath;
 }
 
-class SyncableType (TypeMapping typeMap) : ISyncableItem {
+class SyncableType (TypeMapping typeMap, string filePath) : ISyncableItem {
 	string HeaderFileName => $"{typeMap.ObjCType}.h";
 	string ModuleFileName => $"{typeMap.ObjCType}.m";
 
-	TypeMapping TypeMap => typeMap;
+	public string FilePath => filePath;
 
-}
+	public TypeMapping TypeMap => typeMap;
 
-class SyncableFiles (XcodeWorkspace xcodeWorkspace, IEnumerable<string> paths, ILogger logger, CancellationToken cancellationToken = default) : ISyncableItem {
-	internal Task ExecuteAsync ()
-	{
-		var visitor = new ObjCImplementationDeclVisitor (logger);
-		visitor.ObjCTypes.CollectionChanged += xcodeWorkspace.ProcessObjCTypes;
-		xcodeWorkspace.LoadObjCTypesFromFiles (paths, visitor, cancellationToken);
-		visitor.ObjCTypes.CollectionChanged -= xcodeWorkspace.ProcessObjCTypes;
-		return Task.CompletedTask;
-	}
 }
