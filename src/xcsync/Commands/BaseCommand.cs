@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
