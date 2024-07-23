@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+
 using ObjCRuntime;
 
 namespace test_project;

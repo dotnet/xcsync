@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+
 using System.IO.Abstractions;
 using Moq;
 using Serilog;
