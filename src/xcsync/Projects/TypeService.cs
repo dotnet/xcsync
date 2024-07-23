@@ -15,7 +15,7 @@ class TypeService (ILogger Logger) : ITypeService {
 	readonly ConcurrentDictionary<string, TypeMapping?> clrTypes = new ();
 	readonly ConcurrentDictionary<string, TypeMapping> objCTypes = new ();
 
-	readonly ConcurrentDictionary<string, Compilation> compilations = new ();
+	public readonly ConcurrentDictionary<string, Compilation> compilations = new ();
 
 	// Add, register new type mapping
 	public TypeMapping? AddType (TypeMapping newType)
