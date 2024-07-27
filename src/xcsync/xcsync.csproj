@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RollForward>Major</RollForward>
     <LangVersion>latest</LangVersion>
 
     <!-- https://github.com/dotnet/msbuild/issues/8086#issuecomment-1290568321
