@@ -347,7 +347,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		Assert.True (Directory.Exists (tmpDir));
 
 		var xcodeDir = Path.Combine (tmpDir, "xcode");
-		Directory.CreateDirectory (xcodeDir);
+		Directory.CreateDirectory (xcodeDir); // create directory so --Force is not needed
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
