@@ -325,10 +325,10 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData ("macos", "", "net8.0-macos", new [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
-	[InlineData ("maccatalyst", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Info.plist", "SceneDelegate" })]
-	[InlineData ("ios", "", "net8.0-ios", new [] { "AppDelegate", "Info.plist", "LaunchScreen.storyboard", "SceneDelegate" })]
-	[InlineData ("tvos", "", "net8.0-tvos", new [] { "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
+	[InlineData ("macos", "", "net8.0-macos", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
+	[InlineData ("maccatalyst", "", "net8.0-maccatalyst", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "SceneDelegate" })]
+	[InlineData ("ios", "", "net8.0-ios", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "LaunchScreen.storyboard", "SceneDelegate" })]
+	[InlineData ("tvos", "", "net8.0-tvos", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
 	[InlineData ("maui", "", "net8.0-ios", new [] { "AppDelegate", "Info.plist" })]
 	[InlineData ("maui", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Info.plist" })]
 	public async Task IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
@@ -357,12 +357,12 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		projectFiles.SelectMany (projectFile => {
 			return (IEnumerable<string>) (Path.HasExtension (projectFile) ? ([projectFile]) : ([$"{projectFile}.m", $"{projectFile}.h"]));
 		}).Union ([
-			 Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
+			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "xcuserdata", $"{Environment.UserName}.xcuserdatad", "WorkspaceSettings.xcsettings"),
 			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.xcworkspace", "contents.xcworkspacedata"),
 			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj"),
 		]).ToList ().ForEach (file => {
 			var fullPathToFile = Path.Combine (xcodeDir, file);
-			Assert.True (File.Exists (fullPathToFile), $"{fullPathToFile} does not exist");
+			Assert.True (File.Exists (fullPathToFile) || Directory.Exists(fullPathToFile), $"{fullPathToFile} does not exist");
 		});
 	}
 

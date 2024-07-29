@@ -111,77 +111,14 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
 		}
 
+		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
+
 		// create in memory representation of Xcode assets
 		var xcodeObjects = new Dictionary<string, XcodeObject> ();
 		var pbxSourcesBuildFiles = new List<string> ();
 		var pbxResourcesBuildFiles = new List<string> ();
 		var pbxFrameworksBuildFiles = new List<string> ();
 		var pbxGroupFiles = new List<string> ();
-
-		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
-
-		// for each file in target directory create FileReference and add to PBXResourcesBuildPhase
-		foreach (var file in FileSystem.Directory.GetFiles (TargetDir)) {
-
-			var fileReference = new PBXFileReference ();
-			var buildFile = new PBXBuildFile ();
-
-			switch (FileSystem.Path.GetExtension (file).ToLower ()) {
-			case ".h":
-				fileReference = new PBXFileReference {
-					Isa = "PBXFileReference",
-					LastKnownFileType = "sourcecode.c.h",
-					Name = FileSystem.Path.GetFileName (file),
-					Path = FileSystem.Path.GetFileName (file),
-					SourceTree = "<group>"
-				};
-				xcodeObjects.Add (fileReference.Token, fileReference);
-				pbxGroupFiles.Add (fileReference.Token);
-
-				// no build file for header files
-				break;
-			case ".m":
-				fileReference = new PBXFileReference {
-					Isa = "PBXFileReference",
-					LastKnownFileType = "sourcecode.c.objc",
-					Name = FileSystem.Path.GetFileName (file),
-					Path = FileSystem.Path.GetFileName (file),
-					SourceTree = "<group>"
-				};
-				xcodeObjects.Add (fileReference.Token, fileReference);
-				pbxGroupFiles.Add (fileReference.Token);
-
-				buildFile = new PBXBuildFile {
-					Isa = "PBXBuildFile",
-					FileRef = fileReference.Token
-				};
-
-				xcodeObjects.Add (buildFile.Token, buildFile);
-				pbxSourcesBuildFiles.Add (buildFile.Token);
-				break;
-			case ".plist":
-			case ".storyboard":
-				// add to resources build phase
-				fileReference = new PBXFileReference {
-					Isa = "PBXFileReference",
-					LastKnownFileType = "text.plist.xml",
-					Name = FileSystem.Path.GetFileName (file),
-					Path = FileSystem.Path.GetFileName (file),
-					SourceTree = "<group>"
-				};
-				xcodeObjects.Add (fileReference.Token, fileReference);
-				pbxGroupFiles.Add (fileReference.Token);
-
-				buildFile = new PBXBuildFile {
-					Isa = "PBXBuildFile",
-					FileRef = fileReference.Token
-				};
-
-				xcodeObjects.Add (buildFile.Token, buildFile);
-				pbxResourcesBuildFiles.Add (buildFile.Token);
-				break;
-			}
-		}
 
 		// add a file reference for the *.app item
 		var appFileReference = new PBXFileReference {
@@ -247,6 +184,92 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			]
 		};
 		xcodeObjects.Add (pbxGroup.Token, pbxGroup);
+
+
+		// for each file in target directory create FileReference and add to PBXResourcesBuildPhase
+		foreach (var file in FileSystem.Directory.EnumerateFileSystemEntries(TargetDir, "*.*", SearchOption.AllDirectories))  {
+
+			var fileReference = new PBXFileReference ();
+			var buildFile = new PBXBuildFile ();
+
+			switch (FileSystem.Path.GetExtension (file).ToLower ()) {
+			case ".h":
+				fileReference = new PBXFileReference {
+					Isa = "PBXFileReference",
+					LastKnownFileType = "sourcecode.c.h",
+					Name = FileSystem.Path.GetFileName (file),
+					Path = FileSystem.Path.GetFileName (file),
+					SourceTree = "<group>"
+				};
+				xcodeObjects.Add (fileReference.Token, fileReference);
+				pbxGroupFiles.Add (fileReference.Token);
+
+				// no build file for header files
+				break;
+
+			case ".m":
+				fileReference = new PBXFileReference {
+					Isa = "PBXFileReference",
+					LastKnownFileType = "sourcecode.c.objc",
+					Name = FileSystem.Path.GetFileName (file),
+					Path = FileSystem.Path.GetFileName (file),
+					SourceTree = "<group>"
+				};
+				xcodeObjects.Add (fileReference.Token, fileReference);
+				pbxGroupFiles.Add (fileReference.Token);
+
+				buildFile = new PBXBuildFile {
+					Isa = "PBXBuildFile",
+					FileRef = fileReference.Token
+				};
+
+				xcodeObjects.Add (buildFile.Token, buildFile);
+				pbxSourcesBuildFiles.Add (buildFile.Token);
+				break;
+
+			case ".xcassets":
+				fileReference = new PBXFileReference {
+					Isa = "PBXFileReference",
+					LastKnownFileType = "folder.assetcatalog",
+					Name = FileSystem.Path.GetFileName (file),
+					Path = FileSystem.Path.GetFileName (file),
+					SourceTree = "<group>"
+				};
+				xcodeObjects.Add (fileReference.Token, fileReference);
+				pbxGroup.Children.Insert (0, fileReference.Token);
+
+				buildFile = new PBXBuildFile {
+					Isa = "PBXBuildFile",
+					FileRef = fileReference.Token
+				};
+
+				xcodeObjects.Add (buildFile.Token, buildFile);
+				pbxSourcesBuildFiles.Add (buildFile.Token);
+				break;
+
+			case ".plist":
+			case ".storyboard":
+				// add to resources build phase
+				fileReference = new PBXFileReference {
+					Isa = "PBXFileReference",
+					LastKnownFileType = "text.plist.xml",
+					Name = FileSystem.Path.GetFileName (file),
+					Path = FileSystem.Path.GetFileName (file),
+					SourceTree = "<group>"
+				};
+				xcodeObjects.Add (fileReference.Token, fileReference);
+				pbxGroupFiles.Add (fileReference.Token);
+
+				buildFile = new PBXBuildFile {
+					Isa = "PBXBuildFile",
+					FileRef = fileReference.Token
+				};
+
+				xcodeObjects.Add (buildFile.Token, buildFile);
+				pbxResourcesBuildFiles.Add (buildFile.Token);
+				break;
+			}
+		}
 
 		var pbxResourcesBuildPhase = new PBXResourcesBuildPhase {
 			Isa = "PBXResourcesBuildPhase",
