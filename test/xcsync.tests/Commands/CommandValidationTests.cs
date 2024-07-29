@@ -107,7 +107,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("{Directory}/xcode", true, "")]
 	public async void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
 	{
-		var fileSystem = new MockFileSystem ();
+		var fileSystem = new FileSystem ();
 
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
@@ -115,7 +115,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		await DotnetNew (TestOutput, "macos", tmpDir);
 
-		string fullProjectPath = $"{tmpDir}{projectName}/{projectName}.csproj";
+		string fullProjectPath = $"{tmpDir}/{projectName}.csproj";
 		string tfm = "net8.0-macos";
 
 		targetPath = targetPath
@@ -131,7 +131,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var validation = XcodeCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
 
-		var errorMessage = XcodeCommand.ValidateCommand (force);
+		var errorMessage = validation.Error;
 
 		Assert.Equal (expectedError, errorMessage);
 		if (string.IsNullOrEmpty (expectedError)) {

@@ -192,7 +192,7 @@ class BaseCommand<T> : Command {
 		return (error, tfm);
 	}
 
-	(string, string) TryValidateTargetPath (string projectPath, string targetPath)
+	protected virtual (string, string) TryValidateTargetPath (string projectPath, string targetPath)
 	{
 		string error = string.Empty;
 

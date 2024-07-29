@@ -2,6 +2,7 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
+using Microsoft.Build.Tasks;
 
 namespace xcsync.Commands;
 
@@ -24,19 +25,6 @@ class XcodeCommand<T> : BaseCommand<T> {
 	{
 		Add (force);
 		Add (open);
-		AddValidator ((result) => {
-			if (!string.IsNullOrEmpty (result.ErrorMessage)) {
-				return;
-			}
-
-			Force = result.GetValueForOption (force);
-			Open = result.GetValueForOption (open);
-
-			var error = ValidateCommand (Force);
-
-			result.ErrorMessage = error;
-		});
-
 	}
 
 	/// <summary>
@@ -51,30 +39,29 @@ class XcodeCommand<T> : BaseCommand<T> {
 	}
 
 
-	protected internal string ValidateCommand (bool force)
+	protected override (string, string) TryValidateTargetPath (string projectPath, string targetPath)
 	{
-		LogVerbose ("[Begin] {Command} Validation", nameof (XcodeCommand<T>));
+		string error = string.Empty;
 
 		if (Force) {
-			if (fileSystem.Directory.Exists (TargetPath) && fileSystem.Directory.EnumerateFileSystemEntries (TargetPath).Any ()) {
-				fileSystem.Directory.Delete (TargetPath, true);
+			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
+				fileSystem.Directory.Delete (targetPath, true);
 			}
 
-			if (!fileSystem.Directory.Exists (TargetPath)) {
-				fileSystem.Directory.CreateDirectory (TargetPath);
+			if (!fileSystem.Directory.Exists (targetPath)) {
+				fileSystem.Directory.CreateDirectory (targetPath);
 			}
 		} else {
-			if (fileSystem.Directory.Exists (TargetPath) && fileSystem.Directory.EnumerateFileSystemEntries (TargetPath).Any ()) {
-				LogDebug (Strings.Errors.Validation.TargetNotEmpty (TargetPath));
-				return Strings.Errors.Validation.TargetNotEmpty (TargetPath);
+			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
+				LogDebug (Strings.Errors.Validation.TargetNotEmpty (targetPath));
+				error = Strings.Errors.Validation.TargetNotEmpty (targetPath);
 			}
 
-			if (!fileSystem.Directory.Exists (TargetPath) && string.Compare (TargetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
-				LogDebug (Strings.Errors.Validation.TargetDoesNotExist (TargetPath));
-				return Strings.Errors.Validation.TargetDoesNotExist (TargetPath);
+			if (!fileSystem.Directory.Exists (targetPath) && string.Compare (targetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
+				LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
+				error =  Strings.Errors.Validation.TargetDoesNotExist (targetPath);
 			}
 		}
-		LogVerbose ("[End] {Command} Validation", nameof (XcodeCommand<T>));
-		return string.Empty;
+		return (error, targetPath);
 	}
 }
