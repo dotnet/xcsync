@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
@@ -60,15 +61,23 @@ class BaseCommand<T> : Command {
 	{
 		this.fileSystem = fileSystem ?? throw new ArgumentNullException (nameof (fileSystem));
 
+		AddOptions ();
+
+		AddValidators ();
+	}
+
+	protected virtual void AddOptions ()
+	{
 		Add (project);
 		Add (tfm);
 		Add (target);
-		AddValidator ((result) => {
-			var projectPath = result.GetValueForOption (project) ?? string.Empty;
-			var targetPath = result.GetValueForOption (target) ?? string.Empty;
-			var moniker = result.GetValueForOption (tfm) ?? string.Empty;
+	}
 
-			var validation = ValidateCommand (projectPath, moniker, targetPath);
+	protected virtual void AddValidators ()
+	{
+		AddValidator ((result) => {
+
+			var validation = ValidateCommand (result);
 
 			ProjectPath = validation.ProjectPath;
 			Tfm = validation.Tfm;
@@ -77,31 +86,20 @@ class BaseCommand<T> : Command {
 		});
 	}
 
-	/// <summary>
-	/// For testing purposes only
-	/// </summary>
-	/// <param name="name"></param>
-	/// <param name="description"></param>
-	/// <param name="logger"></param>
-	internal BaseCommand (IFileSystem fileSystem, string name, string description, string projectPath, string tfm, string targetPath)
-		: this (fileSystem, name, description)
-	{
-		ProjectPath = projectPath;
-		Tfm = tfm;
-		TargetPath = targetPath;
-	}
-
 	internal record struct ValidationResult (string ProjectPath, string Tfm, string TargetPath, string Error);
 
-	internal ValidationResult ValidateCommand (string projectPath, string tfm, string targetPath)
+	internal ValidationResult ValidateCommand (CommandResult result)
 	{
 		string error;
+		var projectPath = result.GetValueForOption (project) ?? string.Empty;
+		var targetPath = result.GetValueForOption (target) ?? string.Empty;
+		var moniker = result.GetValueForOption (tfm) ?? string.Empty;
 
 		(error, string newProjectPath) = TryValidateProjectPath (projectPath);
-		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, tfm, targetPath, error); }
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, moniker, targetPath, error); }
 
-		(error, string newTfm) = TryValidateTfm (projectPath, tfm);
-		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, tfm, targetPath, error); }
+		(error, string newTfm) = TryValidateTfm (projectPath, moniker);
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, moniker, targetPath, error); }
 
 		(error, string newTargetPath) = TryValidateTargetPath (projectPath, targetPath);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, newTfm, targetPath, error); }
@@ -109,7 +107,7 @@ class BaseCommand<T> : Command {
 		return new ValidationResult (newProjectPath, newTfm, newTargetPath, error);
 	}
 
-	(string, string) TryValidateProjectPath (string projectPath)
+	protected virtual (string, string) TryValidateProjectPath (string projectPath)
 	{
 		string error = string.Empty;
 		var updatedPath = projectPath;
@@ -124,7 +122,9 @@ class BaseCommand<T> : Command {
 			// We have been given a directory, let's see if we can find a .csproj file
 			LogDebug (Strings.Base.SearchForProjectFiles (projectPath));
 
-			var csprojFiles = fileSystem.Directory.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly).ToArray ();
+			var csprojFiles = fileSystem.Directory.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly)
+												  .Select((path) => fileSystem.Path.GetRelativePath (fileSystem.Path.GetDirectoryName(projectPath) ?? string.Empty, path))
+												  .ToArray ();
 
 			if (csprojFiles.Length == 0) {
 				LogDebug (Strings.Errors.CsprojNotFound (projectPath));
@@ -151,7 +151,7 @@ class BaseCommand<T> : Command {
 		return (error, projectPath);
 	}
 
-	(string, string) TryValidateTfm (string projectPath, string tfm)
+	protected virtual (string, string) TryValidateTfm (string projectPath, string tfm)
 	{
 		string error = string.Empty;
 
