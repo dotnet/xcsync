@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
+using System.CommandLine;
+using System.CommandLine.IO;
 using System.Text;
 using Xamarin.Utils;
 using Xunit.Abstractions;
@@ -42,6 +44,39 @@ public class Base {
 		public override Encoding Encoding {
 			get {
 				return Encoding.UTF8;
+			}
+		}
+	}
+
+
+	public class CapturingConsole : IConsole {
+		readonly List<string> output = [];
+		readonly List<string> error = [];
+
+		public IStandardStreamWriter Out => new ListStreamWriter (output);
+
+		public bool IsOutputRedirected => true;
+
+		public IStandardStreamWriter Error => new ListStreamWriter (error);
+
+		public bool IsErrorRedirected => true;
+
+		public bool IsInputRedirected => false;
+
+		public IReadOnlyList<string> Output => output.AsReadOnly ();
+		public IReadOnlyList<string> ErrorOutput => error.AsReadOnly ();
+
+		class ListStreamWriter (List<string> list) : IStandardStreamWriter {
+			public void Write (string? value)
+			{
+				if (string.IsNullOrEmpty (value))
+					return;
+
+				foreach (var line in value.Split (Environment.NewLine)) {
+					if (!string.IsNullOrEmpty (value) && !string.IsNullOrWhiteSpace (value)) {
+						list.Add (line);
+					}
+				}
 			}
 		}
 	}
