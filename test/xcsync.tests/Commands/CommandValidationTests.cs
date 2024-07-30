@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 
+using System.CommandLine;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using Xamarin;
@@ -57,17 +58,22 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			.Replace ("{TargetFramework}", tfm)
 			.Replace ("{TargetPath}", targetPath);
 
-		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description", fullProjectPath, tfm, targetPath);
+		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
 
-		var validation = baseCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
+		var args = new string [] {
+			"--project", fullProjectPath,
+			"--target-framework-moniker", tfm,
+			"--target", targetPath
+		 };
 
-		Assert.Equal (expectedError, validation.Error);
+		var console = new CapturingConsole ();
+		int exitCode = baseCommand.Invoke (args, console);
+
+		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
+
+		Assert.Equal (expectedError, errorMessage);
 		if (string.IsNullOrEmpty (expectedError)) {
-			Assert.NotEmpty (validation.ProjectPath);
-			Assert.EndsWith (".csproj", validation.ProjectPath);
-			Assert.NotEmpty (validation.Tfm);
-			Assert.NotEmpty (validation.TargetPath);
-			Assert.True (fileSystem.Directory.Exists (validation.TargetPath));
+			Assert.Equal (0, exitCode);
 		}
 	}
 
@@ -95,16 +101,30 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var tfm = "net8.0-macos";
 		var targetPath = "";
-		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description", fullProjectPath, tfm, targetPath);
+		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
 
-		var validation = baseCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
+		var args = new string [] {
+			"--project", fullProjectPath,
+			"--target-framework-moniker", tfm,
+			"--target", targetPath
+		 };
 
-		Assert.Contains (expectedError, validation.Error);
+		var console = new CapturingConsole ();
+		var exitCode = baseCommand.Invoke (args, console);
+
+		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
+
+		Assert.StartsWith (expectedError, errorMessage);
+		if (string.IsNullOrEmpty (expectedError)) {
+			Assert.Equal (0, exitCode);
+		}
 	}
 
 	[Theory]
 	[InlineData ("{Directory}/xcode", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
 	[InlineData ("{Directory}/xcode", true, "")]
+	[InlineData ("{Directory}/some/rando/folder/xcode", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
+	[InlineData ("{Directory}/some/rando/folder/xcode", true, "")]
 	public async void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
 	{
 		var fileSystem = new FileSystem ();
@@ -127,19 +147,24 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			.Replace ("{TargetFramework}", tfm)
 			.Replace ("{TargetPath}", targetPath);
 
-		var XcodeCommand = new XcodeCommand<string> (fileSystem, "test", "test description", fullProjectPath, tfm, targetPath, force);
+		var XcodeCommand = new XcodeCommand<string> (fileSystem, "test", "test description");
 
-		var validation = XcodeCommand.ValidateCommand (fullProjectPath, tfm, targetPath);
+		var args = new string [] {
+			"--project", fullProjectPath,
+			"--target-framework-moniker", tfm,
+			"--target", targetPath
+		 };
+		if (force) {
+			args = [.. args, "--force"];
+		}
+		var console = new CapturingConsole ();
+		int exitCode = XcodeCommand.Invoke (args, console);
 
-		var errorMessage = validation.Error;
+		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput[0] : string.Empty;
 
 		Assert.Equal (expectedError, errorMessage);
 		if (string.IsNullOrEmpty (expectedError)) {
-			Assert.NotEmpty (validation.ProjectPath);
-			Assert.EndsWith (".csproj", validation.ProjectPath);
-			Assert.NotEmpty (validation.Tfm);
-			Assert.NotEmpty (validation.TargetPath);
-			Assert.True (fileSystem.Directory.Exists (validation.TargetPath));
+			Assert.Equal (0, exitCode);
 		}
 	}
 

@@ -22,22 +22,23 @@ class XcodeCommand<T> : BaseCommand<T> {
 		getDefaultValue: () => false);
 
 	public XcodeCommand (IFileSystem fileSystem, string name, string description) : base (fileSystem, name, description)
+	{}
+
+	protected override void AddOptions () 
 	{
+		base.AddOptions ();
 		Add (force);
 		Add (open);
 	}
 
-	/// <summary>
-	/// For testing purposes only
-	/// </summary>
-	/// <param name="name"></param>
-	/// <param name="description"></param>
-	/// <param name="logger"></param>
-	internal XcodeCommand (IFileSystem fileSystem, string name, string description, string projectPath, string tfm, string targetPath, bool force) : base (fileSystem, name, description, projectPath, tfm, targetPath)
+	protected override void AddValidators ()
 	{
-		Force = force;
+		AddValidator ((result) => {
+			Force = result.GetValueForOption (force);
+			Open = result.GetValueForOption (open);			
+		});
+		base.AddValidators ();
 	}
-
 
 	protected override (string, string) TryValidateTargetPath (string projectPath, string targetPath)
 	{
