@@ -5,8 +5,6 @@ using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using Newtonsoft.Json.Linq;
 using Serilog;
 
 namespace xcsync.Commands;
@@ -51,14 +49,11 @@ class BaseCommand<T> : Command {
 		description: Strings.Options.TargetDescription,
 		getDefaultValue: () => $".{Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
 
-	static BaseCommand ()
+	public BaseCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (name, description)
 	{
-		Logger = xcSync.Logger?
-					.ForContext ("SourceContext", typeof (T).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
-	}
+		Logger = logger ?? xcSync.Logger?
+			.ForContext ("SourceContext", typeof (T).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
 
-	public BaseCommand (IFileSystem fileSystem, string name, string description) : base (name, description)
-	{
 		this.fileSystem = fileSystem ?? throw new ArgumentNullException (nameof (fileSystem));
 
 		AddOptions ();
@@ -123,7 +118,7 @@ class BaseCommand<T> : Command {
 			LogDebug (Strings.Base.SearchForProjectFiles (projectPath));
 
 			var csprojFiles = fileSystem.Directory.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly)
-												  .Select((path) => fileSystem.Path.GetRelativePath (fileSystem.Path.GetDirectoryName(projectPath) ?? string.Empty, path))
+												  .Select((path) => fileSystem.Path.GetRelativePath (fileSystem.Path.Combine(".", fileSystem.Path.GetDirectoryName(projectPath) ?? string.Empty), path))
 												  .ToArray ();
 
 			if (csprojFiles.Length == 0) {
@@ -223,8 +218,8 @@ class BaseCommand<T> : Command {
 			tfms = Scripts.GetTfms (fileSystem, csproj);
 
 			return tfms.Count > 0;
-		} catch {
-			// in case there are issues when loading the file
+		} catch (Exception ex) {
+			Logger?.Error (ex, "Failed to get TFM's from project {project}", csproj);
 			return false;
 		}
 	}

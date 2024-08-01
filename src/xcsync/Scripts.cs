@@ -9,8 +9,13 @@ namespace xcsync;
 
 static class Scripts {
 
+#pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
+	static string PathToDotnet => Path.Combine (xcSync.DotnetPath, "dotnet");
+#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
+
 	static Execution ExecuteCommand (string command, string [] args, TimeSpan timeout)
 	{
+		xcSync.Logger?.Debug ($"Executing: {command} {string.Join (' ', args)}");
 		var exec = Execution.RunAsync (command, args, mergeOutput: true, timeout: timeout).Result;
 
 		if (exec.TimedOut)
@@ -35,7 +40,7 @@ static class Scripts {
 		var resultFile = fileSystem.Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" };
 
-		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
 
@@ -63,7 +68,7 @@ static class Scripts {
 	{
 		var resultFile = fileSystem.Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		return fileSystem.File.ReadAllText (resultFile).Trim ('\n');
 	}
@@ -73,7 +78,7 @@ static class Scripts {
 		var resultFile = fileSystem.Path.GetTempFileName ();
 		//maybe add support for ImageAsset? But right now doesn't seem v necessary? (Default is BundleResource)
 		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		// dynamic cuz don't wanna create a whole class to rep the incoming json
 		dynamic data = JsonConvert.DeserializeObject (fileSystem.File.ReadAllText (resultFile))!;
@@ -103,7 +108,7 @@ static class Scripts {
 	{
 		var resultFile = fileSystem.Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getItem:Compile,None", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		ExecuteCommand ("dotnet", args, TimeSpan.FromMinutes (1));
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
 

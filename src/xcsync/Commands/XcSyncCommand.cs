@@ -11,19 +11,14 @@ class XcSyncCommand : RootCommand {
 
 	public static ILogger? Logger { get; private set; }
 
-	static XcSyncCommand ()
+	public XcSyncCommand (IFileSystem fileSystem, ILogger? logger = null) : base ("xcsync")
 	{
-		Logger = xcSync.Logger!
-					.ForContext ("SourceContext", typeof (XcSyncCommand).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
-	}
-
-	public XcSyncCommand (IFileSystem fileSystem) : base ("xcsync")
-	{
-		AddCommand (new GenerateCommand (fileSystem));
-		AddCommand (new SyncCommand (fileSystem));
-		AddCommand (new WatchCommand (fileSystem));
+		Logger = logger ?? xcSync.Logger!
+			.ForContext ("SourceContext", typeof (XcSyncCommand).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
 
 		AddGlobalOption (SharedOptions.Verbose);
+		AddGlobalOption (SharedOptions.DotnetPath);
+
 		SharedOptions.Verbose.AddValidator (result => {
 			var value = result.GetValueForOption (SharedOptions.Verbose);
 			if (!result.IsImplicit && result.Tokens.Count == 0) {
@@ -37,7 +32,15 @@ class XcSyncCommand : RootCommand {
 				Verbosity.Diagnostic => LogEventLevel.Verbose,
 				_ => LogEventLevel.Information,
 			};
-
 		});
+
+		SharedOptions.DotnetPath.AddValidator (result => {
+			xcSync.DotnetPath = result.GetValueForOption (SharedOptions.DotnetPath) ?? string.Empty;
+			Logger?.Debug ("Using the `dotnet` located at {0}", xcSync.DotnetPath);
+		});
+
+		AddCommand (new GenerateCommand (fileSystem, Logger));
+		AddCommand (new SyncCommand (fileSystem, Logger));
+		AddCommand (new WatchCommand (fileSystem, Logger));
 	}
 }

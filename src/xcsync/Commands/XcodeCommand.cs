@@ -2,7 +2,7 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
-using Microsoft.Build.Tasks;
+using Serilog;
 
 namespace xcsync.Commands;
 
@@ -21,7 +21,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 		description: Strings.Options.OpenDescription,
 		getDefaultValue: () => false);
 
-	public XcodeCommand (IFileSystem fileSystem, string name, string description) : base (fileSystem, name, description)
+	public XcodeCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (fileSystem, logger, name, description)
 	{}
 
 	protected override void AddOptions () 

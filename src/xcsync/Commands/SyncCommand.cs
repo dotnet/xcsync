@@ -2,12 +2,13 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
+using Serilog;
 using xcsync.Projects;
 
 namespace xcsync.Commands;
 
 class SyncCommand : BaseCommand<SyncCommand> {
-	public SyncCommand (IFileSystem fileSystem) : base (fileSystem, "sync", "synchronize changes from the Xcode project back to the.NET project")
+	public SyncCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "sync", "synchronize changes from the Xcode project back to the.NET project")
 	{
 		this.SetHandler (Execute);
 	}

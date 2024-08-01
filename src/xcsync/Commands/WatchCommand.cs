@@ -2,6 +2,7 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
+using Serilog;
 using xcsync.Projects;
 
 namespace xcsync.Commands;
@@ -9,7 +10,7 @@ namespace xcsync.Commands;
 class WatchCommand : XcodeCommand<WatchCommand> {
 	bool keepRunning = true;
 
-	public WatchCommand (IFileSystem fileSystem) : base (fileSystem, "watch",
+	public WatchCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "watch",
 			"generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project")
 	{
 		this.SetHandler (Execute, project, target, tfm, force, open);
