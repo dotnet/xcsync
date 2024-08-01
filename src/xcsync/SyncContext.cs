@@ -155,7 +155,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			_ => ""
 		};
 
-		var appleDirectory = FileSystem.Path.Exists (altPath) ? altPath : FileSystem.Path.GetDirectoryName (ProjectPath)!;
+		var appleDirectory = FileSystem.Path.Exists (altPath) ? altPath : FileSystem.Path.Combine (".", FileSystem.Path.GetDirectoryName (ProjectPath) ?? string.Empty);
 
 		foreach (var file in appleFiles) {
 			FileSystem.File.Copy (file, FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (file)), true);

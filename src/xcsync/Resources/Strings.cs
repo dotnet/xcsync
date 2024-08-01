@@ -10,18 +10,13 @@ static class Strings {
 	internal static class Options {
 		internal static string ForceDescription => Resources.Strings.Options_Force_Description;
 		internal static string ProjectDescription => Resources.Strings.Options_Project_Description;
-
 		internal static string? ProjectValidationError (string error) => Errors.InvalidOption ("project", error);
-
 		internal static string TargetDescription => Resources.Strings.Options_Target_Description;
-
 		internal static string? TargetValidationError (string error) => Errors.InvalidOption ("target", error);
-
 		internal static string OpenDescription => Resources.Strings.Options_Open_Description;
-
 		internal static string TfmDescription => Resources.Strings.Options_Tfm_Description;
-
 		internal static string VerbosityDescription => Resources.Strings.Options_Verbosity_Description;
+		internal static string DotnetPathDescription => Resources.Strings.Options_DotnetPath_Description;
 	}
 
 	internal static class Commands {

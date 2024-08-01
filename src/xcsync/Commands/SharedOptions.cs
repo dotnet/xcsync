@@ -12,4 +12,12 @@ static class SharedOptions {
 			Arity = ArgumentArity.ZeroOrOne,
 			Description = Strings.Options.VerbosityDescription
 		};
+		
+	public static readonly Option<string> DotnetPath =
+		new (["--dotnet-path", "-d"],
+			getDefaultValue: () => string.Empty) {
+			IsRequired = false,
+			Arity = ArgumentArity.ZeroOrOne,
+			Description = Strings.Options.DotnetPathDescription
+		};
 }
