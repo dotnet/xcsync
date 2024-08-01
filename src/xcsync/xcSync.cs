@@ -5,6 +5,7 @@ using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Serilog;
 using Serilog.Core;
@@ -17,15 +18,20 @@ namespace xcsync;
 
 static class xcSync {
 
+	public static string DotnetPath { get; set; } = string.Empty;
+
 	public static ApplePlatforms ApplePlatforms { get; } = new ();
 
 	static internal readonly LoggingLevelSwitch LogLevelSwitch = new (LogEventLevel.Information);
-	public static ILogger? Logger { get; private set; }
+	public static ILogger? Logger { get; internal set; }
 	public static IFileSystem FileSystem { get; } = new FileSystem ();
 
 	public static async Task Main (string [] args)
 	{
 		ConfigureLogging ();
+
+		RegisterMSBuild ();
+
 		WriteHeader ();
 
 		var parser = new CommandLineBuilder (new XcSyncCommand (FileSystem))
@@ -33,6 +39,22 @@ static class xcSync {
 			.Build ();
 
 		await parser.InvokeAsync (args).ConfigureAwait (false);
+	}
+
+	static void RegisterMSBuild ()
+	{
+		if (!MSBuildLocator.IsRegistered) {
+			var msbuildInstances = MSBuildLocator.QueryVisualStudioInstances ()
+				.OrderByDescending (instance => instance.Version);
+
+			foreach (var instance in msbuildInstances)
+				Logger?.Debug ("Found MSBuild instance {0} at {1}", instance.Version, instance.MSBuildPath);
+			var msbuildInstance = msbuildInstances.First ();
+
+			// Register a specific instance of MSBuild
+			MSBuildLocator.RegisterInstance (msbuildInstance);
+			Logger?.Debug ("Registered MSBuild instance {0} at {1}", msbuildInstance.Version, msbuildInstance.MSBuildPath);
+		}
 	}
 
 	static void ConfigureLogging ()

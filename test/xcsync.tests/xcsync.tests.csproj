@@ -24,11 +24,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build" Version="17.9.5" ExcludeAssets="runtime"/>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.9.5" ExcludeAssets="runtime"/>
-    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.9.5" ExcludeAssets="runtime"/>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.Build" Version="17.10.4" ExcludeAssets="runtime"/>
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
     <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.0.2"/>
   </ItemGroup>
 

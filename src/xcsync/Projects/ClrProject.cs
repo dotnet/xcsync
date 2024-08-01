@@ -13,10 +13,6 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 
 	public async Task<Project> OpenProject ()
 	{
-		// we care about the project interactions
-		// the workspace is simply a means of accessing the project
-		if (!MSBuildLocator.IsRegistered)
-			MSBuildLocator.RegisterDefaults ();
 
 		using var workspace = MSBuildWorkspace.Create (new Dictionary<string, string> {
 			{"TargetFrameworks", Framework}

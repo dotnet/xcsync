@@ -3,6 +3,8 @@
 using System.CommandLine;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using Moq;
+using Serilog;
 using Xamarin;
 using xcsync.Commands;
 using Xunit.Abstractions;
@@ -10,23 +12,34 @@ using Xunit.Abstractions;
 namespace xcsync.tests.Commands;
 
 public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
+	[Fact]
+	public void TestXcSyncCommandCreation ()
+	{
+		var fileSystem = new MockFileSystem ();
+
+		var command = new XcSyncCommand (fileSystem, Mock.Of<ILogger> ());
+		Assert.NotNull (command);
+		command.Invoke ([ "--dotnet-path", "/path/to/dotnet" ], new CapturingConsole ());
+		Assert.Equal ("/path/to/dotnet", xcSync.DotnetPath);
+	}
 
 	[Fact]
 	public void TestBaseCommandCreation ()
 	{
 		var fileSystem = new MockFileSystem ();
-
-		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
-		Assert.NotNull (baseCommand);
+		var logger = new XunitLogger (TestOutput);
+		var command = new BaseCommand<string> (fileSystem, logger, "test", "test description");
+		Assert.NotNull (command);
 	}
 
 	[Fact]
 	public void TestXcodeCommandCreation ()
 	{
 		var fileSystem = new MockFileSystem ();
+		var logger = new XunitLogger (TestOutput);
 
-		var baseCommand = new XcodeCommand<string> (fileSystem, "test", "test description");
-		Assert.NotNull (baseCommand);
+		var command = new XcodeCommand<string> (fileSystem, logger, "test", "test description");
+		Assert.NotNull (command);
 	}
 
 	[Theory]
@@ -45,6 +58,8 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
 		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+
 		await DotnetNew (TestOutput, projectType, tmpDir, "");
 		Assert.True (Directory.Exists (tmpDir));
 		var fullProjectPath = Path.Combine (tmpDir, $"{projectName}.csproj");
@@ -58,7 +73,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			.Replace ("{TargetFramework}", tfm)
 			.Replace ("{TargetPath}", targetPath);
 
-		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
+		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
 
 		var args = new string [] {
 			"--project", fullProjectPath,
@@ -78,12 +93,13 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData ("", "Multiple .csproj files found in '{CsProjFile}', please specify which project file to use via the [--project, -p] option:")]
-	[InlineData ("does-not-exist.csproj", "Path '{CsProjFile}' does not exist")]
-	public void BaseCommandValidation_MultipleProjects (string projectNameParam, string expectedError)
+	[InlineData ("/src","", "Multiple .csproj files found in '{CsProjFile}', please specify which project file to use via the [--project, -p] option:")]
+	[InlineData ("", ".", "Multiple .csproj files found in '{CsProjFile}', please specify which project file to use via the [--project, -p] option:")]
+	[InlineData ("", "does-not-exist.csproj", "Path '{CsProjFile}' does not exist")]
+	[InlineData ("/src", "does-not-exist.csproj", "Path '{CsProjFile}' does not exist")]
+	public void BaseCommandValidation_MultipleProjects (string projectDir, string projectNameParam, string expectedError)
 	{
 		var projectName = Guid.NewGuid ().ToString ();
-		var projectDir = "/src";
 
 		var fileSystem = new MockFileSystem (
 			new Dictionary<string, MockFileData> {
@@ -91,6 +107,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 				{ Path.Combine (projectDir, $"{projectName}-2.csproj"), new MockFileData ("") }
 			}
 		);
+		var logger = new XunitLogger (TestOutput);
 
 		var fullProjectPath = fileSystem.Path.Combine (projectDir, $"{projectNameParam}");
 		Assert.False (fileSystem.File.Exists (fullProjectPath));
@@ -101,7 +118,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var tfm = "net8.0-macos";
 		var targetPath = "";
-		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
+		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
 
 		var args = new string [] {
 			"--project", fullProjectPath,
@@ -128,6 +145,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	public async void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
 	{
 		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
 
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
@@ -147,7 +165,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			.Replace ("{TargetFramework}", tfm)
 			.Replace ("{TargetPath}", targetPath);
 
-		var XcodeCommand = new XcodeCommand<string> (fileSystem, "test", "test description");
+		var XcodeCommand = new XcodeCommand<string> (fileSystem, logger, "test", "test description");
 
 		var args = new string [] {
 			"--project", fullProjectPath,
@@ -178,12 +196,14 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
 		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+		xcSync.Logger = logger;
 
 		await DotnetNew (TestOutput, projectType, tmpDir, "");
 		Assert.True (Directory.Exists (tmpDir));
 		var fullProjectPath = fileSystem.Path.Combine (tmpDir, $"{projectName}.csproj");
 
-		var baseCommand = new BaseCommand<string> (fileSystem, "test", "test description");
+		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
 
 		baseCommand.TryGetTfmFromProject (fullProjectPath, out var tfms);
 

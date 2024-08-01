@@ -148,6 +148,10 @@
 		<value>Set the verbosity level</value>
 	</data>
 
+	<data name="Options.DotnetPath.Description" xml:space="preserve">
+		<value>Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</value>
+	</data>
+
 	<!-- Commands -->
 	<data name="Commands.Generate.Description" xml:space="preserve">
 		<value>generate a Xcode project at the path specified by --target from the project identified by --project</value>
@@ -191,7 +195,7 @@
 		<comment>{0} is the path to the file or directory</comment>
 	</data>
 	<data name="Errors.Validation.MissingValidTargetFrameworkInPath" xml:space="preserve">
-		<value>Missing valid target framework in '{0}</value>
+		<value>Missing valid target framework in '{0}'.</value>
 		<comment>{0} is the path to the file or directory</comment>
 	</data>
 	<data name="Errors.Validation.InvalidTargetFramework" xml:space="preserve">
