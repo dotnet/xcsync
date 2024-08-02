@@ -4,4 +4,5 @@ pushd "$(dirname "$0")" > /dev/null
 SCRIPTPATH=$(pwd -P)
 popd > /dev/null
 
-exec "$SCRIPTPATH/../lib/xcsync/xcsync" "$@"
+DOTNET=$(ps -o comm= -p $PPID)
+$DOTNET "$SCRIPTPATH/../lib/xcsync/xcsync.dll" "$@"
