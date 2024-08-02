@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -39,11 +39,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="xcsync" Link="xcsync" Pack="true" PackagePath="bin" />
+    <Content Include="dotnet-xcsync" Link="dotnet-xcsync" Pack="true" PackagePath="bin" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="bin/$(Configuration)/net8.0/publish/**/*" Exclude="bin/$(Configuration)/net8.0/publish/BuildHost-*/**/*" Pack="true" PackagePath="lib" />
+    <Content Include="bin/$(Configuration)/net8.0/publish/**/*" Pack="true" PackagePath="lib" />
   </ItemGroup>
 
   <PropertyGroup>
