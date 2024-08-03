@@ -155,10 +155,13 @@
       </Item>
       <Item ItemId=";Errors.Validation.MissingValidTargetFrameworkInPath" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          <Val><![CDATA[Missing valid target framework in '{0}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['{0}에 유효한 대상 프레임워크가 없습니다.]]></Val>
+            <Val><![CDATA['{0}'에 유효한 대상 프레임워크가 없습니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -239,6 +242,15 @@
           <Val><![CDATA['{0}' is open in Xcode]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA['{0}'이(가) Xcode에서 열려 있습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.DotnetPath.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[.NET SDK의 경로를 설정하며, 제공되지 않을 경우 경로가 'dotnet'인 경우 부모 프로세스의 경로를 사용하고 그렇지 않은 경우 경로의 'dotnet'으로 되돌아갑니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

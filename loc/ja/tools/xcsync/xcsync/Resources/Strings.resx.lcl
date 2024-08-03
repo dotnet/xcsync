@@ -155,10 +155,13 @@
       </Item>
       <Item ItemId=";Errors.Validation.MissingValidTargetFrameworkInPath" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          <Val><![CDATA[Missing valid target framework in '{0}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['{0}' に有効なターゲット フレームワークがありません]]></Val>
+            <Val><![CDATA['{0}' に有効なターゲット フレームワークがありません。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -239,6 +242,15 @@
           <Val><![CDATA['{0}' is open in Xcode]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA['{0}' は Xcode で開いています]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.DotnetPath.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[.NET SDK へのパスを設定します。指定しない場合、親プロセスからのパスが 'dotnet' の場合はそのパスを使用し、それ以外の場合は、PATH の 'dotnet' にフォールバックします。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
