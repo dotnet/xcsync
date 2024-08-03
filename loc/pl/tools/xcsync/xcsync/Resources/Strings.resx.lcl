@@ -155,10 +155,13 @@
       </Item>
       <Item ItemId=";Errors.Validation.MissingValidTargetFrameworkInPath" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          <Val><![CDATA[Missing valid target framework in '{0}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Brak prawidłowej struktury docelowej w „{0}]]></Val>
+            <Val><![CDATA[Brak prawidłowej struktury docelowej w „{0}”.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -239,6 +242,15 @@
           <Val><![CDATA['{0}' is open in Xcode]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Element „{0}” jest otwarty w środowisku Xcode]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.DotnetPath.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Ustaw ścieżkę do zestawu SDK platformy .NET, jeśli nie zostanie podana, użyje ścieżki z procesu nadrzędnego, jeśli jest to ścieżka „dotnet”, w przeciwnym razie powróci do ścieżki „dotnet” w ścieżce PATH.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
