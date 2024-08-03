@@ -155,10 +155,13 @@
       </Item>
       <Item ItemId=";Errors.Validation.MissingValidTargetFrameworkInPath" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          <Val><![CDATA[Missing valid target framework in '{0}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[V {0} chybí platná cílová architektura.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -239,6 +242,15 @@
           <Val><![CDATA['{0}' is open in Xcode]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Projekt {0} je otevřený v Xcode.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.DotnetPath.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nastavte cestu k sadě .NET SDK. Pokud se nezadá, použije se cesta z nadřazeného procesu (pokud je to dotnet, jinak se vrátí k dotnet v parametru PATH).]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
