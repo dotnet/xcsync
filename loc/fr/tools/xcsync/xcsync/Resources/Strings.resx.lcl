@@ -155,10 +155,13 @@
       </Item>
       <Item ItemId=";Errors.Validation.MissingValidTargetFrameworkInPath" ItemType="0;.resx" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          <Val><![CDATA[Missing valid target framework in '{0}'.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Framework cible valide manquant dans « {0} »]]></Val>
+            <Val><![CDATA[Infrastructure cible valide manquant dans « {0} ».]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Missing valid target framework in '{0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -239,6 +242,15 @@
           <Val><![CDATA['{0}' is open in Xcode]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[« {0} » est ouvert dans Xcode]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Options.DotnetPath.Description" ItemType="0;.resx" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Définissez le chemin d’accès au Kit de développement logiciel (SDK) .NET, s’il n’est pas fourni, il utilise le chemin d’accès du processus parent s’il s’agit de 'dotnet'. Sinon, il revient au 'dotnet' dans CHEMIN D’ACCÈS.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
