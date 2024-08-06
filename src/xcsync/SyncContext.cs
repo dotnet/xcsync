@@ -448,7 +448,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger?.Information (Strings.Generate.GeneratedProject (TargetDir));
 
 		if (Open) {
-			string workspacePath = FileSystem.Path.Combine (TargetDir, projectName + ".xcodeproj", "project.xcworkspace");
+			string workspacePath = FileSystem.Path.GetFullPath (FileSystem.Path.Combine (TargetDir, projectName + ".xcodeproj", "project.xcworkspace"));
 			Logger?.Information (Strings.Generate.OpenProject (Scripts.Run (Scripts.OpenXcodeProject (workspacePath))));
 		}
 		return;
