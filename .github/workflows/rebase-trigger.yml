@@ -5,18 +5,46 @@ on:
     types: [created]
 
 jobs:
-  launchBackportBuild:
+  setupRebase:
     runs-on: ubuntu-latest
+    # GITHUB_TOKEN change from read-write to read-only on 2024-02-01 requires permissions block
+    # https://docs.opensource.microsoft.com/github/apps/permission-changes/
+    # https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+    permissions:
+      actions: write
+      contents: read
+      security-events: write
     if: github.event.issue.pull_request != '' && contains(github.event.comment.body, '/sudo rebase')
-
     steps:
-      - uses: xamarin/rebase-bot-action@v1.0
-        with:
-          pull_request_url: ${{ github.event.issue.pull_request.url }}
-          comment_author: ${{ github.actor }}
-          github_repository: ${{ github.repository }}
-          ado_organization: ${{ secrets.ADO_PROJECTCOLLECTION }}
-          ado_project: ${{ secrets.ADO_PROJECT }}
-          rebase_pipeline_id: 13926
-          ado_build_pat: ${{ secrets.ADO_BUILDPAT }}
-          github_account_pat: ${{ secrets.SERVICEACCOUNT_PAT }}
+      - name: Show Comment
+        shell: pwsh
+        id: show_comment
+        run: |
+          Write-Host "Comment: ${env:COMMENT}"
+        env:
+          COMMENT: "${{ github.event.comment.body }}"
+
+  launchRebaseBuild:
+    needs: setupRebase
+    uses: xamarin/rebase-bot-action/.github/workflows/rebase-action.yml@v2.0
+    # GITHUB_TOKEN change from read-write to read-only on 2024-02-01 requires permissions block
+    # https://docs.opensource.microsoft.com/github/apps/permission-changes/
+    # https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+    permissions:
+      actions: write
+      contents: read
+      security-events: write
+      id-token: write           # The rebase-action template being invoked requires this permission
+    with:
+      pull_request_url: ${{ github.event.issue.pull_request.url }}
+      comment_author: ${{ github.actor }}
+      github_repository: ${{ github.repository }}
+    secrets:
+      azure_tenant_id: ${{ secrets.REBASE_AZURE_TENANT_ID }}
+      azure_subscription_id: ${{ secrets.REBASE_AZURE_SUBSCRIPTION_ID }}
+      azure_client_id: ${{ secrets.REBASE_AZURE_CLIENT_ID }}
+      ado_organization: ${{ secrets.ADO_PROJECTCOLLECTION }}
+      ado_project: ${{ secrets.ADO_PROJECT }}
+      rebase_pipeline_id: ${{ secrets.REBASE_PIPELINEID }}
+      github_account_pat: ${{ secrets.SERVICEACCOUNT_PAT }}
+
