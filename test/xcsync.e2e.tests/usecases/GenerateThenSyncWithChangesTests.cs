@@ -9,7 +9,7 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 	public static IEnumerable<object []> AddControlAndOutlet =>
 	[
 		["macos", "net8.0-macos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
-		// ["maccatalyst", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
+		// ["maccatalyst", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], 
 		// ["ios", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
 		["tvos", "net8.0-tvos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
 		// ["maui", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
