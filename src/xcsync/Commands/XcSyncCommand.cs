@@ -20,18 +20,22 @@ class XcSyncCommand : RootCommand {
 		AddGlobalOption (SharedOptions.DotnetPath);
 
 		SharedOptions.Verbose.AddValidator (result => {
-			var value = result.GetValueForOption (SharedOptions.Verbose);
-			if (!result.IsImplicit && result.Tokens.Count == 0) {
-				value = Verbosity.Normal;
+			try {
+				var value = result.GetValueForOption (SharedOptions.Verbose);
+				if (!result.IsImplicit && result.Tokens.Count == 0) {
+					value = Verbosity.Normal;
+				}
+				xcSync.LogLevelSwitch.MinimumLevel = value switch {
+					Verbosity.Quiet => LogEventLevel.Error,
+					Verbosity.Minimal => LogEventLevel.Error,
+					Verbosity.Normal => LogEventLevel.Information,
+					Verbosity.Detailed => LogEventLevel.Verbose,
+					Verbosity.Diagnostic => LogEventLevel.Verbose,
+					_ => LogEventLevel.Information,
+				};
+			} catch (InvalidOperationException) {
+				result.ErrorMessage = Strings.Errors.Validation.InvalidVerbosity;
 			}
-			xcSync.LogLevelSwitch.MinimumLevel = value switch {
-				Verbosity.Quiet => LogEventLevel.Error,
-				Verbosity.Minimal => LogEventLevel.Error,
-				Verbosity.Normal => LogEventLevel.Information,
-				Verbosity.Detailed => LogEventLevel.Verbose,
-				Verbosity.Diagnostic => LogEventLevel.Verbose,
-				_ => LogEventLevel.Information,
-			};
 		});
 
 		SharedOptions.DotnetPath.AddValidator (result => {
