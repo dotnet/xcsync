@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true' and '$(DotNetBuild)' != 'true'">
+    <ProjectToBuild Include="$(RepoRoot)src\**\*.csproj" />
+    <ProjectToBuild Include="$(RepoRoot)tests\**\*.csproj" Exclude="$(RepoRoot)tests\test-project\**\*.csproj" />
+  </ItemGroup>
+</Project>

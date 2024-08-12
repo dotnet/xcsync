@@ -1,21 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
+  <PropertyGroup Label="GeneralProperties">
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RollForward>Major</RollForward>
     <LangVersion>latest</LangVersion>
+  </PropertyGroup>
 
+  <PropertyGroup Label="ArcadeConfiguration">
+    <IsShipping>true</IsShipping>
+    <SignAssembly>false</SignAssembly>
     <!-- https://github.com/dotnet/msbuild/issues/8086#issuecomment-1290568321
         This is required because the C#/C# Dev Kit extension calls the build in a way
         that will skip resource generation. Without this line, Roslyn won't
         find the generated .cs files and analysis will fail.
      -->
-    <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>
+    <!-- <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn> -->
+    <!-- <GenerateResxSourceEmitFormatMethods>true</GenerateResxSourceEmitFormatMethods> -->
+    <!-- <EnableXlfLocalization>true</EnableXlfLocalization> -->
   </PropertyGroup>
 
   <PropertyGroup Label="nuget pkg">
@@ -34,7 +41,6 @@
     <ToolCommandName>xcsync</ToolCommandName>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <Description>xcsync is a closed source internal tool used provide Xcode storyboard editing support.</Description>
-    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -96,15 +102,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources/Strings.resx">
-      <Generator>MSBuild:Compile</Generator>
-      <LastGenOutput>$(BaseIntermediateOutputPath)/Strings.Designer.cs</LastGenOutput>
-      <StronglyTypedFileName>$(BaseIntermediateOutputPath)/Strings.Designer.cs</StronglyTypedFileName>
-      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
-      <StronglyTypedNamespace>xcsync.Resources</StronglyTypedNamespace>
-      <StronglyTypedClassName>Strings</StronglyTypedClassName>
-      <LogicalName>$(RootNamespace).Resources.Strings.resources</LogicalName>
+    <EmbeddedResource Update="Resources/Strings.resx" GenerateSource="true">
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Compile Update="Resources/Strings.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
