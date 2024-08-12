@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
-
+#nullable enable
 namespace xcsync;
 
 static class Strings {
