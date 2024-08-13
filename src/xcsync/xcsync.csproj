@@ -15,8 +15,6 @@
   <PropertyGroup Label="ArcadeConfiguration">
     <IsShipping>true</IsShipping>
     <SignAssembly>false</SignAssembly>
-    <!-- <GenerateResxSourceEmitFormatMethods>true</GenerateResxSourceEmitFormatMethods> -->
-    <!-- <EnableXlfLocalization>true</EnableXlfLocalization> -->
   </PropertyGroup>
 
   <PropertyGroup Label="nuget pkg">
@@ -28,17 +26,19 @@
     <Copyright>Microsoft Corporation</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsPackable>true</IsPackable>
-    <PackageId>Microsoft.Tools.xcsync</PackageId>
+    <PackageId>Microsoft.Tools.Xcsync</PackageId>
     <EnablePackageValidation>true</EnablePackageValidation>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>xcsync</ToolCommandName>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <Description>xcsync is a closed source internal tool used provide Xcode storyboard editing support.</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>xcsync is a .NET tool providing editing and connecting resource capabilities by using Xcode.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="../README.md" Link="README.md" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../README.md" Link="README.md" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../LICENSE" Link="LICENSE" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <PropertyGroup>
