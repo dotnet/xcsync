@@ -1,0 +1,120 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+    - release/*
+    - internal/release/*
+  paths:
+    include:
+      - '*'
+    exclude:
+      - '**.md'
+      - eng/Version.Details.xml
+      - .github/*
+      - docs/*
+      - LICENSE.TXT
+      - PATENTS.TXT
+      - THIRD-PARTY-NOTICES.TXT
+
+pr:
+  branches:
+    include:
+    - main
+    - release/*
+    - feature/*
+    - internal/release/*
+  paths:
+    include:
+      - '*'
+    exclude:
+      - '**.md'
+      - eng/Version.Details.xml
+      - .github/*
+      - docs/*
+      - LICENSE.TXT
+      - PATENTS.TXT
+      - THIRD-PARTY-NOTICES.TXT
+
+variables:
+  - template: /eng/pipelines/common-variables.yml@self
+  - template: /eng/common/templates-official/variables/pool-providers.yml@self
+
+  - name: _BuildConfig
+    value: Release
+  - name: Build.Arcade.ArtifactsPath
+    value: $(Build.SourcesDirectory)/artifacts/
+  - name: Build.Arcade.LogsPath
+    value: $(Build.Arcade.ArtifactsPath)log/$(_BuildConfig)/
+  - name: Build.Arcade.TestResultsPath
+    value: $(Build.Arcade.ArtifactsPath)TestResults/$(_BuildConfig)/
+
+  - name: _PublishArgs
+    value: ''
+  - name: _OfficialBuildIdArgs
+    value: ''
+  # needed for signing
+  - name: _SignType
+    value: test
+  - name: _SignArgs
+    value: ''
+  - name: _Sign
+    value: false
+
+  - name: DotNetVersion
+    value: '8.0'
+
+
+  stages:
+
+  # ----------------------------------------------------------------
+  # This stage performs build, test, packaging
+  # ----------------------------------------------------------------
+  - stage: build
+    displayName: Build
+    jobs:
+    - template: /eng/common/templates-official/jobs/jobs.yml@self
+      parameters:
+        artifacts:
+          publish: 
+            artifacts: true
+        enableMicrobuild: true
+        enablePublishUsingPipelines: true
+        enablePublishBuildAssets: true
+        enableSourceBuild: false
+        enableSourceIndex: false
+        publishAssetsImmediately: true
+        enablePublishBuildArtifacts: true
+        enablePublishTestResults: true
+        workspace:
+          clean: all
+
+        jobs:
+        - job: MacOS
+          # timeout accounts for wait times for helix agents up to 30mins
+          timeoutInMinutes: 90
+
+          pool:
+            name: Azure Pipelines
+            image: macos-latest-internal
+            os: macOS
+
+          variables:
+            - name: _buildScript
+              value: $(Build.SourcesDirectory)/build.sh --ci
+
+          preSteps:
+            - checkout: self
+              fetchDepth: 1
+              clean: true
+
+          steps:                
+            - template: /eng/pipelines/templates/buildandtest.yml
+              parameters:
+                dotnetScript: $(Build.SourcesDirectory)/dotnet.sh
+                buildScript: $(_buildScript)
+                buildConfig: $(_BuildConfig)
+                repoArtifactsPath: $(Build.Arcade.ArtifactsPath)
+                repoLogPath: $(Build.Arcade.LogsPath)
+                repoTestResultsPath: $(Build.Arcade.TestResultsPath)
+                isWindows: false
