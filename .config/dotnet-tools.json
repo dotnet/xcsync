@@ -7,6 +7,24 @@
       "commands": [
         "t4"
       ]
+    },
+    "dotnet-coverage": {
+      "version": "17.11.3",
+      "commands": [
+        "dotnet-coverage"
+      ]
+    },
+    "dotnet-reportgenerator-globaltool": {
+      "version": "5.2.4",
+      "commands": [
+        "reportgenerator"
+      ]
+    },
+    "PowerShell": {
+      "version": "7.4.4",
+      "commands": [
+        "pwsh"
+      ]
     }
   }
 }
