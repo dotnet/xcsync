@@ -32,7 +32,6 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>xcsync</ToolCommandName>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>xcsync is a .NET tool providing editing and connecting resource capabilities by using Xcode.</Description>
   </PropertyGroup>
 
