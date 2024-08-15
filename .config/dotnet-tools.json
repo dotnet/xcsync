@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "microsoft.visualstudio.texttemplating.commandline": {
-      "version": "17.11.38181-preview.1",
+      "version": "17.12.39124-preview.2",
       "commands": [
         "t4"
       ]
