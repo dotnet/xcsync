@@ -80,7 +80,7 @@ stages:
           artifacts: false
       enableMicrobuild: true
       enablePublishUsingPipelines: true
-      enablePublishBuildAssets: true
+      enablePublishBuildAssets: false
       enableSourceBuild: false
       enableSourceIndex: false
       publishAssetsImmediately: true
