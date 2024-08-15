@@ -1,6 +1,7 @@
 <Project>
   <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true' and '$(DotNetBuild)' != 'true'">
-    <ProjectToBuild Include="$(RepoRoot)src\**\*.csproj" />
-    <ProjectToBuild Include="$(RepoRoot)tests\**\*.csproj" Exclude="$(RepoRoot)tests\test-project\**\*.csproj" />
+    <ProjectToBuild Include="$(RepoRoot)src/xcsync/xcsync.csproj" />
+    <ProjectToBuild Include="$(RepoRoot)test/xcsync.tests/xcsync.tests.csproj" />
+    <ProjectToBuild Include="$(RepoRoot)test/xcsync.e2e.tests/xcsync.e2e.tests.csproj" />
   </ItemGroup>
 </Project>
