@@ -111,6 +111,7 @@ stages:
         steps:                
           - template: /eng/pipelines/templates/buildandtest.yml
             parameters:
+              runAsPublic: true
               dotnetScript: $(Build.SourcesDirectory)/dotnet.sh
               buildScript: $(_buildScript)
               buildConfig: $(_BuildConfig)
