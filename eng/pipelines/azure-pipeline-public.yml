@@ -96,8 +96,7 @@ stages:
 
         pool:
           name: Azure Pipelines
-          image: macos-latest-internal
-          os: macOS
+          vmImage: macos-latest-internal
 
         variables:
           - name: _buildScript
