@@ -1,8 +1,8 @@
 <Project>
   <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
-  <Properties>
+  <PropertyGroup>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </Properties>
+  </PropertyGroup>
   
 </Project>

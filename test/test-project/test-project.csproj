@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <UseCentralPackageVersions>false</UseCentralPackageVersions>
         <TargetFramework>net8.0-macos</TargetFramework>
         <RootNamespace>test_project</RootNamespace>
         <OutputType>Exe</OutputType>
