@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 using System.IO.Abstractions;
 using Marille;
@@ -469,7 +470,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
-		var typeLoader = new ObjCTypesLoader (Logger, new TaskCompletionSource<bool> ());
+		var typeLoader = new ObjCTypesLoader (Logger);
 		foreach (var syncItem in xcodeWorkspace.Items) {
 			jobs.Add(syncItem switch {
 				SyncableType type => /* Hub.Publish (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)) */
@@ -519,7 +520,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var fileWorker = new FileWorker (Logger, tcs, FileSystem);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
 
-		var otlWorker = new ObjCTypesLoader (Logger, tcs);
+		var otlWorker = new ObjCTypesLoader (Logger);
 		await Hub.RegisterAsync (FileChannel, otlWorker);
 	}
 
