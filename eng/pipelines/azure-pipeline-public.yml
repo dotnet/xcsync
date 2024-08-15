@@ -65,56 +65,56 @@ variables:
     value: '8.0'
 
 
-  stages:
+stages:
 
-  # ----------------------------------------------------------------
-  # This stage performs build, test, packaging
-  # ----------------------------------------------------------------
-  - stage: build
-    displayName: Build
-    jobs:
-    - template: /eng/common/templates-official/jobs/jobs.yml@self
-      parameters:
-        artifacts:
-          publish: 
-            artifacts: true
-        enableMicrobuild: true
-        enablePublishUsingPipelines: true
-        enablePublishBuildAssets: true
-        enableSourceBuild: false
-        enableSourceIndex: false
-        publishAssetsImmediately: true
-        enablePublishBuildArtifacts: true
-        enablePublishTestResults: true
-        workspace:
-          clean: all
+# ----------------------------------------------------------------
+# This stage performs build, test, packaging
+# ----------------------------------------------------------------
+- stage: build
+  displayName: Build
+  jobs:
+  - template: /eng/common/templates-official/jobs/jobs.yml@self
+    parameters:
+      artifacts:
+        publish: 
+          artifacts: true
+      enableMicrobuild: true
+      enablePublishUsingPipelines: true
+      enablePublishBuildAssets: true
+      enableSourceBuild: false
+      enableSourceIndex: false
+      publishAssetsImmediately: true
+      enablePublishBuildArtifacts: true
+      enablePublishTestResults: true
+      workspace:
+        clean: all
 
-        jobs:
-        - job: MacOS
-          # timeout accounts for wait times for helix agents up to 30mins
-          timeoutInMinutes: 90
+      jobs:
+      - job: MacOS
+        # timeout accounts for wait times for helix agents up to 30mins
+        timeoutInMinutes: 90
 
-          pool:
-            name: Azure Pipelines
-            image: macos-latest-internal
-            os: macOS
+        pool:
+          name: Azure Pipelines
+          image: macos-latest-internal
+          os: macOS
 
-          variables:
-            - name: _buildScript
-              value: $(Build.SourcesDirectory)/build.sh --ci
+        variables:
+          - name: _buildScript
+            value: $(Build.SourcesDirectory)/build.sh --ci
 
-          preSteps:
-            - checkout: self
-              fetchDepth: 1
-              clean: true
+        preSteps:
+          - checkout: self
+            fetchDepth: 1
+            clean: true
 
-          steps:                
-            - template: /eng/pipelines/templates/buildandtest.yml
-              parameters:
-                dotnetScript: $(Build.SourcesDirectory)/dotnet.sh
-                buildScript: $(_buildScript)
-                buildConfig: $(_BuildConfig)
-                repoArtifactsPath: $(Build.Arcade.ArtifactsPath)
-                repoLogPath: $(Build.Arcade.LogsPath)
-                repoTestResultsPath: $(Build.Arcade.TestResultsPath)
-                isWindows: false
+        steps:                
+          - template: /eng/pipelines/templates/buildandtest.yml
+            parameters:
+              dotnetScript: $(Build.SourcesDirectory)/dotnet.sh
+              buildScript: $(_buildScript)
+              buildConfig: $(_BuildConfig)
+              repoArtifactsPath: $(Build.Arcade.ArtifactsPath)
+              repoLogPath: $(Build.Arcade.LogsPath)
+              repoTestResultsPath: $(Build.Arcade.TestResultsPath)
+              isWindows: false
