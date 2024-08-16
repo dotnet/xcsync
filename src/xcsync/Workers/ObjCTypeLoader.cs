@@ -10,6 +10,7 @@ namespace xcsync.Workers;
 readonly record struct LoadTypesFromObjCMessage (string Id, XcodeWorkspace XcodeWorkspace, ISyncableItem Item);
 
 
+
 class ObjCTypesLoader (ILogger Logger): IWorker<LoadTypesFromObjCMessage> {
 	public async Task ConsumeAsync (LoadTypesFromObjCMessage message, CancellationToken token = default)
 	{
