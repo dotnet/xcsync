@@ -3,8 +3,8 @@ trigger:
   branches:
     include:
     - main
-    - release/*
-    - internal/release/*
+    - prerelease
+    - release
   paths:
     include:
       - '*'
@@ -21,9 +21,8 @@ pr:
   branches:
     include:
     - main
-    - release/*
-    - feature/*
-    - internal/release/*
+    - prerelease
+    - release
   paths:
     include:
       - '*'
