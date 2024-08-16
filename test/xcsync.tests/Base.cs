@@ -20,7 +20,7 @@ public class Base : IDisposable {
 
 	static async Task Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
-		output.WriteLine ($"\rRunning: {path}/{executable} {string.Join(", ", arguments)}");
+		output.WriteLine ($"\rRunning: {path}/{executable} {string.Join (", ", arguments)}");
 		var outputWrapper = new LoggingOutputWriter (output);
 		var exec = await Execution.RunAsync (
 				executable,
@@ -57,8 +57,7 @@ public class Base : IDisposable {
 		}
 	}
 
-	public class XunitLogger(ITestOutputHelper output) : ILogger
-	{
+	public class XunitLogger (ITestOutputHelper output) : ILogger {
 		public void Write (LogEvent logEvent)
 		{
 			try {

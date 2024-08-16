@@ -363,7 +363,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 			Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj", "project.pbxproj"),
 		]).ToList ().ForEach (file => {
 			var fullPathToFile = Path.Combine (xcodeDir, file);
-			Assert.True (File.Exists (fullPathToFile) || Directory.Exists(fullPathToFile), $"{fullPathToFile} does not exist");
+			Assert.True (File.Exists (fullPathToFile) || Directory.Exists (fullPathToFile), $"{fullPathToFile} does not exist");
 		});
 	}
 

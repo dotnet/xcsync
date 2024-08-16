@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 namespace xcsync.e2e.tests.UseCases;
 
 public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testOutput) : Base (testOutput) {
-	
+
 	[Theory]
 	[InlineData ("macos", "net8.0-macos")]
 	[InlineData ("maccatalyst", "net8.0-maccatalyst")]
@@ -54,28 +54,29 @@ public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testO
 
 
 	[Theory]
-	[InlineData ("https://github.com/haritha-mohan/vision-analyzer", new [] {"VisionAnalyzer/VisionAnalyzer.csproj"} )]
+	[InlineData ("https://github.com/haritha-mohan/vision-analyzer", new [] { "VisionAnalyzer/VisionAnalyzer.csproj" })]
 	[Trait ("Category", "IntegrationTest")]
-	public async Task GenerateThenSyncFromGitRepo_WithNoChanges_GeneratesNoChangesAsync (string repoUrl, string[] projects)
+	public async Task GenerateThenSyncFromGitRepo_WithNoChanges_GeneratesNoChangesAsync (string repoUrl, string [] projects)
 	{
 		// Arrange
-		var repoName = repoUrl.Split('/').Last();
+		var repoName = repoUrl.Split ('/').Last ();
 		var repoRootDir = Cache.CreateTemporaryDirectory (repoName);
 
 		await Git (TestOutput, "clone", repoUrl, repoRootDir).ConfigureAwait (false);
 
-		await Task.WhenAll (projects.Select (AssertNoChanges)); 
-		
-		async Task AssertNoChanges(string projectRelativePath)	{
+		await Task.WhenAll (projects.Select (AssertNoChanges));
+
+		async Task AssertNoChanges (string projectRelativePath)
+		{
 
 			// Arrange
 
 			await Git (TestOutput, "-C", repoRootDir, "clean", "-dxf");
 
 			var csproj = Path.Combine (repoRootDir, projectRelativePath);
-			var csprojDir = Path.GetDirectoryName(csproj) ?? repoRootDir;
+			var csprojDir = Path.GetDirectoryName (csproj) ?? repoRootDir;
 
-			var xcodeDir = Path.Combine (csprojDir, "obj", "xcode");			
+			var xcodeDir = Path.Combine (csprojDir, "obj", "xcode");
 			Directory.CreateDirectory (xcodeDir);
 
 			await DotnetNew (TestOutput, "gitignore", csprojDir, string.Empty).ConfigureAwait (false);
@@ -95,6 +96,6 @@ public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testO
 			var changesPresent = await Git (commandOutput, "-C", repoRootDir, "diff", "-w", "--exit-code", "--").ConfigureAwait (false);
 			if (changesPresent == 1)
 				Assert.Fail ($"Git diff failed, there are changes in the source files.\n{commandOutput.Output}");
-		}		
+		}
 	}
 }
