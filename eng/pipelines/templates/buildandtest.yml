@@ -111,6 +111,12 @@ steps:
         targetPath: '${{ parameters.repoArtifactsPath }}/CodeCoverage'
         artifactName: '$(Agent.JobName)_CodeCoverageResults'
         publishLocation: 'pipeline'
+    - task: PublishPipelineArtifact@1
+      displayName: Publish THIRD-PART-NOTICES.TXT
+      inputs:
+        targetPath: '${{ parameters.repoArtifactsPath }}/THIRD-PARTY-NOTICES.TXT'
+        artifactName: '$(Agent.JobName)_NOTICES'
+        publishLocation: 'pipeline'
 
   - ${{ if ne(parameters.runAsPublic, 'true') }}:
     - task: 1ES.PublishPipelineArtifact@1
@@ -118,6 +124,11 @@ steps:
       inputs:
         targetPath: '${{ parameters.repoArtifactsPath }}/CodeCoverage'
         artifactName: '$(Agent.JobName)_CodeCoverageResults'
+    - task: 1ES.PublishPipelineArtifact@1
+      displayName: Publish THIRD-PART-NOTICES.TXT
+      inputs:
+        targetPath: '${{ parameters.repoArtifactsPath }}/THIRD-PARTY-NOTICES.TXT'
+        artifactName: '$(Agent.JobName)_NOTICES'
 
   # Run on windows, for internal pipeline, or public+non-helix-tests job
   - ${{ if and(eq(parameters.isWindows, 'true'), or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true'))) }}:
