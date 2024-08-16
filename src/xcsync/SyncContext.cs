@@ -485,7 +485,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files
 
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
-		var fileWorker = new FileWorker (Logger, new TaskCompletionSource<bool> (), FileSystem);
+		var fileWorker = new FileWorker (Logger, FileSystem);
 
 		foreach (var type in typesToWrite) {
 			Logger.Information ("Processing type {Type}", type?.ClrType);
@@ -516,8 +516,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	public async Task CreateWorkers ()
 	{
-		var tcs = new TaskCompletionSource<bool> ();
-		var fileWorker = new FileWorker (Logger, tcs, FileSystem);
+		var fileWorker = new FileWorker (Logger, FileSystem);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
 
 		var otlWorker = new ObjCTypesLoader (Logger);

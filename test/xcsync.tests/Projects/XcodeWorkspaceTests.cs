@@ -110,7 +110,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		await xcodeWorkspace.LoadAsync ();
 
-		var loader = new ObjCTypesLoader (testLogger, new TaskCompletionSource<bool> ());
+		var loader = new ObjCTypesLoader (testLogger);
 
 		// Act
 		foreach (var syncItem in xcodeWorkspace.Items) {
