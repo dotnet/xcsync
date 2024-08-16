@@ -99,8 +99,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 	public async Task RegisterChangeWorker (IHub hub)
 	{
-		var tcs = new TaskCompletionSource<bool> ();
-		var worker = new ChangeWorker (tcs);
+		var worker = new ChangeWorker ();
 		await hub.RegisterAsync (ChangeChannel, worker);
 		// worker now knows to pick up any and all change-related events from the channel in hub
 	}

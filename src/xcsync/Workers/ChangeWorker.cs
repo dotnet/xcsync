@@ -11,17 +11,16 @@ public struct ChangeMessage (string id, string path, object payload) {
 	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
 }
 
-class ChangeWorker (TaskCompletionSource<bool> tcs) : IWorker<ChangeMessage> {
-	public TaskCompletionSource<bool> Completion { get; set; } = tcs;
+class ChangeWorker () : IWorker<ChangeMessage> {
 
 	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
 		// todo: impl per load
 		return message.Change switch {
-			SyncLoad => Task.FromResult (Completion.TrySetResult (true)),
-			ErrorLoad => Task.FromResult (Completion.TrySetResult (true)),
-			RenameLoad => Task.FromResult (Completion.TrySetResult (true)),
-			_ => Task.FromResult (Completion.TrySetResult (true))
+			SyncLoad => Task.CompletedTask,
+			ErrorLoad => Task.CompletedTask,
+			RenameLoad => Task.CompletedTask,
+			_ => Task.CompletedTask
 		};
 	}
 }
