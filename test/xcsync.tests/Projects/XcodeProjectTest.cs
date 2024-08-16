@@ -308,7 +308,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 	public void Deserialize_ThenSerialize_GeneratesSameJson ()
 	{
 		// Arrange
-		string testFilePath = Path.Combine (SolutionPathFinder.GetProjectRoot (), "tests", "xcsync.tests", "Resources", "SampleProject.json");
+		string testFilePath = Path.Combine (SolutionPathFinder.GetProjectRoot (), "test", "xcsync.tests", "Resources", "SampleProject.json");
 		string json = File.ReadAllText (testFilePath);
 
 		var options = new JsonSerializerOptions {
