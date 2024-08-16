@@ -23,9 +23,9 @@ class XcodeCommand<T> : BaseCommand<T> {
 		getDefaultValue: () => false);
 
 	public XcodeCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (fileSystem, logger, name, description)
-	{}
+	{ }
 
-	protected override void AddOptions () 
+	protected override void AddOptions ()
 	{
 		base.AddOptions ();
 		Add (force);
@@ -36,7 +36,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 	{
 		AddValidator ((result) => {
 			Force = result.GetValueForOption (force);
-			Open = result.GetValueForOption (open);			
+			Open = result.GetValueForOption (open);
 		});
 		base.AddValidators ();
 	}
@@ -61,7 +61,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 
 			if (!fileSystem.Directory.Exists (targetPath) && string.Compare (targetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
 				LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
-				error =  Strings.Errors.Validation.TargetDoesNotExist (targetPath);
+				error = Strings.Errors.Validation.TargetDoesNotExist (targetPath);
 			}
 		}
 		return (error, targetPath);

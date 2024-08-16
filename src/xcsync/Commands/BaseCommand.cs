@@ -119,7 +119,7 @@ class BaseCommand<T> : Command {
 			LogDebug (Strings.Base.SearchForProjectFiles (projectPath));
 
 			var csprojFiles = fileSystem.Directory.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly)
-												  .Select((path) => fileSystem.Path.GetRelativePath (fileSystem.Path.Combine(".", fileSystem.Path.GetDirectoryName(projectPath) ?? string.Empty), path))
+												  .Select ((path) => fileSystem.Path.GetRelativePath (fileSystem.Path.Combine (".", fileSystem.Path.GetDirectoryName (projectPath) ?? string.Empty), path))
 												  .ToArray ();
 
 			if (csprojFiles.Length == 0) {

@@ -87,25 +87,22 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (productsGroup.Token, productsGroup);
 
 		var pbxFrameworkFiles = new List<string> ();
-		
-		var frameworksGroup = new PBXGroup
-		{
+
+		var frameworksGroup = new PBXGroup {
 			Isa = "PBXGroup",
 			Children = pbxFrameworkFiles,
 			Name = "Frameworks",
 		};
-		xcodeObjects.Add(frameworksGroup.Token, frameworksGroup);
+		xcodeObjects.Add (frameworksGroup.Token, frameworksGroup);
 
-		var projectGroup = new PBXGroup
-		{
+		var projectGroup = new PBXGroup {
 			Isa = "PBXGroup",
 			Children = pbxGroupFiles,
 			Name = projectName,
 		};
-		xcodeObjects.Add(projectGroup.Token, projectGroup);
+		xcodeObjects.Add (projectGroup.Token, projectGroup);
 
-		var pbxGroup = new PBXGroup
-		{
+		var pbxGroup = new PBXGroup {
 			Isa = "PBXGroup",
 			Children = [
 				productsGroup.Token,
@@ -113,7 +110,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 				projectGroup.Token
 			]
 		};
-		xcodeObjects.Add(pbxGroup.Token, pbxGroup);
+		xcodeObjects.Add (pbxGroup.Token, pbxGroup);
 
 		foreach (var t in TypeService.QueryTypes ()) {
 			if (t is null) continue;
@@ -181,29 +178,26 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			pbxResourcesBuildFiles.Add (pbxBuildFile.Token);
 		}
 
-		foreach (var f in frameworks)
-		{
+		foreach (var f in frameworks) {
 			string path = $"System/Library/Frameworks/{f}.framework";
 
-			var fileReference = new PBXFileReference
-			{
+			var fileReference = new PBXFileReference {
 				Isa = "PBXFileReference",
 				LastKnownFileType = "wrapper.framework",
-				Name = FileSystem.Path.GetFileName(path),
+				Name = FileSystem.Path.GetFileName (path),
 				Path = path,
 				SourceTree = "SDKROOT"
 			};
-			xcodeObjects.Add(fileReference.Token, fileReference);
-			pbxFrameworkFiles.Add(fileReference.Token);
+			xcodeObjects.Add (fileReference.Token, fileReference);
+			pbxFrameworkFiles.Add (fileReference.Token);
 
-			var buildFile = new PBXBuildFile
-			{
+			var buildFile = new PBXBuildFile {
 				Isa = "PBXBuildFile",
 				FileRef = fileReference.Token
 			};
 
-			xcodeObjects.Add(buildFile.Token, buildFile);
-			pbxFrameworksBuildFiles.Add(buildFile.Token);
+			xcodeObjects.Add (buildFile.Token, buildFile);
+			pbxFrameworksBuildFiles.Add (buildFile.Token);
 		}
 
 		// copy assets
@@ -472,14 +466,14 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		var typeLoader = new ObjCTypesLoader (Logger);
 		foreach (var syncItem in xcodeWorkspace.Items) {
-			jobs.Add(syncItem switch {
+			jobs.Add (syncItem switch {
 				SyncableType type => /* Hub.Publish (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)) */
 										typeLoader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem), token),
 				_ => Task.CompletedTask
 			});
 		}
 		Task.WaitAll ([.. jobs], token);
-		jobs.Clear (); 
+		jobs.Clear ();
 
 		var typesToWrite = TypeService.QueryTypes (null, null) // All Types
 			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files

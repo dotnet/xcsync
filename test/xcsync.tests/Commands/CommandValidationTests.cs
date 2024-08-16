@@ -20,7 +20,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var command = new XcSyncCommand (fileSystem, Mock.Of<ILogger> ());
 		Assert.NotNull (command);
-		command.Invoke ([ "--dotnet-path", "/path/to/dotnet" ], new CapturingConsole ());
+		command.Invoke (["--dotnet-path", "/path/to/dotnet"], new CapturingConsole ());
 		Assert.Equal ("/path/to/dotnet", xcSync.DotnetPath);
 	}
 
@@ -94,7 +94,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData ("/src","", "Multiple .csproj files found in '{CsProjFile}', please specify which project file to use via the [--project, -p] option:")]
+	[InlineData ("/src", "", "Multiple .csproj files found in '{CsProjFile}', please specify which project file to use via the [--project, -p] option:")]
 	[InlineData ("", ".", "Multiple .csproj files found in '{CsProjFile}', please specify which project file to use via the [--project, -p] option:")]
 	[InlineData ("", "does-not-exist.csproj", "Path '{CsProjFile}' does not exist")]
 	[InlineData ("/src", "does-not-exist.csproj", "Path '{CsProjFile}' does not exist")]
@@ -179,7 +179,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var console = new CapturingConsole ();
 		int exitCode = XcodeCommand.Invoke (args, console);
 
-		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput[0] : string.Empty;
+		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
 		Assert.Equal (expectedError, errorMessage);
 		if (string.IsNullOrEmpty (expectedError)) {
