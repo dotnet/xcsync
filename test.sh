@@ -12,5 +12,7 @@ while [[ -h $source ]]; do
   [[ $source != /* ]] && source="$scriptroot/$source"
 done
 
+#arch=$(uname -m)
+
 scriptroot="$( cd -P "$( dirname "$source" )" && pwd )"
-"$scriptroot/eng/common/build.sh" --test $@
+"$scriptroot/eng/build.sh" --test $@ #-p:Platform=$arch
