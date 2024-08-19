@@ -367,7 +367,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		});
 	}
 
-	[IgnoreInCiFact]
+	[Fact(Skip="Disabled until a CI-friendly solution is found.")]
 	[Trait ("Category", "XcodeIntegration")]
 	public async void IsXcodeProjectOpen ()
 	{
