@@ -398,6 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Repository specific 
+.packages
 *.log
 */TestResults/
 xcsync/xcsync.sln
