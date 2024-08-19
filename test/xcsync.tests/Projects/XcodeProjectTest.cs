@@ -367,7 +367,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		});
 	}
 
-	[Fact]
+	[IgnoreInCiFact]
 	[Trait ("Category", "XcodeIntegration")]
 	public async void IsXcodeProjectOpen ()
 	{
