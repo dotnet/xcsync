@@ -26,7 +26,7 @@ steps:
     inputs: 
       useGlobalJson: true
 
-  - script: dotnet workload install macos, ios, maccatalyst, tvos
+  - script: dotnet workload install macos ios maccatalyst tvos
 
   - script: ${{ parameters.buildScript }}
             -restore -build
