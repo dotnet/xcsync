@@ -2,9 +2,7 @@ trigger:
   batch: false
   branches:
     include:
-    - main
-    - prerelease
-    - release
+    - '*'
   paths:
     include:
       - '*'
@@ -20,9 +18,7 @@ trigger:
 pr:
   branches:
     include:
-    - main
-    - prerelease
-    - release
+    - '*'
   paths:
     include:
       - '*'
