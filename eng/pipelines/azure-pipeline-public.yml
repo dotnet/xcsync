@@ -1,10 +1,8 @@
 trigger:
-  batch: true
+  batch: false
   branches:
     include:
-    - main
-    - prerelease
-    - release
+      - '*'
   paths:
     include:
       - '*'
