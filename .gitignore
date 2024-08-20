@@ -398,6 +398,8 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Repository specific 
+.packages
+.dotnet
 *.log
 */TestResults/
 xcsync/xcsync.sln
