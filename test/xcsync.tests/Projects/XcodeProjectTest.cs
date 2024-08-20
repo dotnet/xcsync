@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Xamarin;
 using xcsync.Projects.Xcode;
 using Xunit.Abstractions;
+using Microsoft.DotNet.XUnitExtensions;
 
 namespace xcsync.tests.Projects;
 
@@ -367,8 +368,9 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		});
 	}
 
-	[Fact(Skip="Disabled until a CI-friendly solution is found.")]
+	[Fact()]
 	[Trait ("Category", "XcodeIntegration")]
+	[SkipOnCI("Only works interactively")]
 	public async void IsXcodeProjectOpen ()
 	{
 		// Assert to make sure Xcode successfully opens project when --open flag used

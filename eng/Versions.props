@@ -34,5 +34,6 @@
     <SystemLinqAsyncPackageVersion>6.0.1</SystemLinqAsyncPackageVersion>
     <CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
     <TestableIOSystemIOAbstractionsTestingHelpers>21.0.2</TestableIOSystemIOAbstractionsTestingHelpers>
+    <MicrosoftDotNetXUnitExtensionsPackageVersion>8.0.0-beta.24376.1</MicrosoftDotNetXUnitExtensionsPackageVersion>    
   </PropertyGroup>
 </Project>

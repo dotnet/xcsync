@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime"/>
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
+    <PackageReference Include="Microsoft.DotNet.XunitExtensions" />
   </ItemGroup>
 
   <ItemGroup>
