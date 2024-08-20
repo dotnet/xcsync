@@ -17,22 +17,24 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
-  <PropertyGroup Label="nuget pkg">
+  <PropertyGroup Label="Nuget Package">
+    <IsPackable>true</IsPackable>
+    <PackageId>dotnet-xcsync</PackageId>
     <Title>xcsync</Title>
-    <PackageId>xcsync</PackageId>
+    <Description>xcsync is a .NET tool providing editing and connecting resource capabilities by using Xcode.</Description>
     <Authors>Microsoft</Authors>
     <Owners>Microsoft</Owners>
     <Company>Microsoft</Company>
     <Copyright>Microsoft Corporation</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <IsPackable>true</IsPackable>
-    <PackageId>Microsoft.Tools.Xcsync</PackageId>
-    <EnablePackageValidation>true</EnablePackageValidation>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <PropertyGroup Label=".Net Tool">
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>xcsync</ToolCommandName>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <Description>xcsync is a .NET tool providing editing and connecting resource capabilities by using Xcode.</Description>
   </PropertyGroup>
 
   <ItemGroup>
