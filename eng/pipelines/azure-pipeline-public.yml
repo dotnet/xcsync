@@ -18,9 +18,9 @@ trigger:
 pr:
   branches:
     include:
-    - main
-    - prerelease
-    - release
+      - main
+      - prerelease
+      - release
   paths:
     include:
       - '*'
