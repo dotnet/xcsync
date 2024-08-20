@@ -2,7 +2,9 @@ trigger:
   batch: false
   branches:
     include:
-      - '*'
+    - main
+    - prerelease
+    - release
   paths:
     include:
       - '*'
