@@ -31,13 +31,14 @@ variables:
 
   # Any new -Svc alternative pools should have variables added here to allow for splitting work
 
+  # TODO: Switch back to 'NetCore1ESPool-Svc-Internal'
   - name: DncEngInternalBuildPool
     value: $[
         replace(
           replace(
             eq(contains(coalesce(variables['System.PullRequest.TargetBranch'], variables['Build.SourceBranch'], 'refs/heads/main'), 'release'), 'true'),
             True,
-            'NetCore1ESPool-Svc-Internal'
+            'NetCore1ESPool-Internal' 
           ),
           False,
           'NetCore1ESPool-Internal'

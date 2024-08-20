@@ -15,6 +15,7 @@ parameters:
     type: string
   - name: isWindows
     type: string
+    default: false    
   - name: dotnetScript
     type: string
   - name: runHelixTests
@@ -28,15 +29,24 @@ steps:
 
   - script: dotnet workload install macos ios maccatalyst tvos maui
 
-  - script: ${{ parameters.buildScript }}
-            -restore -build
-            -pack
-            -configuration ${{ parameters.buildConfig }}
-            /p:ArchiveTests=true
-            /bl:${{ parameters.repoLogPath }}build.binlog
-            $(_OfficialBuildIdArgs)
-            -p:Platform=`uname -m`
-    displayName: Build
+  - ${{ if ne(parameters.isWindows, 'true') }}:
+    - script: ${{ parameters.buildScript }}
+              -restore -build
+              -configuration ${{ parameters.buildConfig }}
+              /p:ArchiveTests=true
+              /bl:${{ parameters.repoLogPath }}build.binlog
+              $(_OfficialBuildIdArgs)
+              -p:Platform=`uname -m`
+      displayName: Build
+  
+  - ${{ if eq(parameters.isWindows, 'true') }}:
+    - script: ${{ parameters.buildScript }}
+              -restore -build
+              -configuration ${{ parameters.buildConfig }}
+              /p:ArchiveTests=true
+              /bl:${{ parameters.repoLogPath }}build.binlog
+              $(_OfficialBuildIdArgs)
+      displayName: Build
 
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
     - ${{ if ne(parameters.isWindows, 'true') }}:
@@ -52,11 +62,19 @@ steps:
       - script: dotnet dev-certs https
         displayName: Install dev-certs
 
-    - script: ${{ parameters.dotnetScript }} dotnet-coverage collect
-              --settings $(Build.SourcesDirectory)/eng/CodeCoverage.config
-              --output ${{ parameters.repoTestResultsPath }}/NonHelix.cobertura.xml
-              "${{ parameters.buildScript }} -testnobuild -test -configuration ${{ parameters.buildConfig }} /bl:${{ parameters.repoLogPath }}tests.binlog $(_OfficialBuildIdArgs) -p:Platform=`uname -m`"
-      displayName: Run non-helix tests
+    - ${{ if ne(parameters.isWindows, 'true') }}:
+      - script: ${{ parameters.dotnetScript }} dotnet-coverage collect
+                --settings $(Build.SourcesDirectory)/eng/CodeCoverage.config
+                --output ${{ parameters.repoTestResultsPath }}/NonHelix.cobertura.xml
+                "${{ parameters.buildScript }} -testnobuild -test -configuration ${{ parameters.buildConfig }} /bl:${{ parameters.repoLogPath }}tests.binlog $(_OfficialBuildIdArgs) -p:Platform=`uname -m`"
+        displayName: Run non-helix tests
+
+    # - ${{ if eq(parameters.isWindows, 'true') }}:
+    #   - script: ${{ parameters.dotnetScript }} dotnet-coverage collect
+    #             --settings $(Build.SourcesDirectory)/eng/CodeCoverage.config
+    #             --output ${{ parameters.repoTestResultsPath }}/NonHelix.cobertura.xml
+    #             "${{ parameters.buildScript }} -testnobuild -test -configuration ${{ parameters.buildConfig }} /bl:${{ parameters.repoLogPath }}tests.binlog $(_OfficialBuildIdArgs)"
+    #     displayName: Run non-helix tests
 
   - ${{ if eq(parameters.runHelixTests, 'true') }}:
     - task: CopyFiles@2
@@ -94,11 +112,11 @@ steps:
   # Run on windows, for internal pipeline, or public+non-helix-tests job
   - ${{ if and(eq(parameters.isWindows, 'true'), or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true'))) }}:
     - script: ${{ parameters.buildScript }}
-              -pack
+              -pack 
               -sign $(_SignArgs)
               -publish $(_PublishArgs)
               -configuration ${{ parameters.buildConfig }}
               /bl:${{ parameters.repoLogPath }}/pack.binlog
               /p:Restore=false /p:Build=false
               $(_OfficialBuildIdArgs)
-      displayName: Pack, Sign, and Publish
+      displayName: Pack, Sign & Publish

@@ -27,6 +27,7 @@
     <Company>Microsoft</Company>
     <Copyright>Microsoft Corporation</Copyright>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <EnablePackageValidation>true</EnablePackageValidation>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -40,7 +41,6 @@
 
   <ItemGroup>
     <Content Include="PACKAGE.md" Link="docs/README.md" Pack="true" PackagePath="/docs/README.md" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="../../LICENSE" Link="LICENSE" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -140,8 +140,26 @@
     <RemoveDir Directories="$(T4GeneratedFilesOutputPath)" />
   </Target>
   
-  <Target Name="GetLatestFrameworks" BeforeTargets="BeforeBuild" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')">
+  <Target Name="GetLatestFrameworks_OSX" BeforeTargets="BeforeBuild" Inputs="@(DownloadFile)" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')" Condition="$([MSBuild]::IsOSPlatform(OSX))">
     <Exec Command="curl --create-dirs -f -s 'https://raw.githubusercontent.com/xamarin/%(DownloadFile.Repo)/%(DownloadFile.Hash)/%(DownloadFile.Identity)' --output '$(LatestFrameworksDownloadOutputPath)/%(DownloadFile.Repo)/%(DownloadFile.Identity)'" />
+  </Target>
+
+  <Target Name="GetLatestFrameworks_Windows" BeforeTargets="BeforeBuild" Inputs="@(DownloadFile)" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')" Condition="$([MSBuild]::IsOSPlatform(Windows))">
+    <!-- https://gist.github.com/fearthecowboy/9e06ad9d92c5d939582147a35c049693 -->
+    <PropertyGroup><PowerShell># 2>nul || type %~df0|find /v "setlocal"|find /v "errorlevel"|powershell.exe -noninteractive -&amp; exit %errorlevel% || #</PowerShell></PropertyGroup>
+
+    <ItemGroup>
+      <DownloadFile Include="@(DownloadFile)">
+        <Script>$(Powershell)
+        If (!(Test-Path $(LatestFrameworksDownloadOutputPath)\%(DownloadFile.Repo)\%(DownloadFile.RelativeDir))) {
+          $null = New-Item -ItemType Directory -Force -Path $(LatestFrameworksDownloadOutputPath)\%(DownloadFile.Repo)\%(DownloadFile.RelativeDir)
+        }
+        Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/xamarin/%(DownloadFile.Repo)/%(DownloadFile.Hash)/%(DownloadFile.Identity)' -OutFile '$(LatestFrameworksDownloadOutputPath)\%(DownloadFile.Repo)\%(DownloadFile.Identity)'
+        </Script>
+      </DownloadFile>
+    </ItemGroup>
+
+    <Exec Command="@(DownloadFile->'%(Script)')" EchoOff="true" />
   </Target>
   
   <Target Name="LatestFrameworksClean" AfterTargets="Clean">
