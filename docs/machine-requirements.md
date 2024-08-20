@@ -17,5 +17,3 @@ From a powershell prompt, and from the root of the xcsync repo, run:
 ```shell
 .\build.cmd --restore
 ```
-
-

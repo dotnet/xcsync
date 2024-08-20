@@ -44,4 +44,3 @@ dotnet xcsync sync
 ```
 
 This will synchronize any changes made to the Xcode project back into the .NET project.
-
