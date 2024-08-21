@@ -368,9 +368,9 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		});
 	}
 
-	[Fact()]
+	[Fact (Skip="Only works interactively")]
 	[Trait ("Category", "XcodeIntegration")]
-	[SkipOnCI("Only works interactively")]
+	[SkipOnCI ("Only works interactively")]
 	public async void IsXcodeProjectOpen ()
 	{
 		// Assert to make sure Xcode successfully opens project when --open flag used
