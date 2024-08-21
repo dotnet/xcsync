@@ -7,5 +7,9 @@
       <Uri>https://github.com/dotnet/arcade</Uri>
       <Sha>cb4788b8aa2a8df6d6abc515555916c7af1ef679</Sha>
     </Dependency>
+    <Dependency Name="Microsoft.NET.Sdk" Version="9.0.100-rc.2.24420.21">
+      <Uri>https://github.com/dotnet/sdk</Uri>
+      <Sha>a16db5fadcee9f39fdfd52d46b971a8973a67f5b</Sha>
+    </Dependency>
   </ToolsetDependencies>
 </Dependencies>
