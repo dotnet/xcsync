@@ -7,7 +7,7 @@ These instructions will get you ready to contribute to this project. If you just
 See [machine-requirements.md](machine-requirements.md).
 
 ## Build the repo
-`.\build.cmd` (Windows) or `.\build.sh` (macOS and Linux)
+`.\build.cmd` (Windows) or `./build.sh` (macOS and Linux)
 
 ## Localization
 
@@ -19,7 +19,7 @@ If you want to try local changes it can be useful to generate the NuGet packages
 in a local folder and use it as a package source.
 
 To do so simply execute:
-`.\build.cmd -pack` (Windows) or `.\build.sh -pack` (macOS and Linux)
+`.\build.cmd -pack` (Windows) or `./build.sh -pack` (macOS and Linux)
 
 This will generate all the packages in the folder `./artifacts/packages/Debug/Shipping`. At this point from your solution folder run:
 
