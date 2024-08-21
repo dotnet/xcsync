@@ -1,3 +1,7 @@
+# Code of Conduct
+
+This project has adopted the [Microsoft Open Source Code of Conduct](CODE_OF_CONDUCT.md). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 # Set up your machine to contribute
 
 These instructions will get you ready to contribute to this project. If you just want to use Xcsync, see [using-latest-daily.md](using-latest-daily.md).
@@ -23,10 +27,10 @@ To do so simply execute:
 
 This will generate all the packages in the folder `./artifacts/packages/Debug/Shipping`. At this point from your solution folder run:
 
-`dotnet nuget add source my_aspire_folder/artifacts/packages/Debug/Shipping`
+`dotnet nuget add source my_xcsync_folder/artifacts/packages/Debug/Shipping`
 
 Or edit the `NuGet.config` file and add this line to the `<packageSources>` list:
 
 ```xml
-<add key="aspire-dev" value="my_aspire_folder/artifacts/packages/Debug/Shipping" />
+<add key="xcsync-dev" value="my_xcsync_folder/artifacts/packages/Debug/Shipping" />
 ```
