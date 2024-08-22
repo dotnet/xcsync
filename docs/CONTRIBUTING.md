@@ -1,6 +1,6 @@
 # Set up your machine to contribute
 
-These instructions will get you ready to contribute to this project. If you just want to use Xcsync, see [using-latest-daily.md](using-latest-daily.md).
+These instructions will get you ready to contribute to this project. If you just want to use xcsync, see [using-latest-daily.md](using-latest-daily.md).
 
 ## Code of Conduct
 
@@ -15,7 +15,7 @@ See [machine-requirements.md](machine-requirements.md).
 
 ## Localization
 
-If you are contributing to Xcsync, please ensure that all strings are localized. New strings are added to the `src/xcsync/Resources/Strings.resx` file.
+If you are contributing to xcsync, please ensure that all strings are localized. New strings are added to the `src/xcsync/Resources/Strings.resx` file.
 
 ## Generating local NuGet packages
 

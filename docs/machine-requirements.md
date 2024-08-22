@@ -1,6 +1,6 @@
 # Set up your environment
 
-Whether you want to contribute to Xcsync, or just use the latest build of Xcsync, these are the common pieces you need to install. 
+Whether you want to contribute to xcsync, or just use the latest build of xcsync, these are the common pieces you need to install. 
 
 ### macOS/Linux
 

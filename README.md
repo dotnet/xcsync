@@ -1,20 +1,20 @@
-# .NET Xcsync
+# xcsync
 
 <!-- [![Build Status](https://dev.azure.com/dnceng-public/public/_apis/build/status%2Fdotnet%2Faspire%2Fdotnet.aspire?branchName=main)](https://dev.azure.com/dnceng-public/public/_build/latest?definitionId=274&branchName=main) -->
 [![Help Wanted](https://img.shields.io/github/issues/dotnet/xcsync/help%20wanted?style=flat&color=%24EC820&label=help%20wanted)](https://github.com/dotnet/xcsync/labels/help%20wanted)
 [![Good First Issue](https://img.shields.io/github/issues/dotnet/xcsync/good%20first%20issue?style=flat&color=%24EC820&label=good%20first%20issue)](https://github.com/dotnet/xcsync/labels/good%20first%20issue)
 
-## What is .NET Xcsync?
+## What is xcsync?
 
-.NET Xcsync is a .NET tool that enables developers to leverage Xcode for managing Apple specific files with .NET projects. 
+The xcsync .NET tool enables developers to leverage Xcode for managing Apple specific files with .NET projects. 
 
 ## What is in this repo?
 
-The .NET Xcsync library and tool source and tests are contained in this repo.
+The xcsync library and tool source and tests are contained in this repo.
 
 ## Using latest daily builds
 
-Follow instructions in [docs/using-latest-daily.md](docs/using-latest-daily.md) to get started using .NET Xcsync with the latest daily build.
+Follow instructions in [docs/using-latest-daily.md](docs/using-latest-daily.md) to get started using xcsync with the latest daily build.
 
 ## How can I contribute?
 
@@ -30,7 +30,7 @@ Also see info about related [Microsoft .NET Core Bug Bounty Program](https://www
 
 ## .NET Foundation
 
-.NET Xcsync is a [.NET Foundation](https://www.dotnetfoundation.org/projects) project.
+This project is a [.NET Foundation](https://www.dotnetfoundation.org/projects) project.
 
 There are many .NET related projects on GitHub.
 
