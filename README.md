@@ -20,11 +20,11 @@ Follow instructions in [docs/using-latest-daily.md](docs/using-latest-daily.md) 
 
 We welcome contributions! Many people all over the world have helped make .NET better.
 
-Follow instructions in [docs/contributing.md](docs/contributing.md) for working in the code in the repository.
+Follow instructions in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for working in the code in the repository.
 
 ## Reporting security issues and security bugs
 
-Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue). You can also find these instructions in this repo's [Security doc](SECURITY.md).
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue). You can also find these instructions in this repo's [Security doc](docs/SECURITY.md).
 
 Also see info about related [Microsoft .NET Core Bug Bounty Program](https://www.microsoft.com/msrc/bounty-dot-net-core).
 
@@ -37,7 +37,7 @@ There are many .NET related projects on GitHub.
 * [.NET home repo](https://github.com/Microsoft/dotnet) - links to 100s of .NET projects, from Microsoft and the community.
 * [.NET MAUI](https://docs.microsoft.com/dotnet/maui) - the best place to start learning about .NET MAUI.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](CODE_OF_CONDUCT.md). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+This project has adopted the [Microsoft Open Source Code of Conduct](docs/CODE_OF_CONDUCT.md). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## License
 
