@@ -6,7 +6,7 @@
 
 ## What is .NET Xcsync?
 
-.NET Xcsync is a .NET tool that provides editing and connecting resource capabilities by using Xcode.
+.NET Xcsync is a .NET tool that enables developers to leverage Xcode for managing Apple specific files with .NET projects. 
 
 ## What is in this repo?
 
