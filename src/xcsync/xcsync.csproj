@@ -21,12 +21,13 @@
     <IsPackable>true</IsPackable>
     <PackageId>dotnet-xcsync</PackageId>
     <Title>xcsync</Title>
-    <Description>xcsync is a .NET tool providing editing and connecting resource capabilities by using Xcode.</Description>
+    <Description>xcsync is a tool that enables developers to leverage Xcode for managing Apple specific files with .NET projects.</Description>
     <Authors>Microsoft</Authors>
     <Owners>Microsoft</Owners>
     <Company>Microsoft</Company>
     <Copyright>Microsoft Corporation</Copyright>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>docs/README.md</PackageReadmeFile>
+    <EnablePackageValidation>true</EnablePackageValidation>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnablePackageValidation>true</EnablePackageValidation>
@@ -38,7 +39,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="../../README.md" Link="README.md" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="PACKAGE.md" Link="docs/README.md" Pack="true" PackagePath="/docs/README.md" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../LICENSE" Link="LICENSE" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
