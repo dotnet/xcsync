@@ -27,8 +27,6 @@
     <Company>Microsoft</Company>
     <Copyright>Microsoft Corporation</Copyright>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
-    <IsPackable>true</IsPackable>
-    <PackageId>Microsoft.Tools.Xcsync</PackageId>
     <EnablePackageValidation>true</EnablePackageValidation>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeBuildOutput>false</IncludeBuildOutput>
