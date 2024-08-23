@@ -1,7 +1,7 @@
 name: Autoformat code - push updates
 on:
   workflow_run:
-    workflows: ["Autoformat code - run formatter"]
+    workflows: ["Autoformat code"]
     types:
       - completed
 
