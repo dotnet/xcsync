@@ -21,11 +21,19 @@ class ChangeWorker () : IWorker<ChangeMessage> {
 	{
 		// todo: impl per load
 		return message.Change switch {
-			SyncLoad => message.Context.SyncAsync (cancellationToken),
+			SyncLoad => ToggleWatcherSync (message, cancellationToken),
 			ErrorLoad => Task.CompletedTask,
 			RenameLoad => Task.CompletedTask,
 			_ => Task.CompletedTask
 		};
+	}
+
+	public async Task ToggleWatcherSync (ChangeMessage message, CancellationToken cancellationToken = default)
+	{
+		message.Monitor.StopMonitoring ();
+		await message.Context.SyncAsync (cancellationToken);
+		// maybe make corresponding project instance accessible via monitor??
+		// message.Monitor.StartMonitoring (project, cancellationToken);
 	}
 }
 
