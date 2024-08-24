@@ -6,7 +6,7 @@
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
   </PropertyGroup>
   <PropertyGroup>
-    <MarillePackageVersion>0.3.8</MarillePackageVersion>
+    <MarillePackageVersion>0.5.2</MarillePackageVersion>
     <MicrosoftBuildPackageVersion>17.10.4</MicrosoftBuildPackageVersion>
     <MicrosoftBuildLocatorPackageVersion>1.7.8</MicrosoftBuildLocatorPackageVersion>
     <MicrosoftCodeAnalysisPackageVersion>4.10.0</MicrosoftCodeAnalysisPackageVersion>
