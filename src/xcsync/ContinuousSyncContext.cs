@@ -35,18 +35,27 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 		clrChanges.OnFileChanged = async path => {
 			Logger.Debug ($"CLR Project file {path} changed");
-			await SyncChange (path, Hub);
+			await SyncChange (path, 
+				xcodeChanges, 
+				new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger), 
+				Hub);
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
 			Logger.Debug ($"Xcode Project file {path} changed");
-			await SyncChange (path, Hub);
+			await SyncChange (path, 
+				clrChanges,
+				new SyncContext (FileSystem, TypeService, SyncDirection.FromXcode, ProjectPath, TargetDir, Framework, Logger), 
+				Hub);
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"CLR Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, Hub);
+			await SyncRename (oldPath, 
+				xcodeChanges,
+				new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger), 
+				Hub);
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
@@ -54,19 +63,30 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, Hub);
+			await SyncRename (oldPath, 	
+				clrChanges,
+				new SyncContext (FileSystem, TypeService, SyncDirection.FromXcode, ProjectPath, TargetDir, Framework, Logger), 
+				Hub);
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
 
 		clrChanges.OnError = async ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in CLR Project file change monitor");
-			await SyncError (ProjectPath, ex, Hub);
+			await SyncError (ProjectPath, 
+				ex, 
+				xcodeChanges,
+				new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger),
+				Hub);
 		};
 
 		xcodeChanges.OnError = async ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in Xcode Project file change monitor");
-			await SyncError (TargetDir, ex, Hub);
+			await SyncError (TargetDir, 
+				ex, 
+				clrChanges,
+				new SyncContext (FileSystem, TypeService, SyncDirection.FromXcode, ProjectPath, TargetDir, Framework, Logger),
+				Hub);
 		};
 
 		do {
@@ -78,23 +98,23 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
 	}
 
-	public async Task SyncChange (string path, IHub hub)
+	public async Task SyncChange (string path, ProjectFileChangeMonitor monitor, SyncContext context, IHub hub)
 	{
 		// Hub will publish the message to the channel, will be received by worker (who will enact consumeAsync)
 		var syncLoad = new SyncLoad (new object ());
-		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, syncLoad));
+		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, monitor, context, syncLoad));
 	}
 
-	public async Task SyncError (string path, Exception ex, IHub hub)
+	public async Task SyncError (string path, Exception ex, ProjectFileChangeMonitor monitor, SyncContext context, IHub hub)
 	{
 		var errorLoad = new ErrorLoad (ex);
-		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, errorLoad));
+		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, monitor, context, errorLoad));
 	}
 
-	public async Task SyncRename (string path, IHub hub)
+	public async Task SyncRename (string path, ProjectFileChangeMonitor monitor, SyncContext context, IHub hub)
 	{
 		var renameLoad = new RenameLoad (new object ());
-		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, renameLoad));
+		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, monitor, context, renameLoad));
 	}
 
 	public async Task RegisterChangeWorker (IHub hub)

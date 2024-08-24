@@ -5,9 +5,13 @@ using Marille;
 
 namespace xcsync.Workers;
 
-public struct ChangeMessage (string id, string path, object payload) {
+struct ChangeMessage (string id, string path, ProjectFileChangeMonitor monitor, SyncContext context, object payload) {
 	public string Id { get; set; } = id;
 	public string Path { get; set; } = path;
+	public ProjectFileChangeMonitor Monitor { get; set; } = monitor;
+	public SyncContext Context { get; set; } = context;
+
+	// is this payload necessary here..? esp w more specific channels avail in lib?
 	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
 }
 
@@ -17,7 +21,7 @@ class ChangeWorker () : IWorker<ChangeMessage> {
 	{
 		// todo: impl per load
 		return message.Change switch {
-			SyncLoad => Task.CompletedTask,
+			SyncLoad => message.Context.SyncAsync (cancellationToken),
 			ErrorLoad => Task.CompletedTask,
 			RenameLoad => Task.CompletedTask,
 			_ => Task.CompletedTask
