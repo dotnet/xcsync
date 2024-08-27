@@ -62,7 +62,7 @@ if ($help) {
 }
 
 if ($vs) {
-  $solution = Split-Path $PSScriptRoot -Parent | Join-Path -ChildPath "Aspire.sln"
+  $solution = Split-Path $PSScriptRoot -Parent | Join-Path -ChildPath "xcsync.sln"
 
   . $PSScriptRoot\common\tools.ps1
 
