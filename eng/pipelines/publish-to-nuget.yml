@@ -1,0 +1,201 @@
+# AzDo Pipeline Definition: https://dev.azure.com/devdiv/DevDiv/_build?definitionId=18492
+trigger: none # We only want to trigger manually or based on resources
+pr: none
+
+parameters:
+- name: DryRun
+  displayName: Dry run only?
+  type: boolean
+  default: false
+
+- name: ArchiveSymbols
+  displayName: Archive Symbols to SymWeb?
+  type: boolean
+  default: false
+
+- name: SourceBranch
+  displayName: 'Source branch'
+  type: string
+  default: 'refs/heads/release'
+
+- name: BuildId
+  displayName: 'BuildId'
+  type: string
+
+resources:
+  repositories:
+  - repository: MicroBuildTemplate
+    type: git
+    name: 1ESPipelineTemplates/MicroBuildTemplate
+    ref: refs/tags/release
+
+# Consume variable groups at top-level so all approvals are done at once.
+variables:
+- group: Publish-Build-Assets
+
+- name: TeamName # Necessary to allow MicroBuild tasks to work
+  value: 'xamarin-macios'
+
+- name: GitHub.Token
+  value: $(github--pat--vs-mobiletools-engineering-service2)
+
+extends:
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
+  parameters:
+    sdl:
+      sourceAnalysisPool:
+        name: AzurePipelines-EO
+        image: 1ESPT-Windows2022
+        os: windows
+    stages:
+    - stage: prepare
+      displayName: Prepare
+      jobs:
+      - job: prepare
+        displayName: Prepare
+        pool:
+          name: AzurePipelines-EO
+          image: AzurePipelinesUbuntu22.04compliantGPT
+          os: linux
+        steps:
+        - checkout: none
+        - powershell: Write-Host "##vso[build.updatebuildnumber]$(resources.pipeline.CI.runName)"
+          displayName: ⚙️ Set run name
+        - pwsh: |
+            $ShippingBranch = '$(resources.pipeline.CI.sourceBranch)'
+            Write-Host "Shipping branch: $ShippingBranch"
+            $tagName = 'v$(resources.pipeline.CI.runName)'
+            if ($ShippingBranch -ne 'refs/heads/release') {
+              $tagName += '-prerelease'
+            }
+
+            $headers = @{ Authorization = 'Bearer $(System.AccessToken)' }
+            $uri = 'https://devdiv.visualstudio.com/DevDiv/_apis/git/repositories/vscode-maui/annotatedtags?api-version=7.0'
+            $requestBody = @{
+              name = $tagName
+              message = "Released on $(get-date -Format 'yyyy-MM-dd')"
+              taggedObject = @{
+                objectId = '$(resources.pipeline.CI.sourceCommit)'
+              }
+            }
+            $requestJson = ConvertTo-Json $requestBody
+            $contentType = 'application/json'
+            if (('${{ parameters.DryRun }}' -eq 'true') -or (($ShippingBranch -ne 'refs/heads/release') -and ($ShippingBranch -ne 'refs/heads/prerelease'))) {
+              Write-Host "Would've pushed tag $tagName."
+              exit 0
+            }
+            $tagPushResult = Invoke-RestMethod -uri $uri -method POST -Headers $headers -ContentType $contentType -Body $requestJson -StatusCodeVariable pushTagStatusCode -SkipHttpErrorCheck
+            if ($pushTagStatusCode -eq 409) {
+              Write-Host "##vso[task.logissue type=warning]Tag $tagName already exists."
+            } elseif ($pushTagStatusCode -ne 201) {
+              Write-Host "##vso[task.logissue type=warning]Pushing tag failed with status code $pushTagStatusCode. Response: $($tagPushResult.message)"
+            }
+          displayName: 🏷️ Push tag
+
+      - ${{ if eq(parameters.ArchiveSymbols, 'true') }}:
+        - job: publish_symbols
+          displayName: 📦 Publish Symbols
+          pool:
+            name: VSEngSS-MicroBuild2022-1ES
+            os: windows
+          steps:
+          - checkout: none
+          - download: CI
+            artifact: Symbols
+            displayName: 🔻 Download symbols artifact
+
+          - task: MicroBuildArchiveSymbols@5
+            displayName: 🗄️ Archive Symbols on Symweb
+            inputs:
+              SymbolsProject: VS
+              SymbolsFeatureName: '.NET MAUI'
+              SymbolsAgentPath: '$(Pipeline.Workspace)/CI/Symbols'
+            continueOnError: true
+
+    # We use unique stages for marketplace and telemetry instead of jobs in a single stage
+    # because Azure Pipelines provides us with the option to skip individual stages at queue time.
+
+    - stage: Promotion
+      displayName: Promote to NuGet.org
+      dependsOn: prepare
+      condition: or(eq(parameters.DryRun, 'true'), eq(variables['Build.SourceBranchName'], 'release'), eq(variables['Build.SourceBranchName'], 'prerelease')) # Protects against publishing on non-release branches. Modify carefully
+      jobs:
+      - job: release
+        displayName: Promotion
+        pool:
+          name: AzurePipelines-EO
+          image: AzurePipelinesUbuntu22.04compliantGPT
+          os: linux
+        steps:
+        - checkout: none
+
+        - powershell: |
+            $contentType = 'application/json';
+            $headers = @{ Authorization = 'Bearer $(System.AccessToken)' };
+            $rawRequest = @{ daysValid = 365 * 2; definitionId = $(resources.pipeline.CI.pipelineID); ownerId = 'User:$(Build.RequestedForId)'; protectPipeline = $false; runId = $(resources.pipeline.CI.runId) };
+            $request = ConvertTo-Json @($rawRequest);
+            Write-Host $request
+            $uri = "$(System.CollectionUri)$(System.TeamProject)/_apis/build/retention/leases?api-version=6.0-preview.1";
+            Invoke-RestMethod -uri $uri -method POST -Headers $headers -ContentType $contentType -Body $request;
+          displayName: 🗻 Retain build
+          
+        # Download artifact from the build
+        - download: CI
+          artifact: VSIX
+          displayName: 🔻 Download package artifact
+
+        - pwsh: |
+            $feedUrl = "https://api.nuget.org/v3/index.json"
+            $apikey = "$(pat--nuget--xamarinc--push--wildcard)"
+
+            # Get the Filter from the list of included packages
+            if ("${{ parameters.nugetIncludeFilters }}" -eq "skip") {
+              $filters = @()
+            } else {
+              $filters = "${{ parameters.nugetIncludeFilters }}" -split ";" | Where-Object { $_ } | % { $_.Trim() }
+            }
+
+            if ($filters) {
+              Write-Output "Only including the following packages:"
+              $filters
+            } else {
+              Write-Output "Including all packages`n"
+            }       
+            Write-Output ""
+            
+            # Get the packages
+            $nupkgs = (Get-ChildItem -Path "$(Build.StagingDirectory)\nupkgs\*" -Filter *.nupkg -Include $filters)
+
+            $maxAttempts = 5
+
+            foreach($nupkg in $nupkgs) {
+              $nupkgFile = $nupkg.FullName
+
+              $attempt = 1
+              $waiting = $true
+
+              do {
+                try {
+                  Write-Output "dotnet push $nupkgFile"
+                  if ( $env:DRY_RUN -eq "False" ) {
+                    & dotnet nuget push --source $feedUrl --api-key $apikey --skip-duplicate $nupkgFile
+                    Write-Output "`tpushed $nupkgFile to $feedUrl"
+                  }
+                  else {
+                    Write-Output "`tdry run, not pushing $nupkgFile"
+                  }
+                  $waiting = $false
+                }
+                catch {
+                  if ($attempt -gt $maxAttempts)
+                  {
+                    throw 'Maximum attempts reached, failing!'
+                  }
+                  Write-Output "  attempt $attempt of $maxAttempts failed..."
+                  $attempt = $attempt + 1
+                }
+              } while ($waiting)
+            }
+          displayName: 📦 Publish to NuGet.org
+          env:
+            DRY_RUN: ${{ parameters.DryRun }}
