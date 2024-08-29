@@ -24,13 +24,7 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : IWorker<FileMessage>
 		}
 	}
 
-	public void Dispose ()
-	{
-		throw new NotImplementedException ();
-	}
+	public void Dispose () {}
 
-	public ValueTask DisposeAsync ()
-	{
-		throw new NotImplementedException ();
-	}
+	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
 }

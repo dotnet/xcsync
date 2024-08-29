@@ -12,7 +12,7 @@ readonly record struct LoadTypesFromObjCMessage (string Id, XcodeWorkspace Xcode
 
 
 class ObjCTypesLoader (ILogger Logger): IWorker<LoadTypesFromObjCMessage> {
-	public bool UseBackgroundThread => throw new NotImplementedException ();
+	public bool UseBackgroundThread => false;
 
 	public async Task ConsumeAsync (LoadTypesFromObjCMessage message, CancellationToken token = default)
 	{
@@ -22,13 +22,7 @@ class ObjCTypesLoader (ILogger Logger): IWorker<LoadTypesFromObjCMessage> {
 		visitor.ObjCTypes.CollectionChanged -= message.XcodeWorkspace.ProcessObjCTypes;
 	}
 
-	public void Dispose ()
-	{
-		throw new NotImplementedException ();
-	}
+	public void Dispose () {}
 
-	public ValueTask DisposeAsync ()
-	{
-		throw new NotImplementedException ();
-	}
+	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
 }

@@ -12,7 +12,7 @@ public struct ChangeMessage (string id, string path, object payload) {
 }
 
 class ChangeWorker () : IWorker<ChangeMessage> {
-	public bool UseBackgroundThread => throw new NotImplementedException ();
+	public bool UseBackgroundThread => false; //todo: use
 
 	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
@@ -25,15 +25,10 @@ class ChangeWorker () : IWorker<ChangeMessage> {
 		};
 	}
 
-	public void Dispose ()
-	{
-		throw new NotImplementedException ();
-	}
+	public void Dispose () {}
 
-	public ValueTask DisposeAsync ()
-	{
-		throw new NotImplementedException ();
-	}
+	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
+
 }
 
 public interface ChangeLoad {
