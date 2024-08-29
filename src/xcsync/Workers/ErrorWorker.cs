@@ -1,13 +1,16 @@
 
 using Marille;
+using Serilog;
 
 namespace xcsync.Workers;
 
 class ChangeErrorWorker : IErrorWorker <ChangeMessage> {
 	public bool UseBackgroundThread => false;
 
-	public Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default)
-		=> Task.CompletedTask;
+	public Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default) {
+		Log.Error (exception, "Error processing change message {Id}", message.Id);
+		return Task.CompletedTask;
+	}
 
 	public void Dispose () { }
 
@@ -17,8 +20,10 @@ class ChangeErrorWorker : IErrorWorker <ChangeMessage> {
 class FileErrorWorker : IErrorWorker<FileMessage> {
 	public bool UseBackgroundThread => false;
 
-	public Task ConsumeAsync (FileMessage message, Exception exception, CancellationToken token = default) 
-		=> Task.CompletedTask;
+	public Task ConsumeAsync (FileMessage message, Exception exception, CancellationToken token = default) {
+		Log.Error (exception, "Error processing file message {Id}", message.Id);
+		return Task.CompletedTask;
+	}
 
 	public void Dispose () {}
 
@@ -28,8 +33,10 @@ class FileErrorWorker : IErrorWorker<FileMessage> {
 class ObjCTypeLoaderErrorWorker : IErrorWorker<LoadTypesFromObjCMessage> {
 	public bool UseBackgroundThread => false;
 
-	public Task ConsumeAsync (LoadTypesFromObjCMessage message, Exception exception, CancellationToken token = default) 
-		=> Task.CompletedTask;
+	public Task ConsumeAsync (LoadTypesFromObjCMessage message, Exception exception, CancellationToken token = default) {
+		Log.Error (exception, "Error processing ObjC type loader message {Id}", message.Id);
+		return Task.CompletedTask;
+	}
 
 	public void Dispose () {}
 
