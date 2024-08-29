@@ -19,7 +19,6 @@ class ChangeWorker () : IWorker<ChangeMessage> {
 		// todo: impl per load
 		return message.Change switch {
 			SyncLoad => Task.CompletedTask,
-			ErrorLoad => Task.CompletedTask,
 			RenameLoad => Task.CompletedTask,
 			_ => Task.CompletedTask
 		};
@@ -36,5 +35,4 @@ public interface ChangeLoad {
 }
 
 readonly record struct SyncLoad (object ChangeDetected) : ChangeLoad;
-readonly record struct ErrorLoad (object ChangeDetected) : ChangeLoad;
 readonly record struct RenameLoad (object ChangeDetected) : ChangeLoad;

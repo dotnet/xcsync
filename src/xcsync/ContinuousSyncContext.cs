@@ -60,14 +60,12 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
 
-		clrChanges.OnError = async ex => {
+		clrChanges.OnError = ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in CLR Project file change monitor");
-			await SyncError (ProjectPath, ex, Hub);
 		};
 
-		xcodeChanges.OnError = async ex => {
+		xcodeChanges.OnError = ex => {
 			Logger.Error (ex, $"Error:{ex.Message} in Xcode Project file change monitor");
-			await SyncError (TargetDir, ex, Hub);
 		};
 
 		do {
@@ -84,12 +82,6 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Hub will publish the message to the channel, will be received by worker (who will enact consumeAsync)
 		var syncLoad = new SyncLoad (new object ());
 		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, syncLoad));
-	}
-
-	public async Task SyncError (string path, Exception ex, IHub hub)
-	{
-		var errorLoad = new ErrorLoad (ex);
-		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, errorLoad));
 	}
 
 	public async Task SyncRename (string path, IHub hub)
