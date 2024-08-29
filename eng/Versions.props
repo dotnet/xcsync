@@ -6,7 +6,10 @@
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
   </PropertyGroup>
   <PropertyGroup>
-    <MarillePackageVersion>0.3.8</MarillePackageVersion>
+    <!-- Bump packages using link below -->
+	<!-- For non-MSFT packages, use `New or non-Microsoft package` even when updating..-->
+    <!-- https://github.com/dotnet/arcade/blob/main/Documentation/MirroringPackages.md -->
+    <MarillePackageVersion>0.5.3</MarillePackageVersion>
     <MicrosoftBuildPackageVersion>17.10.4</MicrosoftBuildPackageVersion>
     <MicrosoftBuildLocatorPackageVersion>1.7.8</MicrosoftBuildLocatorPackageVersion>
     <MicrosoftCodeAnalysisPackageVersion>4.10.0</MicrosoftCodeAnalysisPackageVersion>
