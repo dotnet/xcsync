@@ -15,7 +15,6 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 	public const string ChangeChannel = "Changes";
 	public async Task SyncAsync (CancellationToken token = default)
 	{
-		ChangeErrorWorker errorWorker = new ();
 		// Generate initial Xcode project
 		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
@@ -26,7 +25,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Hub creates a topic channel w message type template
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
 		// Different changes will be processed differently based on unique payload
-		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, errorWorker);
+		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, new ChangeErrorWorker ());
 		await RegisterChangeWorker (Hub);
 
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
@@ -36,18 +35,18 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 		clrChanges.OnFileChanged = async path => {
 			Logger.Debug ($"CLR Project file {path} changed");
-			await SyncChange (path, Hub);
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger)));
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
 			Logger.Debug ($"Xcode Project file {path} changed");
-			await SyncChange (path, Hub);
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, new SyncContext (FileSystem, TypeService, SyncDirection.FromXcode, ProjectPath, TargetDir, Framework, Logger)));
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"CLR Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, Hub);
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger)));
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
@@ -55,7 +54,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, Hub);
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, new SyncContext (FileSystem, TypeService, SyncDirection.FromXcode, ProjectPath, TargetDir, Framework, Logger)));
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
@@ -75,19 +74,6 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		} while (token.IsCancellationRequested == false);
 
 		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
-	}
-
-	public async Task SyncChange (string path, IHub hub)
-	{
-		// Hub will publish the message to the channel, will be received by worker (who will enact consumeAsync)
-		var syncLoad = new SyncLoad (new object ());
-		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, syncLoad));
-	}
-
-	public async Task SyncRename (string path, IHub hub)
-	{
-		var renameLoad = new RenameLoad (new object ());
-		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, renameLoad));
 	}
 
 	public async Task RegisterChangeWorker (IHub hub)

@@ -5,10 +5,10 @@ using Marille;
 
 namespace xcsync.Workers;
 
-public struct ChangeMessage (string id, string path, object payload) {
+public struct ChangeMessage (string id, string path, object context) {
 	public string Id { get; set; } = id;
 	public string Path { get; set; } = path;
-	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
+	public object Context { get; set; } = context;
 }
 
 class ChangeWorker () : IWorker<ChangeMessage> {
@@ -16,23 +16,27 @@ class ChangeWorker () : IWorker<ChangeMessage> {
 
 	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
-		// todo: impl per load
-		return message.Change switch {
-			SyncLoad => Task.CompletedTask,
-			RenameLoad => Task.CompletedTask,
-			_ => Task.CompletedTask
-		};
+		var context = (SyncContext) message.Context; //delaying cast due to accessibility modifiers..
+		switch (context.SyncDirection) {
+			case SyncDirection.FromXcode:
+				return context.SyncFromXcodeAsync (cancellationToken);
+			case SyncDirection.ToXcode:
+				return context.SyncToXcodeAsync (cancellationToken);
+			default:
+				throw new InvalidOperationException ("Invalid context type"); //necessary..?
+		}
 	}
 
-	public void Dispose () {}
+	// protected virtual void Dispose (bool disposing) { }
+
+	// public void Dispose () 
+	// {
+	// 	Dispose (true);
+	// 	GC.SuppressFinalize (this);
+	// }
+
+	public void Dispose () { }
 
 	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
 
 }
-
-public interface ChangeLoad {
-	object ChangeDetected { get; }
-}
-
-readonly record struct SyncLoad (object ChangeDetected) : ChangeLoad;
-readonly record struct RenameLoad (object ChangeDetected) : ChangeLoad;

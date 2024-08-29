@@ -17,7 +17,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	public const string FileChannel = "Files";
 	public const string SyncChannel = "SyncFromXcode";
 
-	protected SyncDirection SyncDirection { get; } = Direction;
+	public SyncDirection SyncDirection { get; } = Direction;
 
 	public async Task SyncAsync (CancellationToken token = default)
 	{
@@ -38,7 +38,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger.Debug (Strings.SyncContext.SyncComplete);
 	}
 
-	async Task SyncToXcodeAsync (CancellationToken token)
+	public async Task SyncToXcodeAsync (CancellationToken token)
 	{
 		Logger.Debug (Strings.SyncContext.GeneratingFiles);
 
@@ -451,7 +451,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		return;
 	}
 
-	async Task SyncFromXcodeAsync (CancellationToken token)
+	public async Task SyncFromXcodeAsync (CancellationToken token)
 	{
 		List<Task> jobs = [];
 
