@@ -5,6 +5,7 @@ using System.IO.Abstractions;
 using Marille;
 using Serilog;
 using xcsync.Projects;
+using xcsync.Workers;
 
 namespace xcsync;
 

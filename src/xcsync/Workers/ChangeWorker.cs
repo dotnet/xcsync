@@ -12,6 +12,7 @@ public struct ChangeMessage (string id, string path, object payload) {
 }
 
 class ChangeWorker () : IWorker<ChangeMessage> {
+	public bool UseBackgroundThread => throw new NotImplementedException ();
 
 	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
@@ -22,6 +23,16 @@ class ChangeWorker () : IWorker<ChangeMessage> {
 			RenameLoad => Task.CompletedTask,
 			_ => Task.CompletedTask
 		};
+	}
+
+	public void Dispose ()
+	{
+		throw new NotImplementedException ();
+	}
+
+	public ValueTask DisposeAsync ()
+	{
+		throw new NotImplementedException ();
 	}
 }
 

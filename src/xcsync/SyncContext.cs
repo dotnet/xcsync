@@ -23,8 +23,10 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	{
 		// use marille channel hub mechanism for better async file creation
 		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
-		await Hub.CreateAsync<FileMessage> (FileChannel, configuration);
-		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration);
+		FileErrorWorker fileErrorWorker = new ();
+		ObjCTypeLoaderErrorWorker objcErrorWorker = new ();
+		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileErrorWorker);
+		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, objcErrorWorker);
 
 		await CreateWorkers ();
 
@@ -518,7 +520,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	}
 
 	public async Task WriteFile (string path, string content) =>
-		await Hub.Publish (FileChannel, new FileMessage {
+		await Hub.PublishAsync (FileChannel, new FileMessage {
 			Id = Guid.NewGuid ().ToString (),
 			Path = path,
 			Content = content

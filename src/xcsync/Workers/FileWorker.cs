@@ -12,6 +12,7 @@ readonly record struct FileMessage (string Id, string Path, string Content);
 readonly record struct CopyFileMessage (string Id, string sourcePath, string destinationPath);
 
 class FileWorker (ILogger Logger, IFileSystem fileSystem) : IWorker<FileMessage> {
+	public bool UseBackgroundThread => throw new NotImplementedException ();
 
 	public async Task ConsumeAsync (FileMessage message, CancellationToken cancellationToken = default)
 	{
@@ -21,5 +22,15 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : IWorker<FileMessage>
 			Logger?.Fatal ($"Exception in ConsumeAsync: {ex.Message}");
 			throw;
 		}
+	}
+
+	public void Dispose ()
+	{
+		throw new NotImplementedException ();
+	}
+
+	public ValueTask DisposeAsync ()
+	{
+		throw new NotImplementedException ();
 	}
 }
