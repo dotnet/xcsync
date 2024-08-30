@@ -174,53 +174,54 @@ extends:
                   repoLogPath: $(Build.Arcade.LogsPath)
                   repoTestResultsPath: $(Build.Arcade.TestResultsPath)
 
-          - job: build_Windows
-            displayName: Build & Pack & Sign on Windows
-            # timeout accounts for wait times for helix agents up to 30mins
-            timeoutInMinutes: 90
+          - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
+            - job: build_Windows
+              displayName: Build & Pack & Sign on Windows
+              # timeout accounts for wait times for helix agents up to 30mins
+              timeoutInMinutes: 90
 
-            pool:
-              name: NetCore1ESPool-Internal
-              image: windows.vs2022preview.amd64
-              os: windows
-                          
-            variables:
-              - name: _buildScript
-                value: $(Build.SourcesDirectory)/build.cmd -ci
+              pool:
+                name: NetCore1ESPool-Internal
+                image: windows.vs2022preview.amd64
+                os: windows
+                            
+              variables:
+                - name: _buildScript
+                  value: $(Build.SourcesDirectory)/build.cmd -ci
 
-            preSteps:
-            - checkout: self
-              fetchDepth: 1
-              clean: true
+              preSteps:
+              - checkout: self
+                fetchDepth: 1
+                clean: true
 
-            steps: 
-              - task: ComponentGovernanceComponentDetection@0 # Necessary for creating NOTICE File: https://docs.opensource.microsoft.com/tools/cg/legal/notice/
-                displayName: '🛡 Component Governance'
-              
-              - task: notice@0
-                displayName: 🛠️ Generate NOTICE.txt file
-                inputs:
-                  outputformat: 'text'
-                  outputfile: $(Build.Arcade.ArtifactsPath)/NOTICES/NOTICE.txt
-                # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-                retryCountOnTaskFailure: 3
+              steps: 
+                - task: ComponentGovernanceComponentDetection@0 # Necessary for creating NOTICE File: https://docs.opensource.microsoft.com/tools/cg/legal/notice/
+                  displayName: '🛡 Component Governance'
+                
+                - task: notice@0
+                  displayName: 🛠️ Generate NOTICE.txt file
+                  inputs:
+                    outputformat: 'text'
+                    outputfile: $(Build.Arcade.ArtifactsPath)/NOTICES/NOTICE.txt
+                  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+                  retryCountOnTaskFailure: 3
 
-              - task: CopyFiles@2
-                inputs:
-                  SourceFolder: $(Build.Arcade.ArtifactsPath)/NOTICES
-                  TargetFolder: $(Build.SourcesDirectory)
-                  flattenFolders: true
-                displayName: Copy NOTICES files
+                - task: CopyFiles@2
+                  inputs:
+                    SourceFolder: $(Build.Arcade.ArtifactsPath)/NOTICES
+                    TargetFolder: $(Build.SourcesDirectory)
+                    flattenFolders: true
+                  displayName: Copy NOTICES files
 
-              - template: /eng/pipelines/templates/buildandtest.yml
-                parameters:
-                  dotnetScript: $(Build.SourcesDirectory)/dotnet.cmd
-                  buildScript: $(_buildScript)
-                  buildConfig: $(_BuildConfig)
-                  repoArtifactsPath: $(Build.Arcade.ArtifactsPath)
-                  repoLogPath: $(Build.Arcade.LogsPath)
-                  repoTestResultsPath: $(Build.Arcade.TestResultsPath)
-                  isWindows: true
+                - template: /eng/pipelines/templates/buildandtest.yml
+                  parameters:
+                    dotnetScript: $(Build.SourcesDirectory)/dotnet.cmd
+                    buildScript: $(_buildScript)
+                    buildConfig: $(_BuildConfig)
+                    repoArtifactsPath: $(Build.Arcade.ArtifactsPath)
+                    repoLogPath: $(Build.Arcade.LogsPath)
+                    repoTestResultsPath: $(Build.Arcade.TestResultsPath)
+                    isWindows: true
 
     - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
       - template: /eng/common/templates-official/post-build/post-build.yml@self
