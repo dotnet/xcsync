@@ -26,7 +26,7 @@ steps:
   - task: ComponentGovernanceComponentDetection@0 # Necessary for creating NOTICE File: https://docs.opensource.microsoft.com/tools/cg/legal/notice/
   
   - task: notice@0
-    displayName: 🛠️ Generate NOTICE file
+    displayName: 🛠️ Generate THIRD-PARTY-NOTICES.TXT file
     inputs:
       outputformat: 'text'
       outputfile: ${{ parameters.repoArtifactsPath }}/NOTICES/THIRD-PARTY-NOTICES.TXT
