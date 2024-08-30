@@ -201,13 +201,13 @@ extends:
                 displayName: 🛠️ Generate THIRD-PARTY-NOTICES.TXT file
                 inputs:
                   outputformat: 'text'
-                  outputfile: ${{ parameters.repoArtifactsPath }}/NOTICES/THIRD-PARTY-NOTICES.TXT
+                  outputfile: $(Build.Arcade.ArtifactsPath)/NOTICES/THIRD-PARTY-NOTICES.TXT
                 # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
                 retryCountOnTaskFailure: 3
 
               - task: CopyFiles@2
                 inputs:
-                  SourceFolder: ${{ parameters.repoArtifactsPath }}/NOTICES
+                  SourceFolder: $(Build.Arcade.ArtifactsPath)/NOTICES
                   TargetFolder: $(Build.SourcesDirectory)
                   flattenFolders: true
                 displayName: Copy NOTICES files
