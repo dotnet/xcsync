@@ -30,7 +30,7 @@ steps:
     inputs:
       outputformat: 'text'
       outputfile: ${{ parameters.repoArtifactsPath }}/THIRD-PARTY-NOTICES.TXT
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     retryCountOnTaskFailure: 3
 
   - task: UseDotNet@2
