@@ -208,7 +208,9 @@ extends:
       parameters:
         publishingInfraVersion: 3
         enableSymbolValidation: true
-        enableSourceLinkValidation: true
+        enableSigningValidation: true
+        # It's a private repo in github so this won't pass until we create an internal mirror
+        enableSourceLinkValidation: false
         validateDependsOn:
         - Build
         publishDependsOn:
@@ -223,8 +225,8 @@ extends:
           -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
           -TsaBugAreaPath $(_TsaBugAreaPath)
           -TsaIterationPath $(_TsaIterationPath)
-          -TsaRepositoryName dotnet-sign
-          -TsaCodebaseName dotnet-sign
+          -TsaRepositoryName xcsync
+          -TsaCodebaseName xcsync
           -TsaOnboard $True
           -TsaPublish $True
-          -PoliCheckAdditionalRunConfigParams @("UserExclusionPath < $(Build.SourcesDirectory)/eng/PoliCheckExclusions.xml")'            
+          -PoliCheckAdditionalRunConfigParams @("UserExclusionPath < $(Build.SourcesDirectory)/.config/PoliCheckExclusions.xml")'            
