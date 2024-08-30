@@ -29,6 +29,7 @@ steps:
       useGlobalJson: true
 
   - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
+    displayName: Install workloads
 
   - ${{ if ne(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
