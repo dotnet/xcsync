@@ -37,7 +37,7 @@ steps:
     inputs: 
       useGlobalJson: true
 
-  - script: dotnet workload install macos ios maccatalyst tvos maui
+  - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
 
   - ${{ if ne(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
@@ -124,6 +124,7 @@ steps:
       inputs:
         targetPath: '${{ parameters.repoArtifactsPath }}/CodeCoverage'
         artifactName: '$(Agent.JobName)_CodeCoverageResults'
+        
     - task: 1ES.PublishPipelineArtifact@1
       displayName: Publish THIRD-PART-NOTICES.TXT
       inputs:
