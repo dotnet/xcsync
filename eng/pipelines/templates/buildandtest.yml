@@ -111,7 +111,7 @@ steps:
       inputs:
         targetPath: '${{ parameters.repoArtifactsPath }}/CodeCoverage'
         artifactName: '$(Agent.JobName)_CodeCoverageResults'
-        
+
   # Run on windows, for internal pipeline, or public+non-helix-tests job
   - ${{ if and(eq(parameters.isWindows, 'true'), or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true'))) }}:
     - script: ${{ parameters.buildScript }}
