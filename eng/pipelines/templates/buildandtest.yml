@@ -39,7 +39,7 @@ steps:
               /bl:${{ parameters.repoLogPath }}build.binlog
               $(_OfficialBuildIdArgs)
               -p:Platform=`uname -m`
-      displayName: Build
+      displayName: 🛠️ Build
   
   - ${{ if eq(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
@@ -48,7 +48,7 @@ steps:
               /p:ArchiveTests=true
               /bl:${{ parameters.repoLogPath }}build.binlog
               $(_OfficialBuildIdArgs)
-      displayName: Build
+      displayName: 🛠️ Build
 
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
     - ${{ if ne(parameters.isWindows, 'true') }}:
