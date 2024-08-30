@@ -204,29 +204,30 @@ extends:
                   repoTestResultsPath: $(Build.Arcade.TestResultsPath)
                   isWindows: true
 
-    - template: /eng/common/templates-official/post-build/post-build.yml@self
-      parameters:
-        publishingInfraVersion: 3
-        enableSymbolValidation: true
-        enableSigningValidation: true
-        # It's a private repo in github so this won't pass until we create an internal mirror
-        enableSourceLinkValidation: false
-        validateDependsOn:
-        - Build
-        publishDependsOn:
-        - Validate
-        # This is to enable SDL runs part of Post-Build Validation Stage
-        SDLValidationParameters:
-          enable: true
-          params: ' -SourceToolsList @("policheck","credscan")
-          -TsaInstanceURL $(_TsaInstanceURL)
-          -TsaProjectName $(_TsaProjectName)
-          -TsaNotificationEmail $(_TsaNotificationEmail)
-          -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
-          -TsaBugAreaPath $(_TsaBugAreaPath)
-          -TsaIterationPath $(_TsaIterationPath)
-          -TsaRepositoryName xcsync
-          -TsaCodebaseName xcsync
-          -TsaOnboard $True
-          -TsaPublish $True
-          -PoliCheckAdditionalRunConfigParams @("UserExclusionPath < $(Build.SourcesDirectory)/.config/PoliCheckExclusions.xml")'            
+    - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
+      - template: /eng/common/templates-official/post-build/post-build.yml@self
+        parameters:
+          publishingInfraVersion: 3
+          enableSymbolValidation: true
+          enableSigningValidation: true
+          # It's a private repo in github so this won't pass until we create an internal mirror
+          enableSourceLinkValidation: false
+          validateDependsOn:
+          - Build
+          publishDependsOn:
+          - Validate
+          # This is to enable SDL runs part of Post-Build Validation Stage
+          SDLValidationParameters:
+            enable: true
+            params: ' -SourceToolsList @("policheck","credscan")
+            -TsaInstanceURL $(_TsaInstanceURL)
+            -TsaProjectName $(_TsaProjectName)
+            -TsaNotificationEmail $(_TsaNotificationEmail)
+            -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
+            -TsaBugAreaPath $(_TsaBugAreaPath)
+            -TsaIterationPath $(_TsaIterationPath)
+            -TsaRepositoryName xcsync
+            -TsaCodebaseName xcsync
+            -TsaOnboard $True
+            -TsaPublish $True
+            -PoliCheckAdditionalRunConfigParams @("UserExclusionPath < $(Build.SourcesDirectory)/.config/PoliCheckExclusions.xml")'            
