@@ -198,10 +198,10 @@ extends:
                 displayName: '🛡 Component Governance'
               
               - task: notice@0
-                displayName: 🛠️ Generate THIRD-PARTY-NOTICES.TXT file
+                displayName: 🛠️ Generate NOTICE.txt file
                 inputs:
                   outputformat: 'text'
-                  outputfile: $(Build.Arcade.ArtifactsPath)/NOTICES/THIRD-PARTY-NOTICES.TXT
+                  outputfile: $(Build.Arcade.ArtifactsPath)/NOTICES/NOTICE.txt
                 # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
                 retryCountOnTaskFailure: 3
 

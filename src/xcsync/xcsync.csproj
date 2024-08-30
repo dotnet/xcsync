@@ -28,7 +28,7 @@
     <Copyright>Microsoft Corporation</Copyright>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageThirdPartyNoticesFile>docs/THIRD-PARTY-NOTICES.TXT</PackageThirdPartyNoticesFile>
+    <PackageThirdPartyNoticesFile>docs/NOTICE.txt</PackageThirdPartyNoticesFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnablePackageValidation>true</EnablePackageValidation>
@@ -41,7 +41,7 @@
 
   <ItemGroup>
     <Content Include="PACKAGE.md" Link="docs/README.md" Pack="true" PackagePath="/docs/README.md" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="$(XcsyncRootDirectory)THIRD-PARTY-NOTICES.TXT" Pack="true" PackagePath="docs/THIRD-PARTY-NOTICES.TXT" Visible="false" Link="docs/THIRD-PARTY-NOTICES.TXT" />
+    <Content Include="$(XcsyncRootDirectory)NOTICE.txt" Pack="true" PackagePath="docs/NOTICE.txt" Visible="false" Link="docs/NOTICE.txt" />
   </ItemGroup>
 
   <PropertyGroup>
