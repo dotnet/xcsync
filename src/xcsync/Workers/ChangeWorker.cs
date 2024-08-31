@@ -11,10 +11,8 @@ public struct ChangeMessage (string id, string path, object payload) {
 	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
 }
 
-class ChangeWorker () : IWorker<ChangeMessage> {
-	public bool UseBackgroundThread => false; //todo: use
-
-	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
+class ChangeWorker () : BaseWorker<ChangeMessage> {
+	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
 		// todo: impl per load
 		return message.Change switch {
@@ -24,11 +22,6 @@ class ChangeWorker () : IWorker<ChangeMessage> {
 			_ => Task.CompletedTask
 		};
 	}
-
-	public void Dispose () {}
-
-	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
-
 }
 
 public interface ChangeLoad {
