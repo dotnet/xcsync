@@ -16,17 +16,11 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 	public async Task SyncAsync (CancellationToken token = default)
 	{
 		// Generate initial Xcode project
+		await ConfigureMarilleHub ();
 		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
 		var clrProject = new ClrProject (FileSystem, Logger, TypeService, "CLR Project", ProjectPath, Framework);
 		var xcodeProject = new XcodeWorkspace (FileSystem, Logger, TypeService, "Xcode Project", TargetDir, Framework);
-
-		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
-		// Hub creates a topic channel w message type template
-		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
-		// Different changes will be processed differently based on unique payload
-		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration);
-		await RegisterChangeWorker (Hub);
 
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (clrProject, token);
@@ -82,25 +76,30 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 	{
 		// Hub will publish the message to the channel, will be received by worker (who will enact consumeAsync)
 		var syncLoad = new SyncLoad (new object ());
-		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, syncLoad));
+		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, syncLoad));
 	}
 
 	public async Task SyncError (string path, Exception ex, IHub hub)
 	{
 		var errorLoad = new ErrorLoad (ex);
-		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, errorLoad));
+		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, errorLoad));
 	}
 
 	public async Task SyncRename (string path, IHub hub)
 	{
 		var renameLoad = new RenameLoad (new object ());
-		await hub.Publish (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, renameLoad));
+		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, renameLoad));
 	}
 
-	public async Task RegisterChangeWorker (IHub hub)
-	{
+	protected async override Task ConfigureMarilleHub () {
+		await base.ConfigureMarilleHub ();
+		ChangeErrorWorker errorWorker = new ();
+		// Hub creates a topic channel w message type template
+		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
+		// Different changes will be processed differently based on unique payload
+		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, errorWorker);
 		var worker = new ChangeWorker ();
-		await hub.RegisterAsync (ChangeChannel, worker);
+		await Hub.RegisterAsync (ChangeChannel, worker);
 		// worker now knows to pick up any and all change-related events from the channel in hub
 	}
 }

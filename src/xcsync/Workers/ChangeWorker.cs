@@ -1,9 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.IO.Abstractions;
 using Marille;
+using Serilog;
+using xcsync.Projects;
+using xcsync.Workers;
 
-namespace xcsync.Workers;
+namespace xcsync;
 
 public struct ChangeMessage (string id, string path, object payload) {
 	public string Id { get; set; } = id;
@@ -11,9 +15,9 @@ public struct ChangeMessage (string id, string path, object payload) {
 	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
 }
 
-class ChangeWorker () : IWorker<ChangeMessage> {
+class ChangeWorker () : BaseWorker<ChangeMessage> {
 
-	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
+	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
 		// todo: impl per load
 		return message.Change switch {

@@ -21,12 +21,9 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	public async Task SyncAsync (CancellationToken token = default)
 	{
-		// use marille channel hub mechanism for better async file creation
-		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
-		await Hub.CreateAsync<FileMessage> (FileChannel, configuration);
-		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration);
-
-		await CreateWorkers ();
+		// use marille channel Hub mechanism for better async file creation
+		// configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
+		await ConfigureMarilleHub ();
 
 		if (SyncDirection == SyncDirection.ToXcode)
 			await SyncToXcodeAsync (token).ConfigureAwait (false);
@@ -465,6 +462,9 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
 		var typeLoader = new ObjCTypesLoader (Logger);
+		ObjCTypeLoaderErrorWorker errorWorker = new ();
+		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, errorWorker);
+		await Hub.RegisterAsync (SyncChannel, typeLoader);
 		foreach (var syncItem in xcodeWorkspace.Items) {
 			jobs.Add (syncItem switch {
 				SyncableType type => /* Hub.Publish (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)) */
@@ -480,6 +480,9 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
 		var fileWorker = new FileWorker (Logger, FileSystem);
+		FileErrorWorker fileErrorWorker = new ();
+		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileErrorWorker);
+		await Hub.RegisterAsync (FileChannel, fileWorker);
 
 		foreach (var type in typesToWrite) {
 			Logger.Information ("Processing type {Type}", type?.ClrType);
@@ -508,17 +511,21 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		jobs.Clear ();
 	}
 
-	public async Task CreateWorkers ()
+	protected async override Task ConfigureMarilleHub ()
 	{
+		await base.ConfigureMarilleHub ();
 		var fileWorker = new FileWorker (Logger, FileSystem);
+		FileErrorWorker fileErrorWorker = new ();
+		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileErrorWorker);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
-
 		var otlWorker = new ObjCTypesLoader (Logger);
-		await Hub.RegisterAsync (FileChannel, otlWorker);
+		ObjCTypeLoaderErrorWorker errorWorker = new ();
+		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, errorWorker);
+		await Hub.RegisterAsync (SyncChannel, otlWorker);
 	}
 
 	public async Task WriteFile (string path, string content) =>
-		await Hub.Publish (FileChannel, new FileMessage {
+		await Hub.PublishAsync (FileChannel, new FileMessage {
 			Id = Guid.NewGuid ().ToString (),
 			Path = path,
 			Content = content
