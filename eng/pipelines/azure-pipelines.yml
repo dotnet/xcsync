@@ -176,7 +176,7 @@ extends:
                   repoLogPath: $(Build.Arcade.LogsPath)
                   repoTestResultsPath: $(Build.Arcade.TestResultsPath)
 
-          - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
+          - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ),  or( eq( variables['Build.SourceBranch'], 'refs/heads/main' ), eq( variables['Build.SourceBranch'], 'refs/heads/prerelease' ), eq( variables['Build.SourceBranch'], 'refs/heads/release' ) ) ) }}:
             - job: build_Windows
               displayName: Build & Pack & Sign on Windows
               # timeout accounts for wait times for helix agents up to 30mins
@@ -225,7 +225,7 @@ extends:
                     repoTestResultsPath: $(Build.Arcade.TestResultsPath)
                     isWindows: true
 
-    - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
+    - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), or( eq( variables['Build.SourceBranch'], 'refs/heads/main' ), eq( variables['Build.SourceBranch'], 'refs/heads/prerelease' ), eq( variables['Build.SourceBranch'], 'refs/heads/release' ) ) ) }}:
       - template: /eng/common/templates-official/post-build/post-build.yml@self
         parameters:
           publishingInfraVersion: 3
