@@ -23,5 +23,10 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	// hub needs to be created, registered to a specific topic, published
 	protected TopicConfiguration configuration = new ();
 	readonly CancellationTokenSource cancellationTokenSource = new ();
+
+	protected virtual Task ConfigureMarilleHub () {
+		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
+		return Task.CompletedTask;
+	} 
 }
 

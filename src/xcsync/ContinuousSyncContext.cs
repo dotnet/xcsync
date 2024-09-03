@@ -15,15 +15,12 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 	public const string ChangeChannel = "Changes";
 	public async Task SyncAsync (CancellationToken token = default)
 	{
-		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
 		// Generate initial Xcode project
+		await ConfigureMarilleHub ();
 		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
 		var clrProject = new ClrProject (FileSystem, Logger, TypeService, "CLR Project", ProjectPath, Framework);
 		var xcodeProject = new XcodeWorkspace (FileSystem, Logger, TypeService, "Xcode Project", TargetDir, Framework);
-
-		var changeWorker = new ChangeWorker ();
-		await changeWorker.ConfigureHub (Hub, ChangeChannel, configuration);
 
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (clrProject, token);
@@ -92,6 +89,18 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 	{
 		var renameLoad = new RenameLoad (new object ());
 		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, renameLoad));
+	}
+
+	protected async override Task ConfigureMarilleHub () {
+		await base.ConfigureMarilleHub ();
+		ChangeErrorWorker errorWorker = new ();
+		// Hub creates a topic channel w message type template
+		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
+		// Different changes will be processed differently based on unique payload
+		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, errorWorker);
+		var worker = new ChangeWorker ();
+		await Hub.RegisterAsync (ChangeChannel, worker);
+		// worker now knows to pick up any and all change-related events from the channel in hub
 	}
 }
 
