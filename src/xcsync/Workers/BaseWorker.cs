@@ -13,6 +13,7 @@ public abstract class BaseWorker<T> : IWorker<T> where T : struct {
 	public virtual void Dispose () { }
 
 	public virtual ValueTask DisposeAsync () => ValueTask.CompletedTask;
+	public async virtual Task ConfigureHub (Hub hub, string topic, TopicConfiguration configuration) => await Task.CompletedTask;
 }
 
 public abstract class BaseErrorWorker<T> : IErrorWorker<T> where T : struct {

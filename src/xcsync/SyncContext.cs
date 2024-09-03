@@ -23,10 +23,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	{
 		// use marille channel hub mechanism for better async file creation
 		configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
-		FileErrorWorker fileErrorWorker = new ();
-		ObjCTypeLoaderErrorWorker objcErrorWorker = new ();
-		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileErrorWorker);
-		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, objcErrorWorker);
 
 		await CreateWorkers ();
 
@@ -467,6 +463,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
 		var typeLoader = new ObjCTypesLoader (Logger);
+		await typeLoader.ConfigureHub (Hub, SyncChannel, configuration);
 		foreach (var syncItem in xcodeWorkspace.Items) {
 			jobs.Add (syncItem switch {
 				SyncableType type => /* Hub.Publish (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)) */
@@ -482,6 +479,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
 		var fileWorker = new FileWorker (Logger, FileSystem);
+		await fileWorker.ConfigureHub (Hub, FileChannel, configuration);
 
 		foreach (var type in typesToWrite) {
 			Logger.Information ("Processing type {Type}", type?.ClrType);
@@ -513,10 +511,9 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	public async Task CreateWorkers ()
 	{
 		var fileWorker = new FileWorker (Logger, FileSystem);
-		await Hub.RegisterAsync (FileChannel, fileWorker);
-
+		await fileWorker.ConfigureHub (Hub, FileChannel, configuration);
 		var otlWorker = new ObjCTypesLoader (Logger);
-		await Hub.RegisterAsync (FileChannel, otlWorker);
+		await otlWorker.ConfigureHub (Hub, SyncChannel, configuration);
 	}
 
 	public async Task WriteFile (string path, string content) =>

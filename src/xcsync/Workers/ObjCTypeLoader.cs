@@ -10,6 +10,13 @@ namespace xcsync.Workers;
 readonly record struct LoadTypesFromObjCMessage (string Id, XcodeWorkspace XcodeWorkspace, ISyncableItem Item);
 
 class ObjCTypesLoader (ILogger Logger): BaseWorker<LoadTypesFromObjCMessage> {
+
+	public async override Task ConfigureHub (Hub hub, string topic, TopicConfiguration configuration) {
+		ObjCTypeLoaderErrorWorker errorWorker = new ();
+		await hub.CreateAsync<LoadTypesFromObjCMessage> (topic, configuration, errorWorker);
+		await hub.RegisterAsync (topic, this);
+	}
+
 	public override async Task ConsumeAsync (LoadTypesFromObjCMessage message, CancellationToken token = default)
 	{
 		var visitor = new ObjCImplementationDeclVisitor (Logger);
