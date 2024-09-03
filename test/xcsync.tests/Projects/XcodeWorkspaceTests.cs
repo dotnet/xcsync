@@ -49,7 +49,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		// Run 'xcsync generate'
-		await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm);
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
 
 		var dotNetProject = new ClrProject (fileSystem, testLogger, typeService, projectName, csproj, tfm);
 		await dotNetProject.OpenProject ();
@@ -93,7 +93,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		// Run 'xcsync generate'
-		await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm);
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
 
 		// Update the ObjC header and module
 		var headerPath = Path.Combine (xcodeDir, "ViewController.h");
