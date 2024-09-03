@@ -121,8 +121,10 @@ extends:
       - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
         - template: /eng/common/templates-official/job/onelocbuild.yml@self
           parameters:
-            LclSource: lclFilesfromPackage
-            LclPackageId: 'LCL-JUNO-PROD-XCSYNC'
+            # LclSource: lclFilesfromPackage
+            # LclPackageId: 'LCL-JUNO-PROD-XCSYNC'
+            LclSource: lclFilesInRepo
+            SkipLocProjectJsonGeneration: true
             MirrorRepo: xcsync
             MirrorBranch: main
 
@@ -174,57 +176,79 @@ extends:
                   repoLogPath: $(Build.Arcade.LogsPath)
                   repoTestResultsPath: $(Build.Arcade.TestResultsPath)
 
-          - job: build_Windows
-            displayName: Build & Pack & Sign on Windows
-            # timeout accounts for wait times for helix agents up to 30mins
-            timeoutInMinutes: 90
+          - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
+            - job: build_Windows
+              displayName: Build & Pack & Sign on Windows
+              # timeout accounts for wait times for helix agents up to 30mins
+              timeoutInMinutes: 90
 
-            pool:
-              name: NetCore1ESPool-Internal
-              image: windows.vs2022preview.amd64
-              os: windows
-                          
-            variables:
-              - name: _buildScript
-                value: $(Build.SourcesDirectory)/build.cmd -ci
+              pool:
+                name: NetCore1ESPool-Internal
+                image: windows.vs2022preview.amd64
+                os: windows
+                            
+              variables:
+                - name: _buildScript
+                  value: $(Build.SourcesDirectory)/build.cmd -ci
 
-            preSteps:
-            - checkout: self
-              fetchDepth: 1
-              clean: true
+              preSteps:
+              - checkout: self
+                fetchDepth: 1
+                clean: true
 
-            steps:                
-              - template: /eng/pipelines/templates/buildandtest.yml
-                parameters:
-                  dotnetScript: $(Build.SourcesDirectory)/dotnet.cmd
-                  buildScript: $(_buildScript)
-                  buildConfig: $(_BuildConfig)
-                  repoArtifactsPath: $(Build.Arcade.ArtifactsPath)
-                  repoLogPath: $(Build.Arcade.LogsPath)
-                  repoTestResultsPath: $(Build.Arcade.TestResultsPath)
-                  isWindows: true
+              steps: 
+                - task: ComponentGovernanceComponentDetection@0 # Necessary for creating NOTICE File: https://docs.opensource.microsoft.com/tools/cg/legal/notice/
+                  displayName: '🛡 Component Governance'
+                
+                - task: notice@0
+                  displayName: 🛠️ Generate NOTICE.txt file
+                  inputs:
+                    outputformat: 'text'
+                    outputfile: $(Build.Arcade.ArtifactsPath)/NOTICES/NOTICE.txt
+                  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+                  retryCountOnTaskFailure: 3
 
-    - template: /eng/common/templates-official/post-build/post-build.yml@self
-      parameters:
-        publishingInfraVersion: 3
-        enableSymbolValidation: true
-        enableSourceLinkValidation: true
-        validateDependsOn:
-        - Build
-        publishDependsOn:
-        - Validate
-        # This is to enable SDL runs part of Post-Build Validation Stage
-        SDLValidationParameters:
-          enable: true
-          params: ' -SourceToolsList @("policheck","credscan")
-          -TsaInstanceURL $(_TsaInstanceURL)
-          -TsaProjectName $(_TsaProjectName)
-          -TsaNotificationEmail $(_TsaNotificationEmail)
-          -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
-          -TsaBugAreaPath $(_TsaBugAreaPath)
-          -TsaIterationPath $(_TsaIterationPath)
-          -TsaRepositoryName dotnet-sign
-          -TsaCodebaseName dotnet-sign
-          -TsaOnboard $True
-          -TsaPublish $True
-          -PoliCheckAdditionalRunConfigParams @("UserExclusionPath < $(Build.SourcesDirectory)/eng/PoliCheckExclusions.xml")'            
+                - task: CopyFiles@2
+                  inputs:
+                    SourceFolder: $(Build.Arcade.ArtifactsPath)/NOTICES
+                    TargetFolder: $(Build.SourcesDirectory)
+                    flattenFolders: true
+                  displayName: Copy NOTICES files
+
+                - template: /eng/pipelines/templates/buildandtest.yml
+                  parameters:
+                    dotnetScript: $(Build.SourcesDirectory)/dotnet.cmd
+                    buildScript: $(_buildScript)
+                    buildConfig: $(_BuildConfig)
+                    repoArtifactsPath: $(Build.Arcade.ArtifactsPath)
+                    repoLogPath: $(Build.Arcade.LogsPath)
+                    repoTestResultsPath: $(Build.Arcade.TestResultsPath)
+                    isWindows: true
+
+    - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
+      - template: /eng/common/templates-official/post-build/post-build.yml@self
+        parameters:
+          publishingInfraVersion: 3
+          enableSymbolValidation: true
+          enableSigningValidation: true
+          # It's a private repo in github so this won't pass until we create an internal mirror
+          enableSourceLinkValidation: false
+          validateDependsOn:
+          - Build
+          publishDependsOn:
+          - Validate
+          # This is to enable SDL runs part of Post-Build Validation Stage
+          SDLValidationParameters:
+            enable: true
+            params: ' -SourceToolsList @("policheck","credscan")
+            -TsaInstanceURL $(_TsaInstanceURL)
+            -TsaProjectName $(_TsaProjectName)
+            -TsaNotificationEmail $(_TsaNotificationEmail)
+            -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
+            -TsaBugAreaPath $(_TsaBugAreaPath)
+            -TsaIterationPath $(_TsaIterationPath)
+            -TsaRepositoryName xcsync
+            -TsaCodebaseName xcsync
+            -TsaOnboard $True
+            -TsaPublish $True
+            -PoliCheckAdditionalRunConfigParams @("UserExclusionPath < $(Build.SourcesDirectory)/.config/PoliCheckExclusions.xml")'            

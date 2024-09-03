@@ -23,11 +23,13 @@ parameters:
     default: false
 
 steps:
+
   - task: UseDotNet@2
     inputs: 
       useGlobalJson: true
 
-  - script: dotnet workload install macos ios maccatalyst tvos maui
+  - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
+    displayName: Install workloads
 
   - ${{ if ne(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
@@ -37,7 +39,7 @@ steps:
               /bl:${{ parameters.repoLogPath }}build.binlog
               $(_OfficialBuildIdArgs)
               -p:Platform=`uname -m`
-      displayName: Build
+      displayName: 🛠️ Build
   
   - ${{ if eq(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
@@ -46,7 +48,7 @@ steps:
               /p:ArchiveTests=true
               /bl:${{ parameters.repoLogPath }}build.binlog
               $(_OfficialBuildIdArgs)
-      displayName: Build
+      displayName: 🛠️ Build
 
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
     - ${{ if ne(parameters.isWindows, 'true') }}:
@@ -68,13 +70,6 @@ steps:
                 --output ${{ parameters.repoTestResultsPath }}/NonHelix.cobertura.xml
                 "${{ parameters.buildScript }} -testnobuild -test -configuration ${{ parameters.buildConfig }} /bl:${{ parameters.repoLogPath }}tests.binlog $(_OfficialBuildIdArgs) -p:Platform=`uname -m`"
         displayName: Run non-helix tests
-
-    # - ${{ if eq(parameters.isWindows, 'true') }}:
-    #   - script: ${{ parameters.dotnetScript }} dotnet-coverage collect
-    #             --settings $(Build.SourcesDirectory)/eng/CodeCoverage.config
-    #             --output ${{ parameters.repoTestResultsPath }}/NonHelix.cobertura.xml
-    #             "${{ parameters.buildScript }} -testnobuild -test -configuration ${{ parameters.buildConfig }} /bl:${{ parameters.repoLogPath }}tests.binlog $(_OfficialBuildIdArgs)"
-    #     displayName: Run non-helix tests
 
   - ${{ if eq(parameters.runHelixTests, 'true') }}:
     - task: CopyFiles@2

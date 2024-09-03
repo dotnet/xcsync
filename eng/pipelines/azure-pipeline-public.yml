@@ -13,7 +13,7 @@ trigger:
       - eng/Version.Details.xml
       - .github/*
       - docs/*
-      - LICENSE.TXT
+      - LICENSE.txt
       - PATENTS.TXT
       - THIRD-PARTY-NOTICES.TXT
 
@@ -31,7 +31,7 @@ pr:
       - eng/Version.Details.xml
       - .github/*
       - docs/*
-      - LICENSE.TXT
+      - LICENSE.txt
       - PATENTS.TXT
       - THIRD-PARTY-NOTICES.TXT
 

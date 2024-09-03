@@ -1,9 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.IO.Abstractions;
 using Marille;
+using Serilog;
+using xcsync.Projects;
+using xcsync.Workers;
 
-namespace xcsync.Workers;
+namespace xcsync;
 
 public struct ChangeMessage (string id, string path, object context) {
 	public string Id { get; set; } = id;
@@ -11,10 +15,9 @@ public struct ChangeMessage (string id, string path, object context) {
 	public object Context { get; set; } = context;
 }
 
-class ChangeWorker () : IWorker<ChangeMessage> {
-	public bool UseBackgroundThread => false; //todo: use
+class ChangeWorker () : BaseWorker<ChangeMessage> {
 
-	public Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
+	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
 		var context = (SyncContext) message.Context; //delaying cast due to accessibility modifiers..
 		switch (context.SyncDirection) {
