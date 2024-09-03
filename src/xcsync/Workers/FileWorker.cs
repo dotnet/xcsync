@@ -21,8 +21,4 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<FileMessa
 			throw;
 		}
 	}
-
-	public void Dispose () {}
-
-	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
 }

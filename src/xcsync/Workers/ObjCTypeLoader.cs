@@ -17,8 +17,4 @@ class ObjCTypesLoader (ILogger Logger): BaseWorker<LoadTypesFromObjCMessage> {
 		await message.XcodeWorkspace.LoadTypesFromObjCFileAsync (((SyncableType) message.Item).FilePath, visitor, token);
 		visitor.ObjCTypes.CollectionChanged -= message.XcodeWorkspace.ProcessObjCTypes;
 	}
-
-	public void Dispose () {}
-
-	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
 }

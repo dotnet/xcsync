@@ -9,7 +9,7 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-public struct ChangeMessage (string id, string path, object context) {
+struct ChangeMessage (string id, string path, object context) {
 	public string Id { get; set; } = id;
 	public string Path { get; set; } = path;
 	public object Context { get; set; } = context;
@@ -29,17 +29,4 @@ class ChangeWorker () : BaseWorker<ChangeMessage> {
 				throw new InvalidOperationException ("Invalid context type"); //necessary..?
 		}
 	}
-
-	// protected virtual void Dispose (bool disposing) { }
-
-	// public void Dispose () 
-	// {
-	// 	Dispose (true);
-	// 	GC.SuppressFinalize (this);
-	// }
-
-	public void Dispose () { }
-
-	public ValueTask DisposeAsync () => ValueTask.CompletedTask;
-
 }
