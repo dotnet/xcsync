@@ -7,5 +7,45 @@
       <Uri>https://github.com/dotnet/arcade</Uri>
       <Sha>cb4788b8aa2a8df6d6abc515555916c7af1ef679</Sha>
     </Dependency>
+    <Dependency Name="Microsoft.NET.Sdk" Version="9.0.100-rc.2.24420.21">
+      <Uri>https://github.com/dotnet/sdk</Uri>
+      <Sha>a16db5fadcee9f39fdfd52d46b971a8973a67f5b</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.Build" Version="17.12.0-preview-24407-03">
+      <Uri>https://github.com/dotnet/msbuild</Uri>
+      <Sha>6bc91d5e2d3d8a199fdbe367ed015b55daf57046</Sha>
+    </Dependency>    
+    <Dependency Name="Microsoft.CodeAnalysis" Version="4.12.0-2.24419.4">
+      <Uri>https://github.com/dotnet/roslyn</Uri>
+      <Sha>63a2cf641e32073c432a505dd899d9e2ea7abbd2</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.CodeAnalysis.CSharp" Version="4.12.0-2.24419.4">
+      <Uri>https://github.com/dotnet/roslyn</Uri>
+      <Sha>63a2cf641e32073c432a505dd899d9e2ea7abbd2</Sha>
+    </Dependency>  
+    <Dependency Name="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0-2.24419.4">
+      <Uri>https://github.com/dotnet/roslyn</Uri>
+      <Sha>63a2cf641e32073c432a505dd899d9e2ea7abbd2</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.12.0-2.24419.4">
+      <Uri>https://github.com/dotnet/roslyn</Uri>
+      <Sha>63a2cf641e32073c432a505dd899d9e2ea7abbd2</Sha>
+    </Dependency>      
+    <Dependency Name="Microsoft.Extensions.Logging" Version="9.0.0-rc.1.24414.5">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>0fbd81404d1f211572387498474063bc6f407f0f</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0-rc.1.24414.5">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>0fbd81404d1f211572387498474063bc6f407f0f</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="9.0.0-rc.1.24414.5">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>0fbd81404d1f211572387498474063bc6f407f0f</Sha>
+    </Dependency>  
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.24324.3">
+      <Uri>https://github.com/dotnet/command-line-api</Uri>
+      <Sha>803d8598f98fb4efd94604b32627ee9407f246db</Sha>
+    </Dependency>      
   </ToolsetDependencies>
 </Dependencies>
