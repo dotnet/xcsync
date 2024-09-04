@@ -76,7 +76,7 @@ variables:
         value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER) /p:PreReleaseVersionLabel=ci
     - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/prerelease') }}:
       - name: _OfficialBuildArgs
-        value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER) /p:PreReleaseVersionLabel=preview /p:DotNetFinalVersionKind=prerelease
+        value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER) /p:PreReleaseVersionLabel=preview
     - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release') }}:
       - name: _OfficialBuildArgs
         value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER) /p:DotNetFinalVersionKind=release
