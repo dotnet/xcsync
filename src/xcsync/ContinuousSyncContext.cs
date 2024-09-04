@@ -29,18 +29,18 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 		clrChanges.OnFileChanged = async path => {
 			Logger.Debug ($"CLR Project file {path} changed");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger)));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path,  SyncDirection.ToXcode));
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
 			Logger.Debug ($"Xcode Project file {path} changed");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, new SyncContext (FileSystem, TypeService, SyncDirection.FromXcode, ProjectPath, TargetDir, Framework, Logger)));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path,  SyncDirection.FromXcode));
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"CLR Project file {oldPath} renamed to {newPath}");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger)));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath,  SyncDirection.ToXcode));
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
@@ -48,7 +48,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, new SyncContext (FileSystem, TypeService, SyncDirection.FromXcode, ProjectPath, TargetDir, Framework, Logger)));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath,  SyncDirection.FromXcode));
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
@@ -77,7 +77,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
 		// Different changes will be processed differently based on unique payload
 		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, errorWorker);
-		var worker = new ChangeWorker ();
+		var worker = new ChangeWorker (FileSystem, TypeService, ProjectPath, TargetDir, Framework, Logger);
 		await Hub.RegisterAsync (ChangeChannel, worker);
 		// worker now knows to pick up any and all change-related events from the channel in hub
 	}

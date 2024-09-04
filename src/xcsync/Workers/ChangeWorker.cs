@@ -9,24 +9,24 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-struct ChangeMessage (string id, string path, SyncContextBase context) {
+struct ChangeMessage (string id, string path, SyncDirection direction) {
 	public string Id { get; set; } = id;
 	public string Path { get; set; } = path;
-	public SyncContextBase Context { get; set; } = context;
+	public SyncDirection Direction { get; set; } = direction;
 }
 
-class ChangeWorker () : BaseWorker<ChangeMessage> {
+class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger) : BaseWorker<ChangeMessage> {
+	public SyncContext Context = new (fileSystem, typeService, SyncDirection.ToXcode, projectPath, targetDir, framework, logger);
 
 	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
-		var context = (SyncContext) message.Context; //delaying cast due to accessibility modifiers..
-		switch (context.SyncDirection) {
+		switch (message.Direction) {
 			case SyncDirection.FromXcode:
-				return context.SyncFromXcodeAsync (cancellationToken);
+				return Context.SyncFromXcodeAsync (cancellationToken);
 			case SyncDirection.ToXcode:
-				return context.SyncToXcodeAsync (cancellationToken);
+				return Context.SyncToXcodeAsync (cancellationToken);
 			default:
-				throw new InvalidOperationException ("Invalid context type"); //necessary..?
+				throw new InvalidOperationException ("Invalid direction type detected");
 		}
 	}
 }
