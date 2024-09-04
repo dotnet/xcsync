@@ -6,6 +6,10 @@
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
   </PropertyGroup>
   <PropertyGroup>
+    <UseVSTestRunner>false</UseVSTestRunner> 
+  </PropertyGroup>
+
+  <PropertyGroup>
     <!-- Bump packages using link below -->
 	<!-- For non-MSFT packages, use `New or non-Microsoft package` even when updating..-->
     <!-- https://github.com/dotnet/arcade/blob/main/Documentation/MirroringPackages.md -->

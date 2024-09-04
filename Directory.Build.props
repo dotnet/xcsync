@@ -6,4 +6,7 @@
     <XcsyncSrcDirectory>$(MSBuildThisFileDirectory)src/</XcsyncSrcDirectory>
   </PropertyGroup>
 
+  <PropertyGroup>
+   <TestArchitectures>x64;arm64</TestArchitectures>
+  </PropertyGroup>
 </Project>
