@@ -21,4 +21,10 @@ class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string pro
 		SyncContext context = new (fileSystem, typeService, message.Direction, projectPath, targetDir, framework, logger);
 		return context.SyncAsync (cancellationToken);
 	}
+
+	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default) 
+	{
+		Log.Error (exception, "Error processing change message {Id}", message.Id);
+		return Task.CompletedTask;
+	}
 }

@@ -462,8 +462,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
 		var typeLoader = new ObjCTypesLoader (Logger);
-		ObjCTypeLoaderErrorWorker errorWorker = new ();
-		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, errorWorker);
+		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, typeLoader);
 		await Hub.RegisterAsync (SyncChannel, typeLoader);
 		foreach (var syncItem in xcodeWorkspace.Items) {
 			jobs.Add (syncItem switch {
@@ -480,8 +479,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
 		var fileWorker = new FileWorker (Logger, FileSystem);
-		FileErrorWorker fileErrorWorker = new ();
-		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileErrorWorker);
+		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileWorker);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
 
 		foreach (var type in typesToWrite) {
@@ -515,12 +513,10 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	{
 		await base.ConfigureMarilleHub ();
 		var fileWorker = new FileWorker (Logger, FileSystem);
-		FileErrorWorker fileErrorWorker = new ();
-		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileErrorWorker);
+		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileWorker);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
 		var otlWorker = new ObjCTypesLoader (Logger);
-		ObjCTypeLoaderErrorWorker errorWorker = new ();
-		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, errorWorker);
+		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, otlWorker);
 		await Hub.RegisterAsync (SyncChannel, otlWorker);
 	}
 

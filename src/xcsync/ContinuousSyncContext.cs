@@ -72,12 +72,11 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 	protected async override Task ConfigureMarilleHub () {
 		await base.ConfigureMarilleHub ();
-		ChangeErrorWorker errorWorker = new ();
 		// Hub creates a topic channel w message type template
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
 		// Different changes will be processed differently based on unique payload
-		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, errorWorker);
 		var worker = new ChangeWorker (FileSystem, TypeService, ProjectPath, TargetDir, Framework, Logger);
+		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, worker);
 		await Hub.RegisterAsync (ChangeChannel, worker);
 		// worker now knows to pick up any and all change-related events from the channel in hub
 	}
