@@ -9,10 +9,10 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-struct ChangeMessage (string id, string path, object context) {
+struct ChangeMessage (string id, string path, SyncContextBase context) {
 	public string Id { get; set; } = id;
 	public string Path { get; set; } = path;
-	public object Context { get; set; } = context;
+	public SyncContextBase Context { get; set; } = context;
 }
 
 class ChangeWorker () : BaseWorker<ChangeMessage> {
