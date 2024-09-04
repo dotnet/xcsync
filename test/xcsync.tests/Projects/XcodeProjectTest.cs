@@ -6,11 +6,18 @@ using System.Text.Json.Serialization;
 using Xamarin;
 using xcsync.Projects.Xcode;
 using Xunit.Abstractions;
-using Microsoft.DotNet.XUnitExtensions;
+using System.IO.Abstractions;
+using Serilog;
+using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
 
 public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
+
+	readonly ILogger testLogger = new LoggerConfiguration ()
+		.MinimumLevel.Verbose ()
+		.WriteTo.TestOutput (TestOutput)
+		.CreateLogger ();
 
 	[Fact]
 	public void Deserialize_RootObject_FromJson_Succeeds ()
@@ -343,7 +350,6 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
 		// Run 'dotnet new macos' in temp dir
-		// DotnetNew (TestOutput, "globaljson", tmpDir, "--sdk-version 8.0.0 --roll-forward feature");
 		await DotnetNew (TestOutput, projectType, tmpDir, templateOptions);
 
 		Assert.True (Directory.Exists (tmpDir));
@@ -354,7 +360,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		// Run 'xcsync generate'
-		await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm);
+		await new SyncContext (new FileSystem(), new TypeService(testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
 
 		projectFiles.SelectMany (projectFile => {
 			return (IEnumerable<string>) (Path.HasExtension (projectFile) ? ([projectFile]) : ([$"{projectFile}.m", $"{projectFile}.h"]));
@@ -389,7 +395,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		try {
 			// Run 'xcsync generate'
-			await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "--open");
+			await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, "", testLogger).SyncAsync ();
 
 			// check if xcode has project open
 
