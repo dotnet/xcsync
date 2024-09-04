@@ -113,5 +113,5 @@ steps:
               -configuration ${{ parameters.buildConfig }}
               /bl:${{ parameters.repoLogPath }}/pack.binlog
               /p:Restore=false /p:Build=false
-              $(_OfficialBuildIdArgs)
+              $(_OfficialBuildArgs)
       displayName: Pack, Sign & Publish

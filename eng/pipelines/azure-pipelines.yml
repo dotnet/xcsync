@@ -49,7 +49,7 @@ variables:
     # needed for darc (dependency flow) publishing
     - name: _PublishArgs
       value: ''
-    - name: _OfficialBuildIdArgs
+    - name: _OfficialBuildArgs
       value: ''
     # needed for signing
     - name: _SignType
@@ -65,8 +65,15 @@ variables:
     - name: _PublishArgs
       value: >-
             /p:DotNetPublishUsingPipelines=true
-    - name: _OfficialBuildIdArgs
-      value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
+    - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+      - name: _OfficialBuildArgs
+        value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER) /p:PreReleaseVersionLabel=ci
+    - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/prerelease') }}:
+      - name: _OfficialBuildArgs
+        value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER) /p:PreReleaseVersionLabel=preview
+    - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release') }}:
+      - name: _OfficialBuildArgs
+        value: /p:OfficialBuildId=$(BUILD.BUILDNUMBER) /p:DotNetFinalVersionKind=release
     # needed for signing
     - name: _SignType
       value: real
