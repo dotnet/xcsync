@@ -33,7 +33,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger.Debug (Strings.SyncContext.SyncComplete);
 	}
 
-	public override async Task SyncToXcodeAsync (CancellationToken token)
+	async Task SyncToXcodeAsync (CancellationToken token)
 	{
 		Logger.Debug (Strings.SyncContext.GeneratingFiles);
 
@@ -446,7 +446,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		return;
 	}
 
-	public override async Task SyncFromXcodeAsync (CancellationToken token)
+	async Task SyncFromXcodeAsync (CancellationToken token)
 	{
 		List<Task> jobs = [];
 

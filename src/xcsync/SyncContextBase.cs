@@ -27,9 +27,6 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	protected virtual Task ConfigureMarilleHub () {
 		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
 		return Task.CompletedTask;
-	} 
-
-	public virtual async Task SyncFromXcodeAsync (CancellationToken token) => await Task.CompletedTask;
-	public virtual async Task SyncToXcodeAsync (CancellationToken token) => await Task.CompletedTask;
+	}
 }
 

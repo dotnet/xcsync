@@ -16,17 +16,9 @@ struct ChangeMessage (string id, string path, SyncDirection direction) {
 }
 
 class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger) : BaseWorker<ChangeMessage> {
-	public SyncContext Context = new (fileSystem, typeService, SyncDirection.ToXcode, projectPath, targetDir, framework, logger);
-
 	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
-		switch (message.Direction) {
-			case SyncDirection.FromXcode:
-				return Context.SyncFromXcodeAsync (cancellationToken);
-			case SyncDirection.ToXcode:
-				return Context.SyncToXcodeAsync (cancellationToken);
-			default:
-				throw new InvalidOperationException ("Invalid direction type detected");
-		}
+		SyncContext context = new (fileSystem, typeService, message.Direction, projectPath, targetDir, framework, logger);
+		return context.SyncAsync (cancellationToken);
 	}
 }
