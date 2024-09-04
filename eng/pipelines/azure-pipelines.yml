@@ -15,9 +15,6 @@ trigger:
       - eng/Version.Details.xml
       - .github/*
       - docs/*
-      - LICENSE.TXT
-      - PATENTS.TXT
-      - THIRD-PARTY-NOTICES.TXT
 
 pr:
   branches:
@@ -33,9 +30,6 @@ pr:
       - eng/Version.Details.xml
       - .github/*
       - docs/*
-      - LICENSE.TXT
-      - PATENTS.TXT
-      - THIRD-PARTY-NOTICES.TXT
 
 variables:
   - template: /eng/pipelines/common-variables.yml@self
