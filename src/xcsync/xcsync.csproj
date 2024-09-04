@@ -26,6 +26,7 @@
     <Owners>Microsoft</Owners>
     <Company>Microsoft</Company>
     <Copyright>Microsoft Corporation</Copyright>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageThirdPartyNoticesFile>docs/NOTICE.txt</PackageThirdPartyNoticesFile>
