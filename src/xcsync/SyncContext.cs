@@ -115,11 +115,11 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			// all NSObjects get a corresponding .h + .m file generated
 			// generated .h + .m files are added to the xcode project deps
 			await GenerateAndWriteFile (".h", "sourcecode.c.h", () => new GenObjcH (t).TransformText (), TargetDir, t.ObjCType, xcodeObjects, pbxGroupFiles);
-			await GenerateAndWriteFile (".m", "sourcecode.c.objc", () => new GenObjcM (t).TransformText (), TargetDir, t.ObjCType, xcodeObjects, pbxGroupFiles);
+			var sourceFileRference = await GenerateAndWriteFile (".m", "sourcecode.c.objc", () => new GenObjcM (t).TransformText (), TargetDir, t.ObjCType, xcodeObjects, pbxGroupFiles);
 
 			pbxBuildFile = new PBXBuildFile {
 				Isa = "PBXBuildFile",
-				FileRef = pbxFileReference.Token
+				FileRef = sourceFileRference.Token
 			};
 
 			xcodeObjects.Add (pbxBuildFile.Token, pbxBuildFile);
@@ -531,7 +531,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			Content = content
 		});
 
-	async Task GenerateAndWriteFile (string extension, string fileType, Func<string> generateContent, string targetDir, string objcType, Dictionary<string, XcodeObject> xcodeObjects, List<string> pbxGroupFiles)
+	async Task<PBXFileReference> GenerateAndWriteFile (string extension, string fileType, Func<string> generateContent, string targetDir, string objcType, Dictionary<string, XcodeObject> xcodeObjects, List<string> pbxGroupFiles)
 	{
 		var content = generateContent ();
 		var filePath = FileSystem.Path.Combine (targetDir, objcType + extension);
@@ -545,5 +545,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 		xcodeObjects.Add (pbxFileReference.Token, pbxFileReference);
 		pbxGroupFiles.Add (pbxFileReference.Token);
+		return pbxFileReference;
 	}
 }
