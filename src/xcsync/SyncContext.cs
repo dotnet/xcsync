@@ -448,8 +448,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	async Task SyncFromXcodeAsync (CancellationToken token)
 	{
-		List<Task> jobs = [];
-
 		Logger.Information (Strings.Sync.HeaderInformation, TargetDir, ProjectPath);
 
 		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
@@ -461,26 +459,17 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
-		var typeLoader = new ObjCTypesLoader (Logger);
-		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, typeLoader);
-		await Hub.RegisterAsync (SyncChannel, typeLoader);
 		foreach (var syncItem in xcodeWorkspace.Items) {
-			jobs.Add (syncItem switch {
-				SyncableType type => /* Hub.Publish (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)) */
-										typeLoader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem), token),
-				_ => Task.CompletedTask
-			});
+			_ = syncItem switch {
+				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)),
+				_ => ValueTask.CompletedTask
+			};
 		}
-		Task.WaitAll ([.. jobs], token);
-		jobs.Clear ();
 
 		var typesToWrite = TypeService.QueryTypes (null, null) // All Types
 			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files
 
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
-		var fileWorker = new FileWorker (Logger, FileSystem);
-		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileWorker);
-		await Hub.RegisterAsync (FileChannel, fileWorker);
 
 		foreach (var type in typesToWrite) {
 			Logger.Information ("Processing type {Type}", type?.ClrType);
@@ -497,24 +486,19 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 			// Write out the file
 			// TODO: This should probably be extracted to a different class, like SyncableFile/Type
-			//await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).GetText ().ToString () ?? string.Empty);
+			await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).GetText ().ToString () ?? string.Empty);
 
-			jobs.Add (fileWorker.ConsumeAsync (new FileMessage {
-				Id = Guid.NewGuid ().ToString (),
-				Path = syntaxTree!.FilePath,
-				Content = syntaxTree?.GetRoot (token).GetText ().ToString () ?? string.Empty
-			}, token));
 		}
-		Task.WaitAll ([.. jobs], token);
-		jobs.Clear ();
 	}
 
 	protected async override Task ConfigureMarilleHub ()
 	{
 		await base.ConfigureMarilleHub ();
+
 		var fileWorker = new FileWorker (Logger, FileSystem);
 		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileWorker);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
+
 		var otlWorker = new ObjCTypesLoader (Logger);
 		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, otlWorker);
 		await Hub.RegisterAsync (SyncChannel, otlWorker);
