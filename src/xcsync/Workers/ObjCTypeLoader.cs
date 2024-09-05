@@ -17,4 +17,9 @@ class ObjCTypesLoader (ILogger Logger): BaseWorker<LoadTypesFromObjCMessage> {
 		await message.XcodeWorkspace.LoadTypesFromObjCFileAsync (((SyncableType) message.Item).FilePath, visitor, token);
 		visitor.ObjCTypes.CollectionChanged -= message.XcodeWorkspace.ProcessObjCTypes;
 	}
+
+	public override Task ConsumeAsync (LoadTypesFromObjCMessage message, Exception exception, CancellationToken token = default)  {
+		Log.Error (exception, "Error processing ObjC type loader message {Id}", message.Id);
+		return Task.CompletedTask;
+	}
 }

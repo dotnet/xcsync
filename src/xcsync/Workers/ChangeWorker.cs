@@ -9,30 +9,19 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-public struct ChangeMessage (string id, string path, object payload) {
+struct ChangeMessage (string id, string path, SyncDirection direction) {
 	public string Id { get; set; } = id;
 	public string Path { get; set; } = path;
-	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
+	public SyncDirection Direction { get; set; } = direction;
 }
 
-class ChangeWorker () : BaseWorker<ChangeMessage> {
+class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger) : BaseWorker<ChangeMessage> {
+	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default) =>
+		new SyncContext (fileSystem, typeService, message.Direction, projectPath, targetDir, framework, logger).SyncAsync (cancellationToken);
 
-	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
+	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default) 
 	{
-		// todo: impl per load
-		return message.Change switch {
-			SyncLoad => Task.CompletedTask,
-			ErrorLoad => Task.CompletedTask,
-			RenameLoad => Task.CompletedTask,
-			_ => Task.CompletedTask
-		};
+		Log.Error (exception, "Error processing change message {Id}", message.Id);
+		return Task.CompletedTask;
 	}
 }
-
-public interface ChangeLoad {
-	object ChangeDetected { get; }
-}
-
-readonly record struct SyncLoad (object ChangeDetected) : ChangeLoad;
-readonly record struct ErrorLoad (object ChangeDetected) : ChangeLoad;
-readonly record struct RenameLoad (object ChangeDetected) : ChangeLoad;

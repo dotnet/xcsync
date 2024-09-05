@@ -27,6 +27,6 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	protected virtual Task ConfigureMarilleHub () {
 		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
 		return Task.CompletedTask;
-	} 
+	}
 }
 
