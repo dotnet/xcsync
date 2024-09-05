@@ -224,7 +224,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			};
 
 			xcodeObjects.Add (pbxBuildFile.Token, pbxBuildFile);
-			pbxSourcesBuildFiles.Add (pbxBuildFile.Token);
+			pbxResourcesBuildFiles.Add (pbxBuildFile.Token);
 		}
 
 		var pbxResourcesBuildPhase = new PBXResourcesBuildPhase {
