@@ -16,11 +16,8 @@ struct ChangeMessage (string id, string path, SyncDirection direction) {
 }
 
 class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger) : BaseWorker<ChangeMessage> {
-	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
-	{
-		SyncContext context = new (fileSystem, typeService, message.Direction, projectPath, targetDir, framework, logger);
-		return context.SyncAsync (cancellationToken);
-	}
+	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default) =>
+		new SyncContext (fileSystem, typeService, message.Direction, projectPath, targetDir, framework, logger).SyncAsync (cancellationToken);
 
 	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default) 
 	{
