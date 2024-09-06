@@ -9,15 +9,17 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-struct ChangeMessage (string id, string path, SyncDirection direction) {
-	public string Id { get; set; } = id;
-	public string Path { get; set; } = path;
-	public SyncDirection Direction { get; set; } = direction;
-}
+record struct ChangeMessage (string Id, string Path, SyncDirection Direction, ProjectFileChangeMonitor ClrMonitor, ProjectFileChangeMonitor XcodeMonitor);
 
-class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger) : BaseWorker<ChangeMessage> {
-	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default) =>
-		new SyncContext (fileSystem, typeService, message.Direction, projectPath, targetDir, framework, logger).SyncAsync (cancellationToken);
+class ChangeWorker (IFileSystem FileSystem, ITypeService TypeService, string ProjectPath, string TargetDir, string Framework, ILogger Logger, ClrProject ClrProject, XcodeWorkspace XcodeProject) : BaseWorker<ChangeMessage> {
+	public override async Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
+	{
+		message.ClrMonitor.StopMonitoring ();
+		message.XcodeMonitor.StopMonitoring ();
+		await new SyncContext (FileSystem, TypeService, message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
+		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
+		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
+	}
 
 	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default) 
 	{
