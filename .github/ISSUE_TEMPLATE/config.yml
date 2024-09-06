@@ -1,0 +1,18 @@
+blank_issues_enabled: true
+contact_links:
+contact_links:
+  - name: "🌴 .NET MAUI"
+    url: https://github.com/dotnet/maui/issues/new/choose
+    about: Issues with .NET MAUI
+  - name: "⚙ Bug report or feature request for Visual Studio (for Windows)"
+    url: https://learn.microsoft.com/en-us/visualstudio/ide/how-to-report-a-problem-with-visual-studio?view=vs-2022
+    about: Use Visual Studio's Report a Problem feature for issues and suggestions with Visual Studio tooling. This includes problems with connecting to remote Macs from Visual Studio.
+  - name: "⚙ VSCode"
+    url: https://github.com/microsoft/vscode-dotnettools/issues
+    about: Issues with VSCode.
+  - name: "🙋‍♀️ Community Support"
+    url: https://learn.microsoft.com/en-us/answers/products/97/dotnet/
+    about: For issues that likely aren't bugs, Microsoft Q&A is a good place to ask for help.
+  - name: "🚩 Issue Management Policies"
+    url: https://aka.ms/aspnet/issue-policies
+    about: More information on our issue management policies is available here.
