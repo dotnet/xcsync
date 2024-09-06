@@ -9,7 +9,7 @@ namespace xcsync.Workers;
 
 readonly record struct LoadTypesFromObjCMessage (string Id, XcodeWorkspace XcodeWorkspace, ISyncableItem Item);
 
-class ObjCTypesLoader (ILogger Logger): BaseWorker<LoadTypesFromObjCMessage> {
+class ObjCTypesLoader (ILogger Logger) : BaseWorker<LoadTypesFromObjCMessage> {
 	public override async Task ConsumeAsync (LoadTypesFromObjCMessage message, CancellationToken token = default)
 	{
 		var visitor = new ObjCImplementationDeclVisitor (Logger);
@@ -18,7 +18,8 @@ class ObjCTypesLoader (ILogger Logger): BaseWorker<LoadTypesFromObjCMessage> {
 		visitor.ObjCTypes.CollectionChanged -= message.XcodeWorkspace.ProcessObjCTypes;
 	}
 
-	public override Task ConsumeAsync (LoadTypesFromObjCMessage message, Exception exception, CancellationToken token = default)  {
+	public override Task ConsumeAsync (LoadTypesFromObjCMessage message, Exception exception, CancellationToken token = default)
+	{
 		Log.Error (exception, "Error processing ObjC type loader message {Id}", message.Id);
 		return Task.CompletedTask;
 	}

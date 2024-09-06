@@ -21,7 +21,7 @@ class ChangeWorker (IFileSystem FileSystem, ITypeService TypeService, string Pro
 		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
 	}
 
-	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default) 
+	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default)
 	{
 		Log.Error (exception, "Error processing change message {Id}", message.Id);
 		return Task.CompletedTask;

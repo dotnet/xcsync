@@ -24,7 +24,8 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	protected TopicConfiguration configuration = new ();
 	readonly CancellationTokenSource cancellationTokenSource = new ();
 
-	protected virtual Task ConfigureMarilleHub () {
+	protected virtual Task ConfigureMarilleHub ()
+	{
 		configuration.Mode = ChannelDeliveryMode.AtMostOnceSync;
 		return Task.CompletedTask;
 	}

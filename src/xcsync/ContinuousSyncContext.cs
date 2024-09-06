@@ -30,6 +30,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 		clrChanges.OnFileChanged = async path => {
 			Logger.Debug ($"CLR Project file {path} changed");
+
 			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path,  SyncDirection.ToXcode, clrChanges, xcodeChanges));
 		};
 
@@ -71,7 +72,8 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
 	}
 
-	protected async override Task ConfigureMarilleHub () {
+	protected async override Task ConfigureMarilleHub ()
+	{
 		await base.ConfigureMarilleHub ();
 		// Hub creates a topic channel w message type template
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order

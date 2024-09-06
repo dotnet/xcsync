@@ -35,7 +35,7 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<FileMessa
 				// However in testing GetPreamble seems to always return the BOM for the encoding regardless of the BOM
 				// actually being present in the file. So we check the encoding's preamble vs the actual preamble,
 				// and if they match, then the BOM was actually present in the file.
-				preamble = encodingPreamble.SequenceEqual (bom [0..encodingPreamble.Length]) ? encodingPreamble : preamble;				
+				preamble = encodingPreamble.SequenceEqual (bom [0..encodingPreamble.Length]) ? encodingPreamble : preamble;
 			} else {
 				// if the file doesn't exist, use the defauilt encoding preamble
 				preamble = encoding.GetPreamble ();
