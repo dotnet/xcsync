@@ -3,7 +3,6 @@
 
 using System.IO.Abstractions;
 using System.Text;
-using ILogger = Serilog.ILogger;
 using Serilog;
 
 namespace xcsync.Workers;
@@ -26,12 +25,13 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<FileMessa
 				using (var fs = fileSystem.FileStream.New (message.Path, FileMode.Open, FileAccess.Read)) {
 					fs.Read (bom, 0, 4);
 				}
-				preamble = DetectPreamble (bom);
 
 				using var inStream = fileSystem.FileStream.New (message.Path, FileMode.Open, FileAccess.Read);
 				using var reader = new StreamReader (inStream, true);
 				await reader.ReadToEndAsync (cancellationToken);
 				encoding = reader.CurrentEncoding;
+				var encodingPreamble = encoding.GetPreamble ();
+				preamble = encodingPreamble.SequenceEqual (bom [0..encodingPreamble.Length]) ? encodingPreamble : preamble;
 			}
 
 			// Write the new content to the file, using the detected BOM
@@ -49,22 +49,11 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<FileMessa
 			Logger?.Fatal ($"Exception in ConsumeAsync: {ex.Message}");
 			throw;
 		}
-	}	
+	}
 
-	public override Task ConsumeAsync (FileMessage message, Exception exception, CancellationToken token = default) 
+	public override Task ConsumeAsync (FileMessage message, Exception exception, CancellationToken token = default)
 	{
 		Log.Error (exception, "Error processing file message {Id}", message.Id);
 		return Task.CompletedTask;
 	}
-
-	static byte [] DetectPreamble (byte [] bom)
-	{
-		if (bom [0] == 0x2b && bom [1] == 0x2f && bom [2] == 0x76) return bom [0..3];
-		if (bom [0] == 0xef && bom [1] == 0xbb && bom [2] == 0xbf) return bom [0..3];
-		if (bom [0] == 0xff && bom [1] == 0xfe) return bom [0..2]; // UTF-16LE
-		if (bom [0] == 0xfe && bom [1] == 0xff) return bom [0..2]; // UTF-16BE
-		if (bom [0] == 0x00 && bom [1] == 0x00 && bom [2] == 0xfe && bom [3] == 0xff) return bom [0..4];
-		return [];
-	}
-
 }

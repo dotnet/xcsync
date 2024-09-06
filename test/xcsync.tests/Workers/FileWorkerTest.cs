@@ -11,7 +11,7 @@ namespace xcsync.tests.Workers;
 
 public class FileWorkerTests () : Base {
 
-	public static IEnumerable<object[]> Encodings => 
+	public static IEnumerable<object []> Encodings =>
 	[
 		[new UTF8Encoding (false)],
 		[new UTF8Encoding (true)],
@@ -37,12 +37,13 @@ partial class ViewController {
 
 	[Theory]
 	[MemberData (nameof (Encodings))]
-	public async Task WritingNewContent_KeepsEncodingFromExistingFile (Encoding encoding) {
+	public async Task WritingNewContent_KeepsEncodingFromExistingFile (Encoding encoding)
+	{
 
 		// Arrange
 		var fileSystem = new MockFileSystem ();
 		var logger = Mock.Of<ILogger> ();
-		var fileWorker = new FileWorker (logger, fileSystem );
+		var fileWorker = new FileWorker (logger, fileSystem);
 
 		using (var vStream = fileSystem.File.Create (fileName)) {
 			// Gets the preamble in order to attach the BOM
@@ -56,7 +57,7 @@ partial class ViewController {
 			vStream.Write (vByteData, 0, vByteData.Length);
 			vStream.Close ();
 		}
-		
+
 		// Act
 		await fileWorker.ConsumeAsync (new FileMessage ("0", fileName, fileContent), default);
 
@@ -66,24 +67,16 @@ partial class ViewController {
 		using var inStream = fileSystem.FileStream.New (fileName, FileMode.Open, FileAccess.Read);
 		byte [] bom = new byte [4];
 		inStream.Read (bom, 0, 4);
-		var actualPreamble = DetectPreamble (bom);
 		inStream.Seek (0, SeekOrigin.Begin);
 
 		using var reader = new StreamReader (inStream, true);
 		reader.ReadToEnd ();
 		var actualEncoding = reader.CurrentEncoding;
+		var encodingPreamble = actualEncoding.GetPreamble ();
+		var actualPreamble = encodingPreamble.SequenceEqual (bom [0..encodingPreamble.Length]) ? encodingPreamble : [];
 
 		Assert.Equivalent (encoding.EncodingName, actualEncoding.EncodingName);
-		Assert.Equal (encoding.GetPreamble(), actualPreamble);
-	}
 
-	static byte [] DetectPreamble (byte [] bom)
-	{
-		if (bom [0] == 0x2b && bom [1] == 0x2f && bom [2] == 0x76) return bom [0..3];
-		if (bom [0] == 0xef && bom [1] == 0xbb && bom [2] == 0xbf) return bom [0..3];
-		if (bom [0] == 0xff && bom [1] == 0xfe) return bom [0..2]; // UTF-16LE
-		if (bom [0] == 0xfe && bom [1] == 0xff) return bom [0..2]; // UTF-16BE
-		if (bom [0] == 0x00 && bom [1] == 0x00 && bom [2] == 0xfe && bom [3] == 0xff) return bom [0..4];
-		return [];
+		Assert.Equal (encoding.GetPreamble (), actualPreamble);
 	}
 }
