@@ -37,7 +37,7 @@ partial class ViewController {
 
 	[Theory]
 	[MemberData (nameof (Encodings))]
-	public async Task WritingNewContent_KeepsEncodingFromExistingFile (Encoding encoding)
+	public async Task ConsumeAsync_ExistingFile_KeepsEncoding (Encoding encoding)
 	{
 
 		// Arrange
@@ -45,18 +45,7 @@ partial class ViewController {
 		var logger = Mock.Of<ILogger> ();
 		var fileWorker = new FileWorker (logger, fileSystem);
 
-		using (var vStream = fileSystem.File.Create (fileName)) {
-			// Gets the preamble in order to attach the BOM
-			var vPreambleByte = encoding.GetPreamble ();
-
-			// Writes the preamble first
-			vStream.Write (vPreambleByte, 0, vPreambleByte.Length);
-
-			// Gets the bytes from text
-			byte [] vByteData = encoding.GetBytes (fileContent);
-			vStream.Write (vByteData, 0, vByteData.Length);
-			vStream.Close ();
-		}
+		await fileSystem.File.WriteAllTextAsync (fileName, fileContent, encoding);
 
 		// Act
 		await fileWorker.ConsumeAsync (new FileMessage ("0", fileName, fileContent), default);
@@ -79,4 +68,36 @@ partial class ViewController {
 
 		Assert.Equal (encoding.GetPreamble (), actualPreamble);
 	}
+
+	[Fact]
+	public async Task ConsumeAsync_NewFile_UsesDefaultEncodingAndPreamble ()
+	{
+		// Arrange
+		var fileSystem = new MockFileSystem ();
+		var logger = Mock.Of<ILogger> ();
+		var fileWorker = new FileWorker (logger, fileSystem);
+		var fileWorker_defaultEncoding = new UTF8Encoding (true);
+		var fileWorker_defaultPreamble = fileWorker_defaultEncoding.GetPreamble ();
+
+		// Act
+		await fileWorker.ConsumeAsync (new FileMessage ("0", fileName, fileContent), default);
+
+		// Assert
+		Assert.True (fileSystem.File.Exists (fileName));
+
+		using var inStream = fileSystem.FileStream.New (fileName, FileMode.Open, FileAccess.Read);
+		byte [] bom = new byte [4];
+		inStream.Read (bom, 0, 4);
+		inStream.Seek (0, SeekOrigin.Begin);
+
+		using var reader = new StreamReader (inStream, true);
+		reader.ReadToEnd ();
+		var actualEncoding = reader.CurrentEncoding;
+		var encodingPreamble = actualEncoding.GetPreamble ();
+		var actualPreamble = encodingPreamble.SequenceEqual (bom [0..encodingPreamble.Length]) ? encodingPreamble : [];
+
+		Assert.Equivalent (fileWorker_defaultEncoding.EncodingName, actualEncoding.EncodingName);
+		Assert.Equal (fileWorker_defaultPreamble, actualPreamble);
+	}
+
 }

@@ -15,38 +15,44 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<FileMessa
 	public override async Task ConsumeAsync (FileMessage message, CancellationToken cancellationToken = default)
 	{
 		try {
-			// Read the existing file and detect the BOM
+			// Preserve the preamble and encoding from the existing file
+			Encoding encoding = new UTF8Encoding (true);
 			byte [] preamble = [];
-			Encoding encoding = Encoding.Default;
 
+			// If the file exists, get the encoding and preamble from the file to preserve it
 			if (fileSystem.File.Exists (message.Path)) {
 
 				byte [] bom = new byte [4];
-				using (var fs = fileSystem.FileStream.New (message.Path, FileMode.Open, FileAccess.Read)) {
-					fs.Read (bom, 0, 4);
-				}
-
 				using var inStream = fileSystem.FileStream.New (message.Path, FileMode.Open, FileAccess.Read);
+				inStream.Read (bom, 0, 4);
+				inStream.Seek (0, SeekOrigin.Begin);
+
 				using var reader = new StreamReader (inStream, true);
 				await reader.ReadToEndAsync (cancellationToken);
 				encoding = reader.CurrentEncoding;
 				var encodingPreamble = encoding.GetPreamble ();
-				preamble = encodingPreamble.SequenceEqual (bom [0..encodingPreamble.Length]) ? encodingPreamble : preamble;
+				// When StreamReader detects the encoding, it is suppoosed to detect the presence of the BOM
+				// However in testing GetPreamble seems to always return the BOM for the encoding regardless of the BOM
+				// actually being present in the file. So we check the encoding's preamble vs the actual preamble,
+				// and if they match, then the BOM was actually present in the file.
+				preamble = encodingPreamble.SequenceEqual (bom [0..encodingPreamble.Length]) ? encodingPreamble : preamble;				
+			} else {
+				// if the file doesn't exist, use the defauilt encoding preamble
+				preamble = encoding.GetPreamble ();
 			}
 
 			// Write the new content to the file, using the detected BOM
-			using var vStream = fileSystem.File.Create (message.Path);
+			using var outStream = fileSystem.File.Create (message.Path);
 
 			// Writes the preamble first
-			vStream.Write (preamble, 0, preamble.Length);
+			outStream.Write (preamble, 0, preamble.Length);
 
 			// Gets the bytes from text
 			byte [] data = encoding.GetBytes (message.Content);
-			vStream.Write (data, 0, data.Length);
-			vStream.Close ();
+			outStream.Write (data, 0, data.Length);
 
 		} catch (Exception ex) {
-			Logger?.Fatal ($"Exception in ConsumeAsync: {ex.Message}");
+			Logger?.Fatal (ex, $"Exception in ConsumeAsync: {ex.Message}");
 			throw;
 		}
 	}
