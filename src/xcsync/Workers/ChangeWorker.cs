@@ -9,13 +9,7 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-struct ChangeMessage (string id, string path, SyncDirection direction, ProjectFileChangeMonitor clrMonitor, ProjectFileChangeMonitor xcodeMonitor) {
-	public string Id { get; set; } = id;
-	public string Path { get; set; } = path;
-	public SyncDirection Direction { get; set; } = direction;
-	public ProjectFileChangeMonitor ClrMonitor { get; set; } = clrMonitor;
-	public ProjectFileChangeMonitor XcodeMonitor { get; set; } = xcodeMonitor;
-}
+record struct ChangeMessage (string Id, string Path, SyncDirection Direction, ProjectFileChangeMonitor ClrMonitor, ProjectFileChangeMonitor XcodeMonitor);
 
 class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, ClrProject clrProject, XcodeWorkspace xcodeProject) : BaseWorker<ChangeMessage> {
 	public override async Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
