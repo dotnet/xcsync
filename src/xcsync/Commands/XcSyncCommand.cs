@@ -46,6 +46,6 @@ class XcSyncCommand : RootCommand {
 
 		AddCommand (new GenerateCommand (fileSystem, Logger));
 		AddCommand (new SyncCommand (fileSystem, Logger));
-		AddCommand (new WatchCommand (fileSystem, Logger));
+		// AddCommand (new WatchCommand (fileSystem, Logger));
 	}
 }
