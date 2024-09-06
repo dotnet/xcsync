@@ -17,15 +17,14 @@ struct ChangeMessage (string id, string path, SyncDirection direction, ProjectFi
 	public ProjectFileChangeMonitor XcodeMonitor { get; set; } = xcodeMonitor;
 }
 
-class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger) : BaseWorker<ChangeMessage> {
-	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default) 
+class ChangeWorker (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, ClrProject clrProject, XcodeWorkspace xcodeProject) : BaseWorker<ChangeMessage> {
+	public override async Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
 		message.ClrMonitor.StopMonitoring ();
 		message.XcodeMonitor.StopMonitoring ();
 		await new SyncContext (fileSystem, typeService, message.Direction, projectPath, targetDir, framework, logger).SyncAsync (cancellationToken);
-		// message.ClrMonitor.StartMonitoring ();
-		// message.XcodeMonitor.StartMonitoring ();
-		return Task.CompletedTask;
+		message.ClrMonitor.StartMonitoring (clrProject, cancellationToken);
+		message.XcodeMonitor.StartMonitoring (xcodeProject, cancellationToken);
 	}
 
 	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default) 
