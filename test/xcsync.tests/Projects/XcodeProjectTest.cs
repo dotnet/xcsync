@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Serilog;
 using Xamarin;
+using xcsync.Projects;
 using xcsync.Projects.Xcode;
 using Xunit.Abstractions;
-using System.IO.Abstractions;
-using Serilog;
-using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
 
@@ -360,7 +360,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		// Run 'xcsync generate'
-		await new SyncContext (new FileSystem(), new TypeService(testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
 
 		projectFiles.SelectMany (projectFile => {
 			return (IEnumerable<string>) (Path.HasExtension (projectFile) ? ([projectFile]) : ([$"{projectFile}.m", $"{projectFile}.h"]));
@@ -374,7 +374,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		});
 	}
 
-	[Fact (Skip="Only works interactively")]
+	[Fact (Skip = "Only works interactively")]
 	[Trait ("Category", "XcodeIntegration")]
 	[SkipOnCI ("Only works interactively")]
 	public async void IsXcodeProjectOpen ()

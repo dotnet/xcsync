@@ -29,18 +29,18 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 		clrChanges.OnFileChanged = async path => {
 			Logger.Debug ($"CLR Project file {path} changed");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path,  SyncDirection.ToXcode));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.ToXcode));
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
 			Logger.Debug ($"Xcode Project file {path} changed");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path,  SyncDirection.FromXcode));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.FromXcode));
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"CLR Project file {oldPath} renamed to {newPath}");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath,  SyncDirection.ToXcode));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.ToXcode));
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
@@ -48,7 +48,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
 			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath,  SyncDirection.FromXcode));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.FromXcode));
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
@@ -70,7 +70,8 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
 	}
 
-	protected async override Task ConfigureMarilleHub () {
+	protected async override Task ConfigureMarilleHub ()
+	{
 		await base.ConfigureMarilleHub ();
 		// Hub creates a topic channel w message type template
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
