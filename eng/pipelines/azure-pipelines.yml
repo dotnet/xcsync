@@ -122,9 +122,9 @@ extends:
       - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
         - template: /eng/common/templates-official/job/onelocbuild.yml@self
           parameters:
-            # LclSource: lclFilesfromPackage
-            # LclPackageId: 'LCL-JUNO-PROD-XCSYNC'
-            LclSource: lclFilesInRepo
+            LclSource: lclFilesfromPackage
+            LclPackageId: 'LCL-JUNO-PROD-XMACCORE'
+            #LclSource: lclFilesInRepo
             SkipLocProjectJsonGeneration: true
             MirrorRepo: xcsync
             MirrorBranch: main
