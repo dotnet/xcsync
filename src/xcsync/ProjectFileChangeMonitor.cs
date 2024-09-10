@@ -53,7 +53,9 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 
 		this.project = project;
 
-		watcher.Path = project.RootPath;
+#pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
+		watcher.Path = Path.GetDirectoryName(project.RootPath)!;
+#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 		watcher.Filter = "*.*";
