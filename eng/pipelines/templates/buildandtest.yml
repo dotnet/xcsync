@@ -28,9 +28,6 @@ steps:
     inputs: 
       useGlobalJson: true
 
-  - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
-    displayName: Install workloads
-
   - ${{ if ne(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
               -restore -build
@@ -51,6 +48,9 @@ steps:
       displayName: 🛠️ Build
 
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
+    - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
+      displayName: Install workloads
+
     - ${{ if ne(parameters.isWindows, 'true') }}:
       - script: mkdir ${{ parameters.repoArtifactsPath }}/devcert-scripts &&
                 cd ${{ parameters.repoArtifactsPath }}/devcert-scripts &&
