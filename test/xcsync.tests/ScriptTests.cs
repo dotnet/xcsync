@@ -4,7 +4,8 @@
 namespace xcsync.tests;
 
 public class ScriptsTests {
-	[Fact]
+	
+	[MacOSOnlyFact]
 	public void SelectXcode_ReturnsXcodePath ()
 	{
 		// Act

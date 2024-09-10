@@ -91,10 +91,18 @@
   </ItemGroup>
   <ItemGroup Label="ClangSharp">
     <PackageReference Include="clangsharp" />
-    <PackageReference Include="libClang.runtime.osx-arm64" />
-    <PackageReference Include="libClangSharp.runtime.osx-arm64" />
-    <PackageReference Include="libClang.runtime.osx-x64" />
-    <PackageReference Include="libClangSharp.runtime.osx-x64" />
+
+    <PackageReference Include="libClang.runtime.osx-arm64" Condition="!$([MSBuild]::IsOSPlatform('windows'))" />
+    <PackageReference Include="libClangSharp.runtime.osx-arm64" Condition="!$([MSBuild]::IsOSPlatform('windows'))" />
+
+    <PackageReference Include="libClang.runtime.osx-x64" Condition="!$([MSBuild]::IsOSPlatform('windows'))" />
+    <PackageReference Include="libClangSharp.runtime.osx-x64" Condition="!$([MSBuild]::IsOSPlatform('windows'))" />
+
+    <PackageReference Include="libClang.runtime.win-x64" Condition="$([MSBuild]::IsOSPlatform('windows'))" />
+    <PackageReference Include="libClangSharp.runtime.win-x64" Condition="$([MSBuild]::IsOSPlatform('windows'))" />
+    
+    <PackageReference Include="libClang.runtime.win-arm64" Condition="$([MSBuild]::IsOSPlatform('windows'))" />
+    <PackageReference Include="libClangSharp.runtime.win-arm64" Condition="$([MSBuild]::IsOSPlatform('windows'))" />
   </ItemGroup>
 
   <ItemGroup>
