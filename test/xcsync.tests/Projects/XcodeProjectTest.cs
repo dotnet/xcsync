@@ -374,7 +374,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		});
 	}
 
-	[Fact (Skip = "Only works interactively")]
+	[MacOSOnlyFact ()]
 	[Trait ("Category", "XcodeIntegration")]
 	[SkipOnCI ("Only works interactively")]
 	public async void IsXcodeProjectOpen ()
@@ -382,9 +382,10 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		// Assert to make sure Xcode successfully opens project when --open flag used
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+		var framework = "macos";
 
 		// Run 'dotnet new macos' in temp dir
-		await DotnetNew (TestOutput, "macos", tmpDir);
+		await DotnetNew (TestOutput, framework, tmpDir);
 
 		Assert.True (Directory.Exists (Path.Combine (tmpDir)));
 
@@ -395,10 +396,9 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		try {
 			// Run 'xcsync generate'
-			await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, "", testLogger).SyncAsync ();
+			await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, framework, testLogger, true).SyncAsync ();
 
 			// check if xcode has project open
-
 			string openResult = Scripts.Run (Scripts.CheckXcodeProject (projectPath));
 
 			Assert.Equal ("true", openResult);
