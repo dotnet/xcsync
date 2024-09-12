@@ -16,6 +16,7 @@ public class ProjectFileChangeMonitorTests {
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
 		var fileSystem = Mock.Of<IFileSystem> ();
+		Mock.Get(fileSystem).Setup (fs => fs.Path.GetDirectoryName (project.RootPath)).Returns ("/repos/repo/project");
 
 		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 
@@ -34,6 +35,7 @@ public class ProjectFileChangeMonitorTests {
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
 		var fileSystem = Mock.Of<IFileSystem> ();
+		Mock.Get(fileSystem).Setup (fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
 
 		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 
@@ -59,6 +61,7 @@ public class ProjectFileChangeMonitorTests {
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> (p => p.ProjectFilesFilter == fileFilter);
 		var fileSystem = Mock.Of<IFileSystem> ();
+		Mock.Get(fileSystem).Setup(fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
 
 		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 
@@ -83,6 +86,7 @@ public class ProjectFileChangeMonitorTests {
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
 		var fileSystem = Mock.Of<IFileSystem> ();
+		Mock.Get(fileSystem).Setup(fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
 
 		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 		var fileRenamed = false;
@@ -104,6 +108,7 @@ public class ProjectFileChangeMonitorTests {
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
 		var fileSystem = Mock.Of<IFileSystem> ();
+		Mock.Get(fileSystem).Setup(fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
 
 		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 		var errorOccurred = false;
