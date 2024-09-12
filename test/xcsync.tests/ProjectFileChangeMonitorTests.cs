@@ -8,18 +8,27 @@ using Serilog;
 namespace xcsync.tests;
 
 public class ProjectFileChangeMonitorTests {
+
+	private IFileSystemWatcher watcher;
+	private ILogger logger;
+	private ISyncableProject project;
+	private IFileSystem fileSystem;
+	private ProjectFileChangeMonitor monitor;
+
+	public ProjectFileChangeMonitorTests ()
+	{
+		watcher = Mock.Of<IFileSystemWatcher>();
+		logger = Mock.Of<ILogger>();
+		project = Mock.Of<ISyncableProject>();
+		fileSystem = Mock.Of<IFileSystem>();
+		Mock.Get(fileSystem).Setup(fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
+
+		monitor = new ProjectFileChangeMonitor(fileSystem, watcher, logger);
+	}
+
 	[Fact]
 	public void StartMonitoring_ShouldEnableRaisingEvents ()
 	{
-		// Arrange
-		var watcher = Mock.Of<IFileSystemWatcher> ();
-		var logger = Mock.Of<ILogger> ();
-		var project = Mock.Of<ISyncableProject> ();
-		var fileSystem = Mock.Of<IFileSystem> ();
-		Mock.Get(fileSystem).Setup (fs => fs.Path.GetDirectoryName (project.RootPath)).Returns ("/repos/repo/project");
-
-		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
-
 		// Act
 		monitor.StartMonitoring (project);
 
@@ -30,15 +39,6 @@ public class ProjectFileChangeMonitorTests {
 	[Fact]
 	public void StopMonitoring_ShouldDisableRaisingEvents ()
 	{
-		// Arrange
-		var watcher = Mock.Of<IFileSystemWatcher> ();
-		var logger = Mock.Of<ILogger> ();
-		var project = Mock.Of<ISyncableProject> ();
-		var fileSystem = Mock.Of<IFileSystem> ();
-		Mock.Get(fileSystem).Setup (fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
-
-		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
-
 		Assert.False (watcher.EnableRaisingEvents);
 		monitor.StartMonitoring (project);
 		Assert.True (watcher.EnableRaisingEvents);
@@ -56,14 +56,7 @@ public class ProjectFileChangeMonitorTests {
 	[InlineData (new string [] { "*/Resources/*.resx", "*.cs" }, @"/repos/repo/project/src/Resources", "Some.File.resx")]
 	public void OnFileChanged_ShouldBeCalled_WhenFileChangesDetected (string [] fileFilter, string filePath, string fileName)
 	{
-		// Arrange
-		var watcher = Mock.Of<IFileSystemWatcher> ();
-		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> (p => p.ProjectFilesFilter == fileFilter);
-		var fileSystem = Mock.Of<IFileSystem> ();
-		Mock.Get(fileSystem).Setup(fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
-
-		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 
 		var fileChanged = false;
 		monitor.OnFileChanged =
@@ -81,14 +74,6 @@ public class ProjectFileChangeMonitorTests {
 	[Fact]
 	public void OnFileRenamed_ShouldBeCalled_WhenFileIsRenamed ()
 	{
-		// Arrange
-		var watcher = Mock.Of<IFileSystemWatcher> ();
-		var logger = Mock.Of<ILogger> ();
-		var project = Mock.Of<ISyncableProject> ();
-		var fileSystem = Mock.Of<IFileSystem> ();
-		Mock.Get(fileSystem).Setup(fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
-
-		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 		var fileRenamed = false;
 		monitor.OnFileRenamed = (oldPath, newPath) => fileRenamed = true;
 
@@ -103,14 +88,6 @@ public class ProjectFileChangeMonitorTests {
 	[Fact]
 	public void OnError_ShouldBeCalled_WhenErrorOccurs ()
 	{
-		// Arrange
-		var watcher = Mock.Of<IFileSystemWatcher> ();
-		var logger = Mock.Of<ILogger> ();
-		var project = Mock.Of<ISyncableProject> ();
-		var fileSystem = Mock.Of<IFileSystem> ();
-		Mock.Get(fileSystem).Setup(fs => fs.Path.GetDirectoryName(project.RootPath)).Returns("/repos/repo/project");
-
-		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 		var errorOccurred = false;
 		monitor.OnError = ex => errorOccurred = true;
 
