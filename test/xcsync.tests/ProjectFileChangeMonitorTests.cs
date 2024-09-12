@@ -98,4 +98,40 @@ public class ProjectFileChangeMonitorTests {
 		// Assert
 		Assert.True (errorOccurred);
 	}
+
+
+
+	[InlineData(WatcherChangeTypes.Changed)]
+	[InlineData(WatcherChangeTypes.Created)]
+	[InlineData(WatcherChangeTypes.Deleted)]
+	[InlineData(WatcherChangeTypes.Renamed)]
+	[Theory]
+	public void AssertMonitorCapturesEvents(WatcherChangeTypes eventType)
+	{
+		var fileChanged = false;
+		monitor.OnFileChanged = path => fileChanged = true;
+		monitor.OnFileRenamed = (oldPath, newPath) => fileChanged = true;
+
+		// Act
+		monitor.StartMonitoring(project);
+
+		switch (eventType)
+		{
+			case WatcherChangeTypes.Changed:
+				Mock.Get(watcher).Raise(w => w.Changed += null, new FileSystemEventArgs(eventType, @"/repos/repo/project/src", "Some.File"));
+				break;
+			case WatcherChangeTypes.Created:
+				Mock.Get(watcher).Raise(w => w.Created += null, new FileSystemEventArgs(eventType, @"/repos/repo/project/src", "Some.File"));
+				break;
+			case WatcherChangeTypes.Deleted:
+				Mock.Get(watcher).Raise(w => w.Deleted += null, new FileSystemEventArgs(eventType, @"/repos/repo/project/src", "Some.File"));
+				break;
+			case WatcherChangeTypes.Renamed:
+				Mock.Get(watcher).Raise(w => w.Renamed += null, new RenamedEventArgs(eventType, @"/repos/repo/project/src", "Some.File", "Old.File"));
+				break;
+		}
+
+		// Assert
+		Assert.True(fileChanged);
+	}
 }
