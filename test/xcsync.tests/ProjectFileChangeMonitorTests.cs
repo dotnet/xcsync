@@ -15,8 +15,9 @@ public class ProjectFileChangeMonitorTests {
 		var watcher = Mock.Of<IFileSystemWatcher> ();
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
+		var fileSystem = Mock.Of<IFileSystem> ();
 
-		var monitor = new ProjectFileChangeMonitor (watcher, logger);
+		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 
 		// Act
 		monitor.StartMonitoring (project);
@@ -32,8 +33,9 @@ public class ProjectFileChangeMonitorTests {
 		var watcher = Mock.Of<IFileSystemWatcher> ();
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
+		var fileSystem = Mock.Of<IFileSystem> ();
 
-		var monitor = new ProjectFileChangeMonitor (watcher, logger);
+		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 
 		Assert.False (watcher.EnableRaisingEvents);
 		monitor.StartMonitoring (project);
@@ -56,8 +58,9 @@ public class ProjectFileChangeMonitorTests {
 		var watcher = Mock.Of<IFileSystemWatcher> ();
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> (p => p.ProjectFilesFilter == fileFilter);
+		var fileSystem = Mock.Of<IFileSystem> ();
 
-		var monitor = new ProjectFileChangeMonitor (watcher, logger);
+		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 
 		var fileChanged = false;
 		monitor.OnFileChanged =
@@ -79,8 +82,9 @@ public class ProjectFileChangeMonitorTests {
 		var watcher = Mock.Of<IFileSystemWatcher> ();
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
+		var fileSystem = Mock.Of<IFileSystem> ();
 
-		var monitor = new ProjectFileChangeMonitor (watcher, logger);
+		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 		var fileRenamed = false;
 		monitor.OnFileRenamed = (oldPath, newPath) => fileRenamed = true;
 
@@ -99,8 +103,9 @@ public class ProjectFileChangeMonitorTests {
 		var watcher = Mock.Of<IFileSystemWatcher> ();
 		var logger = Mock.Of<ILogger> ();
 		var project = Mock.Of<ISyncableProject> ();
+		var fileSystem = Mock.Of<IFileSystem> ();
 
-		var monitor = new ProjectFileChangeMonitor (watcher, logger);
+		var monitor = new ProjectFileChangeMonitor (fileSystem, watcher, logger);
 		var errorOccurred = false;
 		monitor.OnError = ex => errorOccurred = true;
 
