@@ -346,6 +346,10 @@
     </data>
 
     <!-- Xcode Workspace Messages -->
+	<data name="XcodeWorkspace.XcodeProjectNotFound" xml:space="preserve">
+        <value>File not found: {0}</value>
+        <comment>{0} is the path to the Xcode project</comment>
+	</data>
     <data name="XcodeWorkspace.FailToLoadXcodeProject" xml:space="preserve">
         <value>Failed to load the Xcode project file at {0}</value>
         <comment>{0} is the path to the Xcode project</comment>
