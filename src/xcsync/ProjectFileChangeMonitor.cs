@@ -12,7 +12,7 @@ namespace xcsync;
 /// </summary>
 /// <param name="fileSystemWatcher">an instance of a <see cref="FileSystemWatcher"/></param>
 /// <param name="logger"></param>
-class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger logger) : IDisposable {
+class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileSystemWatcher, ILogger logger) : IDisposable {
 	readonly static Action<string> defaultOnFileChanged = _ => { };
 	readonly static Action<string, string> defaultOnFileRenamed = (_, _) => { };
 	readonly static Action<Exception> defaultOnError = _ => { };
@@ -53,7 +53,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 
 		this.project = project;
 
-		watcher.Path = project.RootPath;
+		watcher.Path = fileSystem.Path.GetDirectoryName(project.RootPath)!;
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 		watcher.Filter = "*.*";

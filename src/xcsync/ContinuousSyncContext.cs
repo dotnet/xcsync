@@ -22,10 +22,10 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// Generate initial Xcode project
 		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
-		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
+		using var clrChanges = new ProjectFileChangeMonitor (FileSystem, FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (ClrProject, token);
 
-		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
+		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem, FileSystem.FileSystemWatcher.New (), Logger);
 		xcodeChanges.StartMonitoring (XcodeProject, token);
 
 		clrChanges.OnFileChanged = async path => {
