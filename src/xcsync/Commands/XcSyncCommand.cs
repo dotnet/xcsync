@@ -3,6 +3,7 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using Serilog;
 using Serilog.Events;
 
@@ -48,5 +49,11 @@ class XcSyncCommand : RootCommand {
 		AddCommand (new SyncCommand (fileSystem, Logger));
 		if (!string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("EnableXcsyncWatch")))
 			AddCommand (new WatchCommand (fileSystem, Logger));
+
+		AddValidator(result => {
+			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				result.ErrorMessage = Strings.Errors.Validation.InvalidOS;
+			}
+		});
 	}
 }

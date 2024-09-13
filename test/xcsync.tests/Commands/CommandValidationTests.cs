@@ -213,6 +213,68 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.Equivalent (expectedTfms, tfms);
 	}
 
+	[WindowsOnlyFact]
+	public async void BaseCommandValidation_WhenRunOnWindows_ReturnsError ()
+	{
+		var projectName = Guid.NewGuid ().ToString ();
+
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+
+		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+		xcSync.Logger = logger;
+
+		await DotnetNew (TestOutput, "ios", tmpDir, "");
+		Assert.True (Directory.Exists (tmpDir));
+		var fullProjectPath = fileSystem.Path.Combine (tmpDir, $"{projectName}.csproj");
+
+		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
+		var args = new string [] {
+			"--project", fullProjectPath,
+			"--target-framework-moniker", "net8.0-ios",
+			"--target", "obj/xcode"
+		 };
+
+		var console = new CapturingConsole ();
+		int exitCode = baseCommand.Invoke (args, console);
+
+		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
+
+		Assert.Equal ("The xcsync tool can only be run on macOS.", errorMessage);
+		Assert.Equal (1, exitCode);
+	}
+
+	[MacOSOnlyFact]
+	public async void BaseCommandValidation_WhenRunOnMacOS_DoesNotReturnError ()
+	{
+		var projectName = Guid.NewGuid ().ToString ();
+
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+
+		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+		xcSync.Logger = logger;
+
+		await DotnetNew (TestOutput, "ios", tmpDir, "");
+		Assert.True (Directory.Exists (tmpDir));
+		var fullProjectPath = fileSystem.Path.Combine (tmpDir, $"{projectName}.csproj");
+
+		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
+		var args = new string [] {
+			"--project", fullProjectPath,
+			"--target-framework-moniker", "net8.0-ios",
+			"--target", "obj/xcode"
+		 };
+
+		var console = new CapturingConsole ();
+		int exitCode = baseCommand.Invoke (args, console);
+
+		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
+
+		Assert.Equal ("", errorMessage);
+		Assert.Equal (0, exitCode);
+	}
+
 	const string net_8_0_iosProject = @"
 <Project Sdk=""Microsoft.NET.Sdk"">
   <PropertyGroup>
