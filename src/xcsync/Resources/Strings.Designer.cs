@@ -36,6 +36,7 @@ static class Strings {
 			internal static string MissingTfmInPath (string path) => string.Format (Resources.Strings.Errors_Validation_MissingValidTargetFrameworkInPath, path);
 			internal static string InvalidTfm (string tfm) => string.Format (Resources.Strings.Errors_Validation_InvalidTargetFramework, tfm);
 			internal static string InvalidVerbosity => Resources.Strings.Errors_Validation_InvalidVerbosity;
+			internal static string InvalidOS => Resources.Strings.Errors_Validation_InvalidOS;
 		}
 
 		internal static string InvalidOption (string option, string error) => string.Format (Resources.Strings.Errors_InvalidOption, option, error);

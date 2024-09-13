@@ -205,6 +205,9 @@
     <data name="Errors.Validation.InvalidVerbosity" xml:space="preserve">
 		<value>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</value>
 	</data>
+    <data name="Errors.Validation.InvalidOS" xml:space="preserve">
+		<value>The xcsync tool can only be run on macOS.</value>
+	</data>	
 	<data name="Errors.MultipleTfmsFound" xml:space="preserve">
 		<value>Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</value>
 	</data>
