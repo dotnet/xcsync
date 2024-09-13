@@ -122,9 +122,9 @@ extends:
       - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
         - template: /eng/common/templates-official/job/onelocbuild.yml@self
           parameters:
-            # LclSource: lclFilesfromPackage
-            # LclPackageId: 'LCL-JUNO-PROD-XCSYNC'
-            LclSource: lclFilesInRepo
+            LclSource: lclFilesfromPackage
+            LclPackageId: 'LCL-JUNO-PROD-XMACCORE'
+            #LclSource: lclFilesInRepo
             SkipLocProjectJsonGeneration: true
             MirrorRepo: xcsync
             MirrorBranch: main
@@ -148,6 +148,10 @@ extends:
             clean: all
 
           jobs:
+
+            # ----------------------------------------------------------------
+            # The macOS job is primarily responsible for running the tests
+            # ----------------------------------------------------------------
           - job: build_macOS
             displayName: Build & Test on macOS
             # timeout accounts for wait times for helix agents up to 30mins
@@ -178,6 +182,9 @@ extends:
                   repoTestResultsPath: $(Build.Arcade.TestResultsPath)
 
           - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ),  or( eq( variables['Build.SourceBranch'], 'refs/heads/main' ), eq( variables['Build.SourceBranch'], 'refs/heads/prerelease' ), eq( variables['Build.SourceBranch'], 'refs/heads/release' ) ) ) }}:
+              # -------------------------------------------------------------------------
+              # The Windows job is only required to sign the package and it's contents
+              # -------------------------------------------------------------------------
             - job: build_Windows
               displayName: Build & Pack & Sign on Windows
               # timeout accounts for wait times for helix agents up to 30mins

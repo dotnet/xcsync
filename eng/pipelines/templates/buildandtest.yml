@@ -28,16 +28,13 @@ steps:
     inputs: 
       useGlobalJson: true
 
-  - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
-    displayName: Install workloads
-
   - ${{ if ne(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
               -restore -build
               -configuration ${{ parameters.buildConfig }}
               /p:ArchiveTests=true
               /bl:${{ parameters.repoLogPath }}build.binlog
-              $(_OfficialBuildIdArgs)
+              $(_OfficialBuildArgs)
               -p:Platform=`uname -m`
       displayName: 🛠️ Build
   
@@ -47,10 +44,13 @@ steps:
               -configuration ${{ parameters.buildConfig }}
               /p:ArchiveTests=true
               /bl:${{ parameters.repoLogPath }}build.binlog
-              $(_OfficialBuildIdArgs)
+              $(_OfficialBuildArgs)
       displayName: 🛠️ Build
 
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
+    - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
+      displayName: Install workloads
+
     - ${{ if ne(parameters.isWindows, 'true') }}:
       - script: mkdir ${{ parameters.repoArtifactsPath }}/devcert-scripts &&
                 cd ${{ parameters.repoArtifactsPath }}/devcert-scripts &&
@@ -68,7 +68,7 @@ steps:
       - script: ${{ parameters.dotnetScript }} dotnet-coverage collect
                 --settings $(Build.SourcesDirectory)/eng/CodeCoverage.config
                 --output ${{ parameters.repoTestResultsPath }}/NonHelix.cobertura.xml
-                "${{ parameters.buildScript }} -testnobuild -test -configuration ${{ parameters.buildConfig }} /bl:${{ parameters.repoLogPath }}tests.binlog $(_OfficialBuildIdArgs) -p:Platform=`uname -m`"
+                "${{ parameters.buildScript }} -testnobuild -test -configuration ${{ parameters.buildConfig }} /bl:${{ parameters.repoLogPath }}tests.binlog $(_OfficialBuildArgs) -p:Platform=`uname -m`"
         displayName: Run non-helix tests
 
   - ${{ if eq(parameters.runHelixTests, 'true') }}:
