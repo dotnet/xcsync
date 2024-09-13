@@ -18,6 +18,7 @@ public class Base (ITestOutputHelper testOutput) {
 
 	protected static readonly string XcsyncExe = Path.Combine (Directory.GetCurrentDirectory (), "xcsync");
 	protected static readonly string GitExe = "git";
+	protected static readonly string PatchExe = "patch";
 
 	protected static async Task<int> Dotnet (ITestOutputHelper output, string path, string command = "") => await Run (output, path, "dotnet", command);
 
@@ -29,18 +30,21 @@ public class Base (ITestOutputHelper testOutput) {
 
 	protected static async Task<int> Git (ITestOutputHelper output, params string [] arguments) => await Run (output, Directory.GetCurrentDirectory (), GitExe, arguments);
 
+	protected static async Task<int> Patch(ITestOutputHelper output, string path, string diff) => await Run (output, path, PatchExe, ["-i", diff]);
 
 	static async Task<int> Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
 		output.WriteLine ($"\rRunning: {path}/{executable} {string.Join (" ", arguments)}");
 		var outputWrapper = new LoggingOutputWriter (output);
 		var exec = await Execution.RunAsync (
-				executable,
-				arguments,
-				workingDirectory: path,
-				standardOutput: outputWrapper,
-				standardError: outputWrapper
-			).ConfigureAwait (false);
+			executable,
+			arguments,
+			workingDirectory: path,
+			standardOutput: outputWrapper,
+			standardError: outputWrapper,
+			log: outputWrapper,
+			timeout: TimeSpan.FromSeconds (10)
+		).ConfigureAwait (false);
 		return exec.ExitCode;
 	}
 

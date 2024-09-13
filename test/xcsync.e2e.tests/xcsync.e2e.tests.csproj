@@ -27,4 +27,9 @@
   <ItemGroup>
     <Compile Include="../xcsync.tests/Cache.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="data/*.diff" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
 </Project>
