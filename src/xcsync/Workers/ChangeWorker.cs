@@ -12,7 +12,7 @@ namespace xcsync;
 
 record struct ChangeMessage (string Id, string Path, SyncDirection Direction, ProjectFileChangeMonitor ClrMonitor, ProjectFileChangeMonitor XcodeMonitor);
 
-class ChangeWorker (IFileSystem FileSystem, ITypeService TypeService, string ProjectPath, string TargetDir, string Framework, ILogger Logger, ClrProject ClrProject, XcodeWorkspace XcodeProject) : BaseWorker<ChangeMessage> {
+class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir, string Framework, ILogger Logger, ClrProject ClrProject, XcodeWorkspace XcodeProject) : BaseWorker<ChangeMessage> {
 	public override async Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
 		Logger.Debug (Strings.Watch.PausingMonitoring);
@@ -21,7 +21,7 @@ class ChangeWorker (IFileSystem FileSystem, ITypeService TypeService, string Pro
 		if (message.Direction == SyncDirection.ToXcode)
 			XcodeCommand<GenerateCommand>.RecreateDirectory (FileSystem, TargetDir);
 		Logger.Debug (Strings.Watch.Syncing);
-		await new SyncContext (FileSystem, TypeService, message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
+		await new SyncContext (FileSystem, new TypeService(Logger!), message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
 		Logger.Debug (Strings.Watch.ResumingMonitoring);
 		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
 		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
