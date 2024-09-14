@@ -13,14 +13,14 @@ namespace xcsync;
 /// <param name="fileSystemWatcher">an instance of a <see cref="FileSystemWatcher"/></param>
 /// <param name="logger"></param>
 class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileSystemWatcher, ILogger logger) : IDisposable {
-	readonly static Action<string> defaultOnFileChanged = _ => { };
+	readonly static Func<string, Task> defaultOnFileChanged = _ => Task.CompletedTask;
 	readonly static Action<string, string> defaultOnFileRenamed = (_, _) => { };
 	readonly static Action<Exception> defaultOnError = _ => { };
 
 	/// <summary>
 	/// Called when a file is changed.
 	/// </summary>
-	public Action<string> OnFileChanged { get; set; } = defaultOnFileChanged;
+	public Func<string, Task> OnFileChanged { get; set; } = defaultOnFileChanged;
 
 	/// <summary>
 	/// Called when a file is renamed.
@@ -124,7 +124,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 		OnFileRenamed (e.OldFullPath, e.FullPath);
 	}
 
-	void OnChangedHandler (object sender, FileSystemEventArgs e)
+	async void OnChangedHandler (object sender, FileSystemEventArgs e)
 	{
 		if (disposedValue)
 			return;
@@ -139,7 +139,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		logger.Information (Strings.Watch.FileChanged (e.FullPath, project!.Name));
 
-		OnFileChanged (e.FullPath);
+		await OnFileChanged (e.FullPath);
 	}
 
 	void OnErrorHandler (object sender, ErrorEventArgs e)

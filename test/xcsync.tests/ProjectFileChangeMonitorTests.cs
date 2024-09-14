@@ -59,8 +59,11 @@ public class ProjectFileChangeMonitorTests {
 		var project = Mock.Of<ISyncableProject> (p => p.ProjectFilesFilter == fileFilter);
 
 		var fileChanged = false;
-		monitor.OnFileChanged =
-			path => fileChanged = true;
+		monitor.OnFileChanged = async path =>
+		{
+			fileChanged = true;
+			await Task.CompletedTask;
+		};
 
 		// Act
 		monitor.StartMonitoring (project);
@@ -109,7 +112,12 @@ public class ProjectFileChangeMonitorTests {
 	public void AssertMonitorCapturesEvents(WatcherChangeTypes eventType)
 	{
 		var fileChanged = false;
-		monitor.OnFileChanged = path => fileChanged = true;
+		monitor.OnFileChanged = async path =>
+		{
+			fileChanged = true;
+			await Task.CompletedTask;
+		};
+
 		monitor.OnFileRenamed = (oldPath, newPath) => fileChanged = true;
 
 		// Act
