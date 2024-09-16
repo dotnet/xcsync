@@ -260,8 +260,8 @@
         <note>{0} is the path to the project folder</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeDetected">
-        <source>Changes detected for {0} in {1}.</source>
-        <target state="new">Changes detected for {0} in {1}.</target>
+        <source>Changes detected for {0} in {1} project.</source>
+        <target state="new">Changes detected for {0} in {1} project.</target>
         <note>{0} is the path to the file that changed, {1} is the name of the project</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeFilter">
