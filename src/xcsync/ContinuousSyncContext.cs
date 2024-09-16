@@ -12,8 +12,8 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string ChangeChannel = "Changes";
-	ClrProject ClrProject {get;} = new (fileSystem, logger, typeService, "CLR Project", projectPath, framework);
-	XcodeWorkspace XcodeProject {get;} = new (fileSystem, logger, typeService, "Xcode Project", targetDir, framework);
+	ClrProject ClrProject {get;} = new (fileSystem, logger, typeService, "CLR", projectPath, framework);
+	XcodeWorkspace XcodeProject {get;} = new (fileSystem, logger, typeService, "Xcode", targetDir, framework);
 
 	public async Task SyncAsync (CancellationToken token = default)
 	{
