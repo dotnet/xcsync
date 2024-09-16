@@ -74,6 +74,10 @@ static class Strings {
 		internal static string FileRenamed (string oldPath, string newPath, string projectName) => string.Format (Resources.Strings.Watch_FileRenameDetected, oldPath, newPath, projectName);
 		internal static string FileChanged (string path, string projectName) => string.Format (Resources.Strings.Watch_FileChangeDetected, path, projectName);
 		internal static string ErrorWhileMonitoring (string path) => string.Format (Resources.Strings.Watch_ErrorMonitoringProjectFiles, path);
+		internal static string PausingMonitoring => Resources.Strings.Watch_PausingMonitoring;
+		internal static string Syncing => Resources.Strings.Watch_Syncing;
+		internal static string ResumingMonitoring => Resources.Strings.Watch_ResumingMonitoring;
+		internal static string WorkerException (string messageId, string exceptionMessage) => string.Format (Resources.Strings.Watch_WorkerException, messageId, exceptionMessage);
 	}
 
 	internal static class TypeService {

@@ -14,16 +14,20 @@ record struct ChangeMessage (string Id, string Path, SyncDirection Direction, Pr
 class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir, string Framework, ILogger Logger, ClrProject ClrProject, XcodeWorkspace XcodeProject) : BaseWorker<ChangeMessage> {
 	public override async Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
+		Logger.Debug (Strings.Watch.PausingMonitoring);
 		message.ClrMonitor.StopMonitoring ();
 		message.XcodeMonitor.StopMonitoring ();
-		await new SyncContext (FileSystem, new TypeService(Logger!), message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
+		Logger.Debug (Strings.Watch.Syncing);
+		await new SyncContext (FileSystem, TypeService, message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
+		Logger.Debug (Strings.Watch.ResumingMonitoring);
 		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
 		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
 	}
 
 	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default)
 	{
-		Log.Error (exception, "Error processing change message {Id}", message.Id);
+		Logger.Error (exception, Strings.Watch.WorkerException (message.Id, exception.Message));
+		//TODO: https://github.com/dotnet/xcsync/issues/82
 		return Task.CompletedTask;
 	}
 }
