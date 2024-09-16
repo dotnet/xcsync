@@ -27,8 +27,7 @@ class ChangeWorker (IFileSystem FileSystem, ITypeService TypeService, string Pro
 	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default)
 	{
 		Logger.Error (exception, Strings.Watch.WorkerException (message.Id, exception.Message));
-		//TODO: if exception is encountered, need to do a better job of alerting and loudly stopping
-		// not a quiet failure and seeminlgy try to continue
+		//TODO: https://github.com/dotnet/xcsync/issues/82
 		return Task.CompletedTask;
 	}
 }
