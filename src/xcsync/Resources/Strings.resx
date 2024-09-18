@@ -205,6 +205,9 @@
     <data name="Errors.Validation.InvalidVerbosity" xml:space="preserve">
 		<value>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</value>
 	</data>
+    <data name="Errors.Validation.InvalidOS" xml:space="preserve">
+		<value>The xcsync tool can only be run on macOS.</value>
+	</data>	
 	<data name="Errors.MultipleTfmsFound" xml:space="preserve">
 		<value>Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</value>
 	</data>
@@ -292,6 +295,20 @@
 		<value>An error occurred while monitoring file changes in {0}.</value>
 		<comment>{0} is the path to the project folder</comment>
 	</data>
+	<data name="Watch.PausingMonitoring" xml:space="preserve">
+		<value>Pausing monitoring</value>
+	</data>
+	<data name="Watch.Syncing" xml:space="preserve">
+		<value>Syncing change context</value>
+	</data>
+	<data name="Watch.ResumingMonitoring" xml:space="preserve">
+		<value>Context synced. Resuming monitoring</value>
+	</data>
+	<data name="Watch.WorkerException" xml:space="preserve">
+		<value>Error processing change message {0}: {1}</value>
+		<comment>{0} is the message Id, {1} is the exception message</comment>
+	</data>
+
 
     <!-- Type Service Messages -->
     <data name="TypeService.DuplicateType" xml:space="preserve">
