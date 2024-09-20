@@ -45,10 +45,9 @@ class XcodeCommand<T> : BaseCommand<T> {
 	{
 		string error = string.Empty;
 
-		if (targetPath.EndsWith(DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(targetPath))
-		{
-			LogVerbose(Strings.Base.EstablishDefaultTarget(fileSystem.Path.GetDirectoryName(projectPath)!));
-			targetPath = fileSystem.Path.Combine(fileSystem.Path.GetDirectoryName(projectPath) ?? ".", DefaultXcodeOutputFolder);
+		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
+			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
+			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
 		}
 
 		if (Force) {
