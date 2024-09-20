@@ -106,7 +106,7 @@ public class ProjectFileChangeMonitorTests {
 	[InlineData(WatcherChangeTypes.Deleted)]
 	[InlineData(WatcherChangeTypes.Renamed)]
 	[Theory]
-	public void AssertMonitorCapturesEvents(WatcherChangeTypes eventType)
+	public void StarMonitoring_ShouldCaptureEvents_WithNoException(WatcherChangeTypes eventType)
 	{
 		var fileChanged = false;
 		monitor.OnFileChanged = path => fileChanged = true;

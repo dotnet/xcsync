@@ -44,7 +44,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Fact]
-	public async Task TestDefaultTargetDirectory ()
+	public async Task GenerateCommand_WhenNoTargetSpecified_UsesDefaultTargetDirectory ()
 	{
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
