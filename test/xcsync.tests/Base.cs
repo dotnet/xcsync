@@ -34,8 +34,6 @@ public class Base : IDisposable {
 
 	protected static async Task DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run (output, path, "dotnet", "new", template, "-o", path, templateOptions);
 
-	protected static async Task Xcsync (ITestOutputHelper output, params string[] arguments) => await Run (output, Directory.GetCurrentDirectory(), XcsyncExe, arguments);
-
 	public void Dispose ()
 	{
 		// Cleanup for all tests as DotnetPath is static
