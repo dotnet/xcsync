@@ -36,6 +36,7 @@ static class Strings {
 			internal static string MissingTfmInPath (string path) => string.Format (Resources.Strings.Errors_Validation_MissingValidTargetFrameworkInPath, path);
 			internal static string InvalidTfm (string tfm) => string.Format (Resources.Strings.Errors_Validation_InvalidTargetFramework, tfm);
 			internal static string InvalidVerbosity => Resources.Strings.Errors_Validation_InvalidVerbosity;
+			internal static string InvalidOS => Resources.Strings.Errors_Validation_InvalidOS;
 		}
 
 		internal static string InvalidOption (string option, string error) => string.Format (Resources.Strings.Errors_InvalidOption, option, error);
@@ -73,6 +74,10 @@ static class Strings {
 		internal static string FileRenamed (string oldPath, string newPath, string projectName) => string.Format (Resources.Strings.Watch_FileRenameDetected, oldPath, newPath, projectName);
 		internal static string FileChanged (string path, string projectName) => string.Format (Resources.Strings.Watch_FileChangeDetected, path, projectName);
 		internal static string ErrorWhileMonitoring (string path) => string.Format (Resources.Strings.Watch_ErrorMonitoringProjectFiles, path);
+		internal static string PausingMonitoring => Resources.Strings.Watch_PausingMonitoring;
+		internal static string Syncing => Resources.Strings.Watch_Syncing;
+		internal static string ResumingMonitoring => Resources.Strings.Watch_ResumingMonitoring;
+		internal static string WorkerException (string messageId, string exceptionMessage) => string.Format (Resources.Strings.Watch_WorkerException, messageId, exceptionMessage);
 	}
 
 	internal static class TypeService {
@@ -92,6 +97,7 @@ static class Strings {
 	}
 
 	internal static class XcodeWorkspace {
+		internal static string XcodeProjectNotFound (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectNotFound, path);
 		internal static string FailToLoadXcodeProject (string path) => string.Format (Resources.Strings.XcodeWorkspace_FailToLoadXcodeProject, path);
 		internal static string XcodeProjectDoesNotContainObjects (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectDoesNotContainObjects, path);
 		internal static string ProcessingObjCImplementation (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingObjCImplementation, objcType);

@@ -53,16 +53,22 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 	public async Task LoadAsync (CancellationToken cancellationToken = default)
 	{
+		var pbxProjFile = FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj");
+		if (!FileSystem.File.Exists (pbxProjFile)) {
+			Logger.Error (Strings.XcodeWorkspace.XcodeProjectNotFound (pbxProjFile));
+			return;
+		}
+
 		// Load the project files
-		Project = await LoadProjectAsync (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"), cancellationToken).ConfigureAwait (false);
+		Project = await LoadProjectAsync (pbxProjFile, cancellationToken).ConfigureAwait (false);
 
 		if (Project is null) {
-			Logger.Error (Strings.XcodeWorkspace.FailToLoadXcodeProject (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
+			Logger.Error (Strings.XcodeWorkspace.FailToLoadXcodeProject (pbxProjFile));
 			return;
 		}
 
 		if (Project.Objects is null) {
-			Logger.Error (Strings.XcodeWorkspace.XcodeProjectDoesNotContainObjects (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
+			Logger.Error (Strings.XcodeWorkspace.XcodeProjectDoesNotContainObjects (pbxProjFile));
 			return;
 		}
 
@@ -78,24 +84,28 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 						 join fileRef in fileReferences on frameworkRef equals fileRef.Token
 						 select fileRef;
 
-		var configuration = (from configurations in Project.Objects.Values
+		var releaseConfigs = from configurations in Project.Objects.Values
 							 where configurations.Isa == "XCBuildConfiguration" && configurations is XCBuildConfiguration { Name: "Release" } // TODO: Support Debug configuration?
-							 select configurations as XCBuildConfiguration).First ();
+							 select configurations as XCBuildConfiguration;
 
-		var buildSettings = configuration?.BuildSettings?.AsQueryable ();
-		var value = buildSettings?
-					.First (
+		string sdk = string.Empty;
+		foreach( var configuration in releaseConfigs)
+		{
+			var buildSettings = configuration.BuildSettings?.AsQueryable ();
+			sdk = buildSettings?
+					.FirstOrDefault (
 						(v) => v.Key == "SDKROOT"
-					).Value?.FirstOrDefault ();
-		SdkRoot = (value ?? string.Empty) switch {
-			"macosx" => "MacOSX",
-			"iphoneos" => "iPhoneOS",
-			_ => string.Empty
-		};
+					).Value?.FirstOrDefault () ?? string.Empty;
+			SdkRoot = (sdk ?? string.Empty) switch {
+				"macosx" => "MacOSX",
+				"iphoneos" => "iPhoneOS",
+				_ => string.Empty
+			};
+		}
 
 		clangCommandLineArgs.AddRange ([
 			"-target",
-			$"arm64-apple-{value}",
+			$"arm64-apple-{sdk}",
 			"-isysroot",
 			FileSystem.Path.Combine (Scripts.SelectXcode (), "Contents", "Developer", "Platforms", $"{SdkRoot}.platform", "Developer", "SDKs", $"{SdkRoot}.sdk"),
 		]);
