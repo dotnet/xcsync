@@ -53,16 +53,22 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 	public async Task LoadAsync (CancellationToken cancellationToken = default)
 	{
+		var pbxProjFile = FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj");
+		if (!FileSystem.File.Exists (pbxProjFile)) {
+			Logger.Error (Strings.XcodeWorkspace.XcodeProjectNotFound (pbxProjFile));
+			return;
+		}
+
 		// Load the project files
-		Project = await LoadProjectAsync (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"), cancellationToken).ConfigureAwait (false);
+		Project = await LoadProjectAsync (pbxProjFile, cancellationToken).ConfigureAwait (false);
 
 		if (Project is null) {
-			Logger.Error (Strings.XcodeWorkspace.FailToLoadXcodeProject (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
+			Logger.Error (Strings.XcodeWorkspace.FailToLoadXcodeProject (pbxProjFile));
 			return;
 		}
 
 		if (Project.Objects is null) {
-			Logger.Error (Strings.XcodeWorkspace.XcodeProjectDoesNotContainObjects (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
+			Logger.Error (Strings.XcodeWorkspace.XcodeProjectDoesNotContainObjects (pbxProjFile));
 			return;
 		}
 
