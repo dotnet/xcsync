@@ -459,7 +459,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework);
 
-		ConvertPbxProjToJson (fileSystem, fileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproject", "project.pbxproj"));
+		Scripts.ConvertPbxProjToJson (FileSystem, FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproject", "project.pbxproj"));
 
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
