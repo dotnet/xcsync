@@ -1,21 +1,3 @@
-trigger:
-  batch: false
-  branches:
-    include:
-    - main
-    - prerelease
-    - release
-  paths:
-    include:
-      - '*'
-    exclude:
-      - '**.md'
-      - eng/Version.Details.xml
-      - .github/*
-      - docs/*
-      - LICENSE.txt
-      - PATENTS.TXT
-      - THIRD-PARTY-NOTICES.TXT
 
 pr:
   branches:
@@ -37,7 +19,6 @@ pr:
 
 variables:
   - template: /eng/pipelines/common-variables.yml@self
-  - template: /eng/common/templates-official/variables/pool-providers.yml@self
 
   - name: _BuildConfig
     value: Release
