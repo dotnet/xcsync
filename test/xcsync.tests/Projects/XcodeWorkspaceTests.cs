@@ -168,20 +168,20 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 	{
 		// Arrange
 		var fileSystem = new MockFileSystem ();
-		var logger = new Mock<ILogger>();
+		var logger = new Mock<ILogger> ();
 
 		var projectName = Guid.NewGuid ().ToString ();
 		var xcodeDir = Path.Combine ("obj", "xcode");
 
 		var pbxProjFile = Path.Combine (xcodeDir, $"{projectName}.xcodeproj", "project.pbxproj");
 
-		var xcodeWorkspace = new XcodeWorkspace (fileSystem, logger.Object, Mock.Of<ITypeService>(), projectName, xcodeDir, "macos");
+		var xcodeWorkspace = new XcodeWorkspace (fileSystem, logger.Object, Mock.Of<ITypeService> (), projectName, xcodeDir, "macos");
 
 		// Act
 		await xcodeWorkspace.LoadAsync ();
 
 		// Assert
-		logger.Verify (l => l.Error (It.Is<string> (msg => string.CompareOrdinal(msg, Strings.XcodeWorkspace.XcodeProjectNotFound (pbxProjFile)) == 0)));
+		logger.Verify (l => l.Error (It.Is<string> (msg => string.CompareOrdinal (msg, Strings.XcodeWorkspace.XcodeProjectNotFound (pbxProjFile)) == 0)));
 	}
 
 	string CreateValidIdentifier (string projectName)
