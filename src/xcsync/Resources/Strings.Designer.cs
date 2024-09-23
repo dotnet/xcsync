@@ -97,6 +97,7 @@ static class Strings {
 	}
 
 	internal static class XcodeWorkspace {
+		internal static string XcodeProjectNotFound (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectNotFound, path);
 		internal static string FailToLoadXcodeProject (string path) => string.Format (Resources.Strings.XcodeWorkspace_FailToLoadXcodeProject, path);
 		internal static string XcodeProjectDoesNotContainObjects (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectDoesNotContainObjects, path);
 		internal static string ProcessingObjCImplementation (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingObjCImplementation, objcType);

@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.CommandLine.Parsing;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Moq;
 using Serilog;
 using Xamarin;
@@ -163,6 +161,27 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		await xcodeWorkspace.LoadAsync ();
 
 		// Assert
+	}
+
+	[Fact]
+	public async void LoadAsync_WhenNoPbxProjFile_LogsErrorMessage ()
+	{
+		// Arrange
+		var fileSystem = new MockFileSystem ();
+		var logger = new Mock<ILogger>();
+
+		var projectName = Guid.NewGuid ().ToString ();
+		var xcodeDir = Path.Combine ("obj", "xcode");
+
+		var pbxProjFile = Path.Combine (xcodeDir, $"{projectName}.xcodeproj", "project.pbxproj");
+
+		var xcodeWorkspace = new XcodeWorkspace (fileSystem, logger.Object, Mock.Of<ITypeService>(), projectName, xcodeDir, "macos");
+
+		// Act
+		await xcodeWorkspace.LoadAsync ();
+
+		// Assert
+		logger.Verify (l => l.Error (It.Is<string> (msg => string.CompareOrdinal(msg, Strings.XcodeWorkspace.XcodeProjectNotFound (pbxProjFile)) == 0)));
 	}
 
 	string CreateValidIdentifier (string projectName)
