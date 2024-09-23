@@ -30,7 +30,7 @@ public class Base (ITestOutputHelper testOutput) {
 
 	protected static async Task<int> Git (ITestOutputHelper output, params string [] arguments) => await Run (output, Directory.GetCurrentDirectory (), GitExe, arguments);
 
-	protected static async Task<int> Patch(ITestOutputHelper output, string path, string diff) => await Run (output, path, PatchExe, ["-i", diff]);
+	protected static async Task<int> Patch (ITestOutputHelper output, string path, string diff) => await Run (output, path, PatchExe, ["-i", diff]);
 
 	static async Task<int> Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{

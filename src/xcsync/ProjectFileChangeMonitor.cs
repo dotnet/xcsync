@@ -53,7 +53,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		this.project = project;
 
-		watcher.Path = fileSystem.Path.GetDirectoryName(project.RootPath)!;
+		watcher.Path = fileSystem.Path.GetDirectoryName (project.RootPath)!;
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 		watcher.Filter = "*.*";
