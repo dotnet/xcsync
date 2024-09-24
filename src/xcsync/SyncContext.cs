@@ -256,8 +256,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 				{"ALWAYS_SEARCH_USER_PATHS", [NO]},
 				{"CLANG_ANALYZER_NONNULL", [YES]},
 				{"CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION", ["YES_AGGRESSIVE"]},
-				{"CLANG_CXX_LANGUAGE_STANDARD", new
-				 List<string> {"gnu++14"}},
+				{"CLANG_CXX_LANGUAGE_STANDARD", ["gnu++14"]},
 				{"CLANG_CXX_LIBRARY", ["libc++"]},
 				{"CLANG_ENABLE_MODULES", [YES]},
 				{"CLANG_ENABLE_OBJC_ARC", [YES]},
@@ -339,7 +338,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 				{"CLANG_WARN_UNREACHABLE_CODE", [YES]},
 				{"COPY_PHASE_STRIP", [NO]},
 				{"DEBUG_INFORMATION_FORMAT", ["dwarf-with-dsym"]},
-				{"ENABLE_NS_ASSERTIONS", new List<string> () {NO}},
+				{"ENABLE_NS_ASSERTIONS", [NO]},
 				{"ENABLE_STRICT_OBJC_MSGSEND", [YES]},
 				{"GCC_C_LANGUAGE_STANDARD", ["gnu11"]},
 				{"GCC_NO_COMMON_BLOCKS", [YES]},
