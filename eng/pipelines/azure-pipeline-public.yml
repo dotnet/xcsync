@@ -1,3 +1,21 @@
+trigger:
+  batch: false
+  branches:
+    include:
+    - main
+    - prerelease
+    - release
+  paths:
+    include:
+      - '*'
+    exclude:
+      - '**.md'
+      - eng/Version.Details.xml
+      - .github/*
+      - docs/*
+      - LICENSE.txt
+      - PATENTS.TXT
+      - THIRD-PARTY-NOTICES.TXT
 
 pr:
   branches:
