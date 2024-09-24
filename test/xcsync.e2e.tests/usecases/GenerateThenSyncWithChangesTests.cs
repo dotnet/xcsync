@@ -9,10 +9,11 @@ namespace xcsync.e2e.tests.UseCases;
 public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOutput) : Base (testOutput) {
 	public static IEnumerable<object []> AddControlAndOutlet =>
 	[
-		["macos", "net8.0-macos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
+		["macos", "net8.0-macos", (ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm)],
+		["macos", "net8.0-macos", (ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChangesFromDiff (testOutput, "data/add_outlet_using_xcode.diff", path, projectType, tfm)],
 		// ["maccatalyst", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], 
 		// ["ios", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
-		["tvos", "net8.0-tvos", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)],
+		["tvos", "net8.0-tvos", (ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm)],
 		// ["maui", "net8.0-ios", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)], # No ViewController.cs file
 		// ["maui", "net8.0-maccatalyst", (string path, string projectType, string tfm) => AddControlAndOutletChanges (path, projectType, tfm)] # No ViewController.cs file
 	];
@@ -20,7 +21,7 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 	[Theory]
 	[MemberData (nameof (AddControlAndOutlet))]
 	[Trait ("Category", "IntegrationTest")]
-	public async Task GenerateThenSync_WithChanges_GeneratesChangesAsync (string projectType, string tfm, Func<string, string, string, Task> makeChanges)
+	public async Task GenerateThenSync_WithChanges_GeneratesChangesAsync (string projectType, string tfm, Func<ITestOutputHelper, string, string, string, Task> makeChanges)
 	{
 		// Arrange
 
@@ -41,9 +42,14 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Initial commit").ConfigureAwait (false);
 
 		// Act
-
 		await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false);
-		await makeChanges (xcodeDir, projectType, tfm).ConfigureAwait (false);
+		await Git (TestOutput, "-C", tmpDir, "add", ".").ConfigureAwait (false);
+		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Xcode Project Generation").ConfigureAwait (false);
+
+		await makeChanges (TestOutput, xcodeDir, projectType, tfm).ConfigureAwait (false);
+		await Git (TestOutput, "-C", tmpDir, "add", ".").ConfigureAwait (false);
+		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Xcode Project Changes").ConfigureAwait (false);
+
 		await Xcsync (TestOutput, "sync", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false);
 
 		// Assert
@@ -53,7 +59,7 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 			Assert.Fail ($"[{projectType},{tfm}] : Git diff-index failed, there are no changes in the source files.\n{commandOutput.Output}");
 	}
 
-	static async Task AddControlAndOutletChanges (string tmpDir, string projectType, string tfm)
+	static async Task AddControlAndOutletChanges (ITestOutputHelper testOutput, string tmpDir, string projectType, string tfm)
 	{
 		await File.WriteAllTextAsync (Path.Combine (tmpDir, "ViewController.h"),
 $@"// ------------------------------------------------------------------------------
@@ -113,5 +119,20 @@ $@"// --------------------------------------------------------------------------
 @end
 ");
 
+	}
+
+	static async Task AddControlAndOutletChangesFromDiff (ITestOutputHelper testOutput, string diff, string tmpDir, string projectType, string tfm)
+	{
+		var diffContents = await File.ReadAllTextAsync (diff);
+		var projectName = Path.GetFileName (Path.GetDirectoryName (Path.GetDirectoryName (tmpDir)));
+		var pbxproj = await File.ReadAllTextAsync (Path.Combine (tmpDir, $"{projectName}.xcodeproj/project.pbxproj"));
+
+		diffContents = diffContents.Replace ("{{PROJECT}}", projectName);
+		diffContents = diffContents.Replace ("{{PBXPROJ}}", pbxproj);
+
+		var newDiff = Path.Combine (tmpDir, $"{projectName}.diff");
+		await File.WriteAllTextAsync (newDiff, diffContents);
+
+		await Patch (testOutput, tmpDir, newDiff).ConfigureAwait (false);
 	}
 }
