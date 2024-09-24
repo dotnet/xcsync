@@ -67,7 +67,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var pbxBuildFile = new PBXBuildFile ();
 
 		var appFileReference = new PBXFileReference {
-			Isa = nameof(PBXFileReference),
+			Isa = nameof (PBXFileReference),
 			ExplicitFileType = "wrapper.application",
 			Name = $"{projectName}.app",
 			Path = $"{projectName}.app",
@@ -77,7 +77,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (appFileReference.Token, appFileReference);
 
 		var productsGroup = new PBXGroup {
-			Isa = nameof(PBXGroup),
+			Isa = nameof (PBXGroup),
 			Children = [appFileReference.Token],
 			Name = "Products",
 		};
@@ -86,21 +86,21 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var pbxFrameworkFiles = new List<string> ();
 
 		var frameworksGroup = new PBXGroup {
-			Isa = nameof(PBXGroup),
+			Isa = nameof (PBXGroup),
 			Children = pbxFrameworkFiles,
 			Name = "Frameworks",
 		};
 		xcodeObjects.Add (frameworksGroup.Token, frameworksGroup);
 
 		var projectGroup = new PBXGroup {
-			Isa = nameof(PBXGroup),
+			Isa = nameof (PBXGroup),
 			Children = pbxGroupFiles,
 			Name = projectName,
 		};
 		xcodeObjects.Add (projectGroup.Token, projectGroup);
 
 		var pbxGroup = new PBXGroup {
-			Isa = nameof(PBXGroup),
+			Isa = nameof (PBXGroup),
 			Children = [
 				productsGroup.Token,
 				frameworksGroup.Token,
@@ -118,7 +118,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			var sourceFileRference = await GenerateAndWriteFile (".m", "sourcecode.c.objc", () => new GenObjcM (t).TransformText (), TargetDir, t.ObjCType, xcodeObjects, pbxGroupFiles);
 
 			pbxBuildFile = new PBXBuildFile {
-				Isa = nameof(PBXBuildFile),
+				Isa = nameof (PBXBuildFile),
 				FileRef = sourceFileRference.Token
 			};
 
@@ -157,7 +157,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 			// add to resources build phase
 			pbxFileReference = new PBXFileReference {
-				Isa = nameof(PBXFileReference),
+				Isa = nameof (PBXFileReference),
 				LastKnownFileType = "text.plist.xml",
 				Name = FileSystem.Path.GetFileName (file),
 				Path = FileSystem.Path.GetFileName (file),
@@ -167,7 +167,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			pbxGroupFiles.Add (pbxFileReference.Token);
 
 			pbxBuildFile = new PBXBuildFile {
-				Isa = nameof(PBXBuildFile),
+				Isa = nameof (PBXBuildFile),
 				FileRef = pbxFileReference.Token
 			};
 
@@ -179,7 +179,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			string path = $"System/Library/Frameworks/{f}.framework";
 
 			var fileReference = new PBXFileReference {
-				Isa = nameof(PBXFileReference),
+				Isa = nameof (PBXFileReference),
 				LastKnownFileType = "wrapper.framework",
 				Name = FileSystem.Path.GetFileName (path),
 				Path = path,
@@ -189,7 +189,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			pbxFrameworkFiles.Add (fileReference.Token);
 
 			var buildFile = new PBXBuildFile {
-				Isa = nameof(PBXBuildFile),
+				Isa = nameof (PBXBuildFile),
 				FileRef = fileReference.Token
 			};
 
@@ -209,7 +209,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
 
 			pbxFileReference = new PBXFileReference {
-				Isa = nameof(PBXFileReference),
+				Isa = nameof (PBXFileReference),
 				LastKnownFileType = "folder.assetcatalog",
 				Name = FileSystem.Path.GetFileName (asset),
 				Path = FileSystem.Path.GetFileName (asset),
@@ -219,7 +219,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			pbxGroup.Children.Insert (0, pbxFileReference.Token);
 
 			pbxBuildFile = new PBXBuildFile {
-				Isa = nameof(PBXBuildFile),
+				Isa = nameof (PBXBuildFile),
 				FileRef = pbxFileReference.Token
 			};
 
@@ -228,19 +228,19 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		}
 
 		var pbxResourcesBuildPhase = new PBXResourcesBuildPhase {
-			Isa = nameof(PBXResourcesBuildPhase),
+			Isa = nameof (PBXResourcesBuildPhase),
 			Files = pbxResourcesBuildFiles
 		};
 		xcodeObjects.Add (pbxResourcesBuildPhase.Token, pbxResourcesBuildPhase);
 
 		var pbxSourcesBuildPhase = new PBXSourcesBuildPhase {
-			Isa = nameof(PBXSourcesBuildPhase),
+			Isa = nameof (PBXSourcesBuildPhase),
 			Files = pbxSourcesBuildFiles
 		};
 		xcodeObjects.Add (pbxSourcesBuildPhase.Token, pbxSourcesBuildPhase);
 
 		var pbxFrameworksBuildPhase = new PBXFrameworksBuildPhase {
-			Isa = nameof(PBXFrameworksBuildPhase),
+			Isa = nameof (PBXFrameworksBuildPhase),
 			Files = pbxFrameworksBuildFiles
 		};
 		xcodeObjects.Add (pbxFrameworksBuildPhase.Token, pbxFrameworksBuildPhase);
@@ -248,7 +248,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var supportedOSVersion = Scripts.GetSupportedOSVersion (FileSystem, ProjectPath, Framework);
 
 		var debugBuildConfiguration = new XCBuildConfiguration {
-			Isa = nameof(XCBuildConfiguration),
+			Isa = nameof (XCBuildConfiguration),
 			BuildSettings = new Dictionary<string, IList<string>> {
 				{"ALWAYS_SEARCH_USER_PATHS", ["NO"]},
 				{"CLANG_ANALYZER_NONNULL", ["YES"]},
@@ -304,7 +304,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (debugBuildConfiguration.Token, debugBuildConfiguration);
 
 		var releaseBuildConfiguration = new XCBuildConfiguration {
-			Isa = nameof(XCBuildConfiguration),
+			Isa = nameof (XCBuildConfiguration),
 			BuildSettings = new Dictionary<string, IList<string>> {
 				{"ALWAYS_SEARCH_USER_PATHS", ["NO"]},
 				{"CLANG_ANALYZER_NONNULL", ["YES"]},
@@ -365,21 +365,21 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 
 		var debugTargetBuildConfiguration = new XCBuildConfiguration {
-			Isa = nameof(XCBuildConfiguration),
+			Isa = nameof (XCBuildConfiguration),
 			BuildSettings = commonTargetBuildSettings,
 			Name = "Debug",
 		};
 		xcodeObjects.Add (debugTargetBuildConfiguration.Token, debugTargetBuildConfiguration);
 
 		var releaseTargetBuildConfiguration = new XCBuildConfiguration {
-			Isa = nameof(XCBuildConfiguration),
+			Isa = nameof (XCBuildConfiguration),
 			BuildSettings = commonTargetBuildSettings,
 			Name = "Release",
 		};
 		xcodeObjects.Add (releaseTargetBuildConfiguration.Token, releaseTargetBuildConfiguration);
 
 		var targetBuildCombo = new XCConfigurationList {
-			Isa = nameof(XCConfigurationList),
+			Isa = nameof (XCConfigurationList),
 			BuildConfigurations = [
 				debugTargetBuildConfiguration.Token,
 				releaseTargetBuildConfiguration.Token],
@@ -389,7 +389,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (targetBuildCombo.Token, targetBuildCombo);
 
 		var buildCombo = new XCConfigurationList {
-			Isa = nameof(XCConfigurationList),
+			Isa = nameof (XCConfigurationList),
 			BuildConfigurations = [
 				debugBuildConfiguration.Token,
 				releaseBuildConfiguration.Token],
@@ -399,7 +399,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (buildCombo.Token, buildCombo);
 
 		var nativeTarget = new PBXNativeTarget {
-			Isa = nameof(PBXNativeTarget),
+			Isa = nameof (PBXNativeTarget),
 			BuildConfigurationList = targetBuildCombo.Token,
 			BuildPhases = [pbxSourcesBuildPhase.Token, pbxResourcesBuildPhase.Token, pbxFrameworksBuildPhase.Token],
 			BuildRules = [],
@@ -412,7 +412,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (nativeTarget.Token, nativeTarget);
 
 		var pbxProject = new PBXProject {
-			Isa = nameof(PBXProject),
+			Isa = nameof (PBXProject),
 			Attributes = new Dictionary<string, string> {
 				{"LastUpgradeCheck", "0930"}
 			},
@@ -518,7 +518,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var filePath = FileSystem.Path.Combine (targetDir, objcType + extension);
 		await WriteFile (filePath, content);
 		var pbxFileReference = new PBXFileReference {
-			Isa = nameof(PBXFileReference),
+			Isa = nameof (PBXFileReference),
 			LastKnownFileType = fileType,
 			Name = FileSystem.Path.GetFileName (filePath),
 			Path = FileSystem.Path.GetFileName (filePath),
