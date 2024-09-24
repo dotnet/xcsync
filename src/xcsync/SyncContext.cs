@@ -21,8 +21,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	public async Task SyncAsync (CancellationToken token = default)
 	{
-		// use marille channel Hub mechanism for better async file creation
-		// configuration.Mode = ChannelDeliveryMode.AtMostOnceAsync; // don't care about order of file writes..just need to get them written!
 		await ConfigureMarilleHub ();
 
 		if (SyncDirection == SyncDirection.ToXcode)
@@ -42,7 +40,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
 			return;
 
-		var clrProject = new ClrProject (FileSystem, Logger!, TypeService, "CLR Project", ProjectPath, Framework);
+		var clrProject = new ClrProject (FileSystem, Logger!, TypeService, "CLR", ProjectPath, Framework);
 		await clrProject.OpenProject ();
 
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
@@ -69,7 +67,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var pbxBuildFile = new PBXBuildFile ();
 
 		var appFileReference = new PBXFileReference {
-			Isa = "PBXFileReference",
+			Isa = nameof(PBXFileReference),
 			ExplicitFileType = "wrapper.application",
 			Name = $"{projectName}.app",
 			Path = $"{projectName}.app",
@@ -79,7 +77,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (appFileReference.Token, appFileReference);
 
 		var productsGroup = new PBXGroup {
-			Isa = "PBXGroup",
+			Isa = nameof(PBXGroup),
 			Children = [appFileReference.Token],
 			Name = "Products",
 		};
@@ -88,21 +86,21 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var pbxFrameworkFiles = new List<string> ();
 
 		var frameworksGroup = new PBXGroup {
-			Isa = "PBXGroup",
+			Isa = nameof(PBXGroup),
 			Children = pbxFrameworkFiles,
 			Name = "Frameworks",
 		};
 		xcodeObjects.Add (frameworksGroup.Token, frameworksGroup);
 
 		var projectGroup = new PBXGroup {
-			Isa = "PBXGroup",
+			Isa = nameof(PBXGroup),
 			Children = pbxGroupFiles,
 			Name = projectName,
 		};
 		xcodeObjects.Add (projectGroup.Token, projectGroup);
 
 		var pbxGroup = new PBXGroup {
-			Isa = "PBXGroup",
+			Isa = nameof(PBXGroup),
 			Children = [
 				productsGroup.Token,
 				frameworksGroup.Token,
@@ -120,7 +118,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			var sourceFileRference = await GenerateAndWriteFile (".m", "sourcecode.c.objc", () => new GenObjcM (t).TransformText (), TargetDir, t.ObjCType, xcodeObjects, pbxGroupFiles);
 
 			pbxBuildFile = new PBXBuildFile {
-				Isa = "PBXBuildFile",
+				Isa = nameof(PBXBuildFile),
 				FileRef = sourceFileRference.Token
 			};
 
@@ -159,7 +157,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 			// add to resources build phase
 			pbxFileReference = new PBXFileReference {
-				Isa = "PBXFileReference",
+				Isa = nameof(PBXFileReference),
 				LastKnownFileType = "text.plist.xml",
 				Name = FileSystem.Path.GetFileName (file),
 				Path = FileSystem.Path.GetFileName (file),
@@ -169,7 +167,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			pbxGroupFiles.Add (pbxFileReference.Token);
 
 			pbxBuildFile = new PBXBuildFile {
-				Isa = "PBXBuildFile",
+				Isa = nameof(PBXBuildFile),
 				FileRef = pbxFileReference.Token
 			};
 
@@ -181,7 +179,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			string path = $"System/Library/Frameworks/{f}.framework";
 
 			var fileReference = new PBXFileReference {
-				Isa = "PBXFileReference",
+				Isa = nameof(PBXFileReference),
 				LastKnownFileType = "wrapper.framework",
 				Name = FileSystem.Path.GetFileName (path),
 				Path = path,
@@ -191,7 +189,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			pbxFrameworkFiles.Add (fileReference.Token);
 
 			var buildFile = new PBXBuildFile {
-				Isa = "PBXBuildFile",
+				Isa = nameof(PBXBuildFile),
 				FileRef = fileReference.Token
 			};
 
@@ -211,7 +209,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
 
 			pbxFileReference = new PBXFileReference {
-				Isa = "PBXFileReference",
+				Isa = nameof(PBXFileReference),
 				LastKnownFileType = "folder.assetcatalog",
 				Name = FileSystem.Path.GetFileName (asset),
 				Path = FileSystem.Path.GetFileName (asset),
@@ -221,7 +219,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			pbxGroup.Children.Insert (0, pbxFileReference.Token);
 
 			pbxBuildFile = new PBXBuildFile {
-				Isa = "PBXBuildFile",
+				Isa = nameof(PBXBuildFile),
 				FileRef = pbxFileReference.Token
 			};
 
@@ -230,19 +228,19 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		}
 
 		var pbxResourcesBuildPhase = new PBXResourcesBuildPhase {
-			Isa = "PBXResourcesBuildPhase",
+			Isa = nameof(PBXResourcesBuildPhase),
 			Files = pbxResourcesBuildFiles
 		};
 		xcodeObjects.Add (pbxResourcesBuildPhase.Token, pbxResourcesBuildPhase);
 
 		var pbxSourcesBuildPhase = new PBXSourcesBuildPhase {
-			Isa = "PBXSourcesBuildPhase",
+			Isa = nameof(PBXSourcesBuildPhase),
 			Files = pbxSourcesBuildFiles
 		};
 		xcodeObjects.Add (pbxSourcesBuildPhase.Token, pbxSourcesBuildPhase);
 
 		var pbxFrameworksBuildPhase = new PBXFrameworksBuildPhase {
-			Isa = "PBXFrameworksBuildPhase",
+			Isa = nameof(PBXFrameworksBuildPhase),
 			Files = pbxFrameworksBuildFiles
 		};
 		xcodeObjects.Add (pbxFrameworksBuildPhase.Token, pbxFrameworksBuildPhase);
@@ -250,107 +248,108 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var supportedOSVersion = Scripts.GetSupportedOSVersion (FileSystem, ProjectPath, Framework);
 
 		var debugBuildConfiguration = new XCBuildConfiguration {
-			Isa = "XCBuildConfiguration",
+			Isa = nameof(XCBuildConfiguration),
 			BuildSettings = new Dictionary<string, IList<string>> {
-				{"ALWAYS_SEARCH_USER_PATHS", new List<string> {"NO"}},
-				{"CLANG_ANALYZER_NONNULL", new List<string> {"YES"}},
-				{"CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION", new List<string> {"YES_AGGRESSIVE"}},
-				{"CLANG_CXX_LANGUAGE_STANDARD", new List<string> {"gnu++14"}},
-				{"CLANG_CXX_LIBRARY", new List<string> {"libc++"}},
-				{"CLANG_ENABLE_MODULES", new List<string> {"YES"}},
-				{"CLANG_ENABLE_OBJC_ARC", new List<string> {"YES"}},
-				{"CLANG_ENABLE_OBJC_WEAK", new List<string> {"YES"}},
-				{"CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING", new List<string> {"YES"}},
-				{"CLANG_WARN_BOOL_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_COMMA", new List<string> {"YES"}},
-				{"CLANG_WARN_CONSTANT_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS", new List<string> {"YES"}},
-				{"CLANG_WARN_DIRECT_OBJC_ISA_USAGE", new List<string> {"YES_ERROR"}},
-				{"CLANG_WARN_DOCUMENTATION_COMMENTS", new List<string> {"YES"}},
-				{"CLANG_WARN_EMPTY_BODY", new List<string> {"YES"}},
-				{"CLANG_WARN_ENUM_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_INFINITE_RECURSION", new List<string> {"YES"}},
-				{"CLANG_WARN_INT_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_NON_LITERAL_NULL_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF", new List<string> {"YES"}},
-				{"CLANG_WARN_OBJC_LITERAL_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_OBJC_ROOT_CLASS", new List<string> {"YES_ERROR"}},
-				{"CLANG_WARN_RANGE_LOOP_ANALYSIS", new List<string> {"YES"}},
-				{"CLANG_WARN_STRICT_PROTOTYPES", new List<string> {"YES"}},
-				{"CLANG_WARN_SUSPICIOUS_MOVE", new List<string> {"YES"}},
-				{"CLANG_WARN_UNGUARDED_AVAILABILITY", new List<string> {"YES_AGGRESSIVE"}},
-				{"CLANG_WARN_UNREACHABLE_CODE", new List<string> {"YES"}},
-				{"COPY_PHASE_STRIP", new List<string> {"NO"}},
-				{"DEBUG_INFORMATION_FORMAT", new List<string> {"dwarf"}},
-				{"ENABLE_STRICT_OBJC_MSGSEND", new List<string> {"YES"}},
-				{"ENABLE_TESTABILITY", new List<string> {"YES"}},
-				{"GCC_C_LANGUAGE_STANDARD", new List<string> {"gnu11"}},
-				{"GCC_DYNAMIC_NO_PIC", new List<string> {"NO"}},
-				{"GCC_NO_COMMON_BLOCKS", new List<string> {"YES"}},
-				{"GCC_OPTIMIZATION_LEVEL", new List<string> {"0"}},
-				{"GCC_PREPROCESSOR_DEFINITIONS", new List<string> {"DEBUG=1","$(inherited)"}},
-				{"GCC_WARN_64_TO_32_BIT_CONVERSION", new List<string> {"YES"}},
-				{"GCC_WARN_ABOUT_RETURN_TYPE", new List<string> {"YES_ERROR"}},
-				{"GCC_WARN_UNDECLARED_SELECTOR", new List<string> {"YES"}},
-				{"GCC_WARN_UNINITIALIZED_AUTOS", new List<string> {"YES_AGGRESSIVE"}},
-				{"GCC_WARN_UNUSED_FUNCTION", new List<string> {"YES"}},
-				{"GCC_WARN_UNUSED_VARIABLE", new List<string> {"YES"}},
-				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {supportedOSVersion}},
-				{"MTL_ENABLE_DEBUG_INFO", new List<string> {"YES"}},
-				{"ONLY_ACTIVE_ARCH", new List<string> {"YES"}},
-				{"SDKROOT", new List<string> {sdkroot}},
+				{"ALWAYS_SEARCH_USER_PATHS", ["NO"]},
+				{"CLANG_ANALYZER_NONNULL", ["YES"]},
+				{"CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION", ["YES_AGGRESSIVE"]},
+				{"CLANG_CXX_LANGUAGE_STANDARD", new
+				 List<string> {"gnu++14"}},
+				{"CLANG_CXX_LIBRARY", ["libc++"]},
+				{"CLANG_ENABLE_MODULES", ["YES"]},
+				{"CLANG_ENABLE_OBJC_ARC", ["YES"]},
+				{"CLANG_ENABLE_OBJC_WEAK", ["YES"]},
+				{"CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING", ["YES"]},
+				{"CLANG_WARN_BOOL_CONVERSION", ["YES"]},
+				{"CLANG_WARN_COMMA", ["YES"]},
+				{"CLANG_WARN_CONSTANT_CONVERSION", ["YES"]},
+				{"CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS", ["YES"]},
+				{"CLANG_WARN_DIRECT_OBJC_ISA_USAGE", ["YES_ERROR"]},
+				{"CLANG_WARN_DOCUMENTATION_COMMENTS", ["YES"]},
+				{"CLANG_WARN_EMPTY_BODY", ["YES"]},
+				{"CLANG_WARN_ENUM_CONVERSION", ["YES"]},
+				{"CLANG_WARN_INFINITE_RECURSION", ["YES"]},
+				{"CLANG_WARN_INT_CONVERSION", ["YES"]},
+				{"CLANG_WARN_NON_LITERAL_NULL_CONVERSION", ["YES"]},
+				{"CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF", ["YES"]},
+				{"CLANG_WARN_OBJC_LITERAL_CONVERSION", ["YES"]},
+				{"CLANG_WARN_OBJC_ROOT_CLASS", ["YES_ERROR"]},
+				{"CLANG_WARN_RANGE_LOOP_ANALYSIS", ["YES"]},
+				{"CLANG_WARN_STRICT_PROTOTYPES", ["YES"]},
+				{"CLANG_WARN_SUSPICIOUS_MOVE", ["YES"]},
+				{"CLANG_WARN_UNGUARDED_AVAILABILITY", ["YES_AGGRESSIVE"]},
+				{"CLANG_WARN_UNREACHABLE_CODE", ["YES"]},
+				{"COPY_PHASE_STRIP", ["NO"]},
+				{"DEBUG_INFORMATION_FORMAT", ["dwarf"]},
+				{"ENABLE_STRICT_OBJC_MSGSEND", ["YES"]},
+				{"ENABLE_TESTABILITY", ["YES"]},
+				{"GCC_C_LANGUAGE_STANDARD", ["gnu11"]},
+				{"GCC_DYNAMIC_NO_PIC", ["NO"]},
+				{"GCC_NO_COMMON_BLOCKS", ["YES"]},
+				{"GCC_OPTIMIZATION_LEVEL", ["0"]},
+				{"GCC_PREPROCESSOR_DEFINITIONS", ["DEBUG=1","$(inherited)"]},
+				{"GCC_WARN_64_TO_32_BIT_CONVERSION", ["YES"]},
+				{"GCC_WARN_ABOUT_RETURN_TYPE", ["YES_ERROR"]},
+				{"GCC_WARN_UNDECLARED_SELECTOR", ["YES"]},
+				{"GCC_WARN_UNINITIALIZED_AUTOS", ["YES_AGGRESSIVE"]},
+				{"GCC_WARN_UNUSED_FUNCTION", ["YES"]},
+				{"GCC_WARN_UNUSED_VARIABLE", ["YES"]},
+				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", [supportedOSVersion]},
+				{"MTL_ENABLE_DEBUG_INFO", ["YES"]},
+				{"ONLY_ACTIVE_ARCH", ["YES"]},
+				{"SDKROOT", [sdkroot]},
 			},
 			Name = "Debug",
 		};
 		xcodeObjects.Add (debugBuildConfiguration.Token, debugBuildConfiguration);
 
 		var releaseBuildConfiguration = new XCBuildConfiguration {
-			Isa = "XCBuildConfiguration",
+			Isa = nameof(XCBuildConfiguration),
 			BuildSettings = new Dictionary<string, IList<string>> {
-				{"ALWAYS_SEARCH_USER_PATHS", new List<string> {"NO"}},
-				{"CLANG_ANALYZER_NONNULL", new List<string> {"YES"}},
-				{"CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION", new List<string> {"YES_AGGRESSIVE"}},
-				{"CLANG_CXX_LANGUAGE_STANDARD", new List<string> {"gnu++14"}},
-				{"CLANG_CXX_LIBRARY", new List<string> {"libc++"}},
-				{"CLANG_ENABLE_MODULES", new List<string> {"YES"}},
-				{"CLANG_ENABLE_OBJC_ARC", new List<string> {"YES"}},
-				{"CLANG_ENABLE_OBJC_WEAK", new List<string> {"YES"}},
-				{"CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING", new List<string> {"YES"}},
-				{"CLANG_WARN_BOOL_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_COMMA", new List<string> {"YES"}},
-				{"CLANG_WARN_CONSTANT_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS", new List<string> {"YES"}},
-				{"CLANG_WARN_DIRECT_OBJC_ISA_USAGE", new List<string> {"YES_ERROR"}},
-				{"CLANG_WARN_DOCUMENTATION_COMMENTS", new List<string> {"YES"}},
-				{"CLANG_WARN_EMPTY_BODY", new List<string> {"YES"}},
-				{"CLANG_WARN_ENUM_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_INFINITE_RECURSION", new List<string> {"YES"}},
-				{"CLANG_WARN_INT_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_NON_LITERAL_NULL_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF", new List<string> {"YES"}},
-				{"CLANG_WARN_OBJC_LITERAL_CONVERSION", new List<string> {"YES"}},
-				{"CLANG_WARN_OBJC_ROOT_CLASS", new List<string> {"YES_ERROR"}},
-				{"CLANG_WARN_RANGE_LOOP_ANALYSIS", new List<string> {"YES"}},
-				{"CLANG_WARN_STRICT_PROTOTYPES", new List<string> {"YES"}},
-				{"CLANG_WARN_SUSPICIOUS_MOVE", new List<string> {"YES"}},
-				{"CLANG_WARN_UNGUARDED_AVAILABILITY", new List<string> {"YES_AGGRESSIVE"}},
-				{"CLANG_WARN_UNREACHABLE_CODE", new List<string> {"YES"}},
-				{"COPY_PHASE_STRIP", new List<string> {"NO"}},
-				{"DEBUG_INFORMATION_FORMAT", new List<string> {"dwarf-with-dsym"}},
+				{"ALWAYS_SEARCH_USER_PATHS", ["NO"]},
+				{"CLANG_ANALYZER_NONNULL", ["YES"]},
+				{"CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION", ["YES_AGGRESSIVE"]},
+				{"CLANG_CXX_LANGUAGE_STANDARD", ["gnu++14"]},
+				{"CLANG_CXX_LIBRARY", ["libc++"]},
+				{"CLANG_ENABLE_MODULES", ["YES"]},
+				{"CLANG_ENABLE_OBJC_ARC", ["YES"]},
+				{"CLANG_ENABLE_OBJC_WEAK", ["YES"]},
+				{"CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING", ["YES"]},
+				{"CLANG_WARN_BOOL_CONVERSION", ["YES"]},
+				{"CLANG_WARN_COMMA", ["YES"]},
+				{"CLANG_WARN_CONSTANT_CONVERSION", ["YES"]},
+				{"CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS", ["YES"]},
+				{"CLANG_WARN_DIRECT_OBJC_ISA_USAGE", ["YES_ERROR"]},
+				{"CLANG_WARN_DOCUMENTATION_COMMENTS", ["YES"]},
+				{"CLANG_WARN_EMPTY_BODY", ["YES"]},
+				{"CLANG_WARN_ENUM_CONVERSION", ["YES"]},
+				{"CLANG_WARN_INFINITE_RECURSION", ["YES"]},
+				{"CLANG_WARN_INT_CONVERSION", ["YES"]},
+				{"CLANG_WARN_NON_LITERAL_NULL_CONVERSION", ["YES"]},
+				{"CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF", ["YES"]},
+				{"CLANG_WARN_OBJC_LITERAL_CONVERSION", ["YES"]},
+				{"CLANG_WARN_OBJC_ROOT_CLASS", ["YES_ERROR"]},
+				{"CLANG_WARN_RANGE_LOOP_ANALYSIS", ["YES"]},
+				{"CLANG_WARN_STRICT_PROTOTYPES", ["YES"]},
+				{"CLANG_WARN_SUSPICIOUS_MOVE", ["YES"]},
+				{"CLANG_WARN_UNGUARDED_AVAILABILITY", ["YES_AGGRESSIVE"]},
+				{"CLANG_WARN_UNREACHABLE_CODE", ["YES"]},
+				{"COPY_PHASE_STRIP", ["NO"]},
+				{"DEBUG_INFORMATION_FORMAT", ["dwarf-with-dsym"]},
 				{"ENABLE_NS_ASSERTIONS", new List<string> () {"NO"}},
-				{"ENABLE_STRICT_OBJC_MSGSEND", new List<string> {"YES"}},
-				{"GCC_C_LANGUAGE_STANDARD", new List<string> {"gnu11"}},
-				{"GCC_NO_COMMON_BLOCKS", new List<string> {"YES"}},
-				{"GCC_WARN_64_TO_32_BIT_CONVERSION", new List<string> {"YES"}},
-				{"GCC_WARN_ABOUT_RETURN_TYPE", new List<string> {"YES_ERROR"}},
-				{"GCC_WARN_UNDECLARED_SELECTOR", new List<string> {"YES"}},
-				{"GCC_WARN_UNINITIALIZED_AUTOS", new List<string> {"YES_AGGRESSIVE"}},
-				{"GCC_WARN_UNUSED_FUNCTION", new List<string> {"YES"}},
-				{"GCC_WARN_UNUSED_VARIABLE", new List<string> {"YES"}},
-				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", new List<string> {supportedOSVersion}},
-				{"MTL_ENABLE_DEBUG_INFO", new List<string> {"NO"}},
-				{"SDKROOT", new List<string> {sdkroot}},
-				{"VALIDATE_PRODUCT", new List<string> {"YES"}},
+				{"ENABLE_STRICT_OBJC_MSGSEND", ["YES"]},
+				{"GCC_C_LANGUAGE_STANDARD", ["gnu11"]},
+				{"GCC_NO_COMMON_BLOCKS", ["YES"]},
+				{"GCC_WARN_64_TO_32_BIT_CONVERSION", ["YES"]},
+				{"GCC_WARN_ABOUT_RETURN_TYPE", ["YES_ERROR"]},
+				{"GCC_WARN_UNDECLARED_SELECTOR", ["YES"]},
+				{"GCC_WARN_UNINITIALIZED_AUTOS", ["YES_AGGRESSIVE"]},
+				{"GCC_WARN_UNUSED_FUNCTION", ["YES"]},
+				{"GCC_WARN_UNUSED_VARIABLE", ["YES"]},
+				{$"{deployment.ToUpper()}_DEPLOYMENT_TARGET", [supportedOSVersion]},
+				{"MTL_ENABLE_DEBUG_INFO", ["NO"]},
+				{"SDKROOT", [sdkroot]},
+				{"VALIDATE_PRODUCT", ["YES"]},
 			},
 			Name = "Release",
 		};
@@ -366,21 +365,21 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 
 		var debugTargetBuildConfiguration = new XCBuildConfiguration {
-			Isa = "XCBuildConfiguration",
+			Isa = nameof(XCBuildConfiguration),
 			BuildSettings = commonTargetBuildSettings,
 			Name = "Debug",
 		};
 		xcodeObjects.Add (debugTargetBuildConfiguration.Token, debugTargetBuildConfiguration);
 
 		var releaseTargetBuildConfiguration = new XCBuildConfiguration {
-			Isa = "XCBuildConfiguration",
+			Isa = nameof(XCBuildConfiguration),
 			BuildSettings = commonTargetBuildSettings,
 			Name = "Release",
 		};
 		xcodeObjects.Add (releaseTargetBuildConfiguration.Token, releaseTargetBuildConfiguration);
 
 		var targetBuildCombo = new XCConfigurationList {
-			Isa = "XCConfigurationList",
+			Isa = nameof(XCConfigurationList),
 			BuildConfigurations = [
 				debugTargetBuildConfiguration.Token,
 				releaseTargetBuildConfiguration.Token],
@@ -390,7 +389,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (targetBuildCombo.Token, targetBuildCombo);
 
 		var buildCombo = new XCConfigurationList {
-			Isa = "XCConfigurationList",
+			Isa = nameof(XCConfigurationList),
 			BuildConfigurations = [
 				debugBuildConfiguration.Token,
 				releaseBuildConfiguration.Token],
@@ -400,7 +399,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (buildCombo.Token, buildCombo);
 
 		var nativeTarget = new PBXNativeTarget {
-			Isa = "PBXNativeTarget",
+			Isa = nameof(PBXNativeTarget),
 			BuildConfigurationList = targetBuildCombo.Token,
 			BuildPhases = [pbxSourcesBuildPhase.Token, pbxResourcesBuildPhase.Token, pbxFrameworksBuildPhase.Token],
 			BuildRules = [],
@@ -413,7 +412,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		xcodeObjects.Add (nativeTarget.Token, nativeTarget);
 
 		var pbxProject = new PBXProject {
-			Isa = "PBXProject",
+			Isa = nameof(PBXProject),
 			Attributes = new Dictionary<string, string> {
 				{"LastUpgradeCheck", "0930"}
 			},
@@ -489,9 +488,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			}
 
 			// Write out the file
-			// TODO: This should probably be extracted to a different class, like SyncableFile/Type
 			await WriteFile (syntaxTree!.FilePath, syntaxTree?.GetRoot (token).GetText ().ToString () ?? string.Empty);
-
 		}
 	}
 
@@ -500,11 +497,11 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		await base.ConfigureMarilleHub ();
 
 		var fileWorker = new FileWorker (Logger, FileSystem);
-		await Hub.CreateAsync<FileMessage> (FileChannel, configuration, fileWorker);
+		await Hub.CreateAsync (FileChannel, configuration, fileWorker);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
 
 		var otlWorker = new ObjCTypesLoader (Logger);
-		await Hub.CreateAsync<LoadTypesFromObjCMessage> (SyncChannel, configuration, otlWorker);
+		await Hub.CreateAsync (SyncChannel, configuration, otlWorker);
 		await Hub.RegisterAsync (SyncChannel, otlWorker);
 	}
 
@@ -521,7 +518,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var filePath = FileSystem.Path.Combine (targetDir, objcType + extension);
 		await WriteFile (filePath, content);
 		var pbxFileReference = new PBXFileReference {
-			Isa = "PBXFileReference",
+			Isa = nameof(PBXFileReference),
 			LastKnownFileType = fileType,
 			Name = FileSystem.Path.GetFileName (filePath),
 			Path = FileSystem.Path.GetFileName (filePath),
