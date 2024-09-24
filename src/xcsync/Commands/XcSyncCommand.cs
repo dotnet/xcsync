@@ -50,7 +50,7 @@ class XcSyncCommand : RootCommand {
 		if (!string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("EnableXcsyncWatch")))
 			AddCommand (new WatchCommand (fileSystem, Logger));
 
-		AddValidator(result => {
+		AddValidator (result => {
 			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 				result.ErrorMessage = Strings.Errors.Validation.InvalidOS;
 			}

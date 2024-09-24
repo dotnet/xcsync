@@ -89,8 +89,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 							 select configurations as XCBuildConfiguration;
 
 		string sdk = string.Empty;
-		foreach( var configuration in releaseConfigs)
-		{
+		foreach (var configuration in releaseConfigs) {
 			var buildSettings = configuration.BuildSettings?.AsQueryable ();
 			sdk = buildSettings?
 					.FirstOrDefault (
