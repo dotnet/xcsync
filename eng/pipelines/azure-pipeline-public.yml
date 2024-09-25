@@ -1,21 +1,4 @@
-trigger:
-  batch: false
-  branches:
-    include:
-    - main
-    - prerelease
-    - release
-  paths:
-    include:
-      - '*'
-    exclude:
-      - '**.md'
-      - eng/Version.Details.xml
-      - .github/*
-      - docs/*
-      - LICENSE.txt
-      - PATENTS.TXT
-      - THIRD-PARTY-NOTICES.TXT
+# AzDo pipeline definition: https://dev.azure.com/dnceng-public/public/_build?definitionId=300
 
 pr:
   branches:
@@ -95,6 +78,7 @@ stages:
         pool:
           name: Azure Pipelines
           vmImage: macos-latest-internal
+          os: macOS
 
         variables:
           - name: _buildScript
