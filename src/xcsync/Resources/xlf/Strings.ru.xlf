@@ -77,11 +77,6 @@
         <target state="translated">Целевая платформа не поддерживается текущим проектом .NET.</target>
         <note />
       </trans-unit>
-      <trans-unit id="Errors.Validation.InvalidOS">
-        <source>The xcsync tool can only be run on macOS.</source>
-        <target state="new">The xcsync tool can only be run on macOS.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
         <source>Invalid TFM: Target framework '{0}' does not target an Apple platform</source>
         <target state="translated">Недопустимый TFM: целевая платформа "{0}" не предназначена для платформы Apple</target>
@@ -284,16 +279,6 @@
         <target state="translated">Синхронизация изменений между проектом "{0}" и "{1}".</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
-      <trans-unit id="Watch.PausingMonitoring">
-        <source>Pausing monitoring</source>
-        <target state="new">Pausing monitoring</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Watch.ResumingMonitoring">
-        <source>Context synced. Resuming monitoring</source>
-        <target state="new">Context synced. Resuming monitoring</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
         <source>Monitoring project file changes in {0} started.</source>
         <target state="translated">Наблюдение за изменениями файлов проекта в {0} запущено.</target>
@@ -303,16 +288,6 @@
         <source>Monitoring project file changes in {0} stopped.</source>
         <target state="translated">Наблюдение за изменениями файлов проекта в {0} остановлено.</target>
         <note>{0} is the path to the project file</note>
-      </trans-unit>
-      <trans-unit id="Watch.Syncing">
-        <source>Syncing change context</source>
-        <target state="new">Syncing change context</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Watch.WorkerException">
-        <source>Error processing change message {0}: {1}</source>
-        <target state="new">Error processing change message {0}: {1}</target>
-        <note>{0} is the message Id, {1} is the exception message</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.DiagnosticIssue">
         <source>{0}</source>
@@ -377,11 +352,6 @@
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
         <target state="translated">Файл проекта Xcode по пути {0} не содержит объектов.</target>
-        <note>{0} is the path to the Xcode project</note>
-      </trans-unit>
-      <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
-        <source>File not found: {0}</source>
-        <target state="new">File not found: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>
