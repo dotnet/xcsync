@@ -14,9 +14,6 @@ pr:
       - eng/Version.Details.xml
       - .github/*
       - docs/*
-      - LICENSE.txt
-      - PATENTS.TXT
-      - THIRD-PARTY-NOTICES.TXT
 
 variables:
   - template: /eng/pipelines/common-variables.yml@self
@@ -30,6 +27,7 @@ variables:
   - name: Build.Arcade.TestResultsPath
     value: $(Build.Arcade.ArtifactsPath)TestResults/$(_BuildConfig)/
 
+    # needed for darc (dependency flow) publishing
   - name: _PublishArgs
     value: ''
   - name: _OfficialBuildIdArgs
@@ -44,7 +42,6 @@ variables:
 
   - name: DotNetVersion
     value: '8.0'
-
 
 stages:
 
