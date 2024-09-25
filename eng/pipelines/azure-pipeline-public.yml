@@ -76,7 +76,7 @@ stages:
 
         pool:
           name: Azure Pipelines
-          vmImage: macos-latest-internal
+          vmImage: macos-latest
           os: macOS
 
         variables:
