@@ -1,5 +1,7 @@
 # AzDo pipeline definition: https://dev.azure.com/dnceng-public/public/_build?definitionId=300
-
+trigger:
+  - none
+  
 pr:
   branches:
     include:
