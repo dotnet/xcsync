@@ -43,6 +43,25 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.NotNull (command);
 	}
 
+	[Fact]
+	public async Task GenerateCommand_WhenNoTargetSpecified_UsesDefaultTargetDirectory ()
+	{
+		var projectName = Guid.NewGuid ().ToString ();
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+
+		await DotnetNew (TestOutput, "ios", tmpDir);
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+		Assert.True (File.Exists (csproj));
+
+		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+		var command = new GenerateCommand (fileSystem, logger);
+		command.Invoke ($"--project {csproj} -f");
+
+		// ensure the default target directory is created relative to the project directory, not the pwd
+		Assert.True (Directory.Exists (Path.Combine (tmpDir, "obj", "xcode")));
+	}
+
 	[Theory]
 	[InlineData ("macos", "", "", "")]
 	[InlineData ("macos", "net8.0-macos", "", "")]

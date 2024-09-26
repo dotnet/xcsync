@@ -4,77 +4,77 @@
     <body>
       <trans-unit id="Base.CreateDefaultTarget">
         <source>Target path '{0}' does not exist, but is the default location, creating.</source>
-        <target state="new">Target path '{0}' does not exist, but is the default location, creating.</target>
+        <target state="translated">'{0}' 대상 경로가 존재하지 않지만 기본 위치이므로 만듭니다.</target>
         <note>{0} is the path to target project</note>
       </trans-unit>
       <trans-unit id="Base.EstablishDefaultTarget">
         <source>Target path is the default location or empty, prefixing with '{0}'</source>
-        <target state="new">Target path is the default location or empty, prefixing with '{0}'</target>
+        <target state="translated">대상 경로가 기본 위치이거나 비어 있으며 '{0}'을(를) 접두사로 사용합니다.</target>
         <note>{0} is the path to project</note>
       </trans-unit>
       <trans-unit id="Base.FoundProjectFile">
         <source>Found .csproj file '{0}' in path '{1}'</source>
-        <target state="new">Found .csproj file '{0}' in path '{1}'</target>
+        <target state="translated">'{1}' 경로에서 '{0}' .csproj 파일을 찾았습니다.</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Base.ProjectTfms">
         <source>Project target frameworks: '{0}'</source>
-        <target state="new">Project target frameworks: '{0}'</target>
+        <target state="translated">프로젝트 대상 프레임워크: '{0}'</target>
         <note>{0} is list of TFMs the selected project supports</note>
       </trans-unit>
       <trans-unit id="Base.SearchForProjectFiles">
         <source>'{0}' is not a .csproj file, searching for .csproj files in directory</source>
-        <target state="new">'{0}' is not a .csproj file, searching for .csproj files in directory</target>
+        <target state="translated">'{0}'은(는) .csproj 파일이 아닙니다. 디렉터리에서 .csproj 파일을 검색합니다.</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Base.UseDefaultTfm">
         <source>No target framework moniker specified, using the first one found in the project.</source>
-        <target state="new">No target framework moniker specified, using the first one found in the project.</target>
+        <target state="translated">대상 프레임워크 모니커가 지정되지 않았습니다. 프로젝트에서 찾는 첫 번째 모니커를 사용합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
         <source>generate a Xcode project at the path specified by --target from the project identified by --project</source>
-        <target state="new">generate a Xcode project at the path specified by --target from the project identified by --project</target>
+        <target state="translated">--project로 식별된 프로젝트에서 --target으로 지정된 경로에 Xcode 프로젝트를 생성합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Sync.Description">
         <source>used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</source>
-        <target state="new">used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</target>
+        <target state="translated">생성 명령 후에 사용하여 생성된 Xcode 프로젝트의 변경 내용을 .NET 프로젝트로 다시 동기화합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
         <source>syncs changes between the .NET project and Xcode project automatically</source>
-        <target state="new">syncs changes between the .NET project and Xcode project automatically</target>
+        <target state="translated">.NET 프로젝트와 Xcode 프로젝트 간의 변경 내용을 자동으로 동기화합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.CsprojNotFound">
         <source>Could not find a .csproj file in path '{0}'</source>
-        <target state="new">Could not find a .csproj file in path '{0}'</target>
+        <target state="translated">'{0}' 경로에서 .csproj 파일을 찾을 수 없습니다.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.InvalidOption">
         <source>Invalid option '{0}' provided: {1}</source>
-        <target state="new">Invalid option '{0}' provided: {1}</target>
+        <target state="translated">잘못된 '{0}' 옵션이 제공됨: {1}</target>
         <note>{0} is name of the command line options, {1} is the value of the option provided by the user</note>
       </trans-unit>
       <trans-unit id="Errors.MultipleProjectFilesFound">
         <source>Multiple .csproj files found in '{0}', please specify which project file to use via the [--project, -p] option: {1}</source>
-        <target state="new">Multiple .csproj files found in '{0}', please specify which project file to use via the [--project, -p] option: {1}</target>
+        <target state="translated">'{0}'에 .csproj 파일이 여러 개 있습니다. [--project, -p] 옵션을 통해 사용할 프로젝트 파일을 지정하세요. {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.MultipleTfmsFound">
         <source>Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</source>
-        <target state="new">Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</target>
+        <target state="translated">프로젝트 파일에 여러 대상 프레임워크가 있습니다. [--target-framework, -tfm] 옵션과 함께 사용할 대상 프레임워크를 지정합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
         <source>Target platform not found</source>
-        <target state="new">Target platform not found</target>
+        <target state="translated">대상 플랫폼을 찾을 수 없음</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.TfmNotSupported">
         <source>Target framework is not supported by current .NET project.</source>
-        <target state="new">Target framework is not supported by current .NET project.</target>
+        <target state="translated">대상 프레임워크는 현재 .NET 프로젝트에서 지원되지 않습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidOS">
@@ -84,279 +84,304 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
         <source>Invalid TFM: Target framework '{0}' does not target an Apple platform</source>
-        <target state="new">Invalid TFM: Target framework '{0}' does not target an Apple platform</target>
+        <target state="translated">잘못된 TFM: '{0}' 대상 프레임워크가 Apple 플랫폼을 대상으로 하지 않습니다.</target>
         <note>{0} is name of the target frameworks, e.g net8-ios, net8-windows</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidVerbosity">
         <source>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</source>
-        <target state="new">Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</target>
+        <target state="translated">세부 정보 표시가 유효하지 않습니다. 허용되는 값은 Quiet, Minimal, Normal, Detailed, Diagnostic입니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.MissingValidTargetFrameworkInPath">
         <source>Missing valid target framework in '{0}'.</source>
-        <target state="new">Missing valid target framework in '{0}'.</target>
+        <target state="translated">'{0}'에 유효한 대상 프레임워크가 없습니다.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathDoesNotContainCsproj">
         <source>'{0}' is not a valid path to a .NET project or a directory.</source>
-        <target state="new">'{0}' is not a valid path to a .NET project or a directory.</target>
+        <target state="translated">'{0}'은(는) .NET 프로젝트 또는 디렉터리의 올바른 경로가 아닙니다.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathDoesNotExist">
         <source>Path '{0}' does not exist</source>
-        <target state="new">Path '{0}' does not exist</target>
+        <target state="translated">경로 '{0}'이(가) 존재하지 않습니다.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathNameIsEmpty">
         <source>Path name is empty</source>
-        <target state="new">Path name is empty</target>
+        <target state="translated">경로 이름이 비어 있습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetDoesNotExist">
         <source>Target path '{0}' does not exist, will create directory if [--force, -f] is set.</source>
-        <target state="new">Target path '{0}' does not exist, will create directory if [--force, -f] is set.</target>
+        <target state="translated">'{0}' 대상 경로가 없습니다. [--force, -f]가 설정된 경우 디렉터리를 만듭니다.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetIsNotEmpty">
         <source>The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</source>
-        <target state="new">The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</target>
+        <target state="translated">'{0}' 대상 경로가 이미 있으며 비어 있지 않습니다. 기존 프로젝트를 덮어쓰려면 [--force, -f]를 사용하세요.</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
         <source>Generated Xcode header and implementation files</source>
-        <target state="new">Generated Xcode header and implementation files</target>
+        <target state="translated">생성된 Xcode 헤더와 구현 파일</target>
         <note />
       </trans-unit>
       <trans-unit id="Generate.GeneratedProject">
         <source>Generated Xcode project at '{0}'</source>
-        <target state="new">Generated Xcode project at '{0}'</target>
+        <target state="translated">'{0}'에서 Xcode 프로젝트를 생성했습니다.</target>
         <note>{0} is the path to the generated Xcode project</note>
       </trans-unit>
       <trans-unit id="Generate.HeaderInformation">
         <source>Generating files from project '{0}' to target '{1}'</source>
-        <target state="new">Generating files from project '{0}' to target '{1}'</target>
+        <target state="translated">'{0}' 프로젝트에서 '{1}' 대상으로의 파일을 생성하는 중</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
       <trans-unit id="Generate.OpenProject">
         <source>'{0}' is open in Xcode</source>
-        <target state="new">'{0}' is open in Xcode</target>
+        <target state="translated">'{0}'이(가) Xcode에서 열려 있습니다.</target>
         <note>{0} is the path to the opened project</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
         <source>Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</source>
-        <target state="new">Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</target>
+        <target state="translated">.NET SDK의 경로를 설정하며, 제공되지 않을 경우 경로가 'dotnet'인 경우 부모 프로세스의 경로를 사용하고 그렇지 않은 경우 경로의 'dotnet'으로 되돌아갑니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Force.Description">
         <source>Force overwrite of an existing Xcode project</source>
-        <target state="new">Force overwrite of an existing Xcode project</target>
+        <target state="translated">기존 Xcode 프로젝트 강제 덮어쓰기</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Open.Description">
         <source>Open the generated project in Xcode</source>
-        <target state="new">Open the generated project in Xcode</target>
+        <target state="translated">생성된 프로젝트를 Xcode에서 엽니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Project.Description">
         <source>Path to the source .NET .csproj</source>
-        <target state="new">Path to the source .NET .csproj</target>
+        <target state="translated">원본 .NET .csproj으로의 경로</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Target.Description">
         <source>Path to the target Xcode project</source>
-        <target state="new">Path to the target Xcode project</target>
+        <target state="translated">대상 Xcode 프로젝트의 경로</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Tfm.Description">
         <source>Specify the target framework moniker</source>
-        <target state="new">Specify the target framework moniker</target>
+        <target state="translated">대상 프레임워크 모니커 지정</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Verbosity.Description">
         <source>Set the verbosity level</source>
-        <target state="new">Set the verbosity level</target>
+        <target state="translated">세부 정보 표시 수준 설정</target>
         <note />
       </trans-unit>
       <trans-unit id="ProgramHeader">
         <source>xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
 		</source>
-        <target state="new">xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
+        <target state="translated">xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
 		</target>
         <note>{0} is a numerical based string containing the version number for the command line tool</note>
       </trans-unit>
       <trans-unit id="Sync.HeaderInformation">
         <source>Syncing files from project '{0}' to target '{1}'</source>
-        <target state="new">Syncing files from project '{0}' to target '{1}'</target>
+        <target state="translated">'{0}' 프로젝트에서 '{1}' 대상으로의 파일을 동기화하는 중</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
       <trans-unit id="SyncContext.GeneratingFiles">
         <source>Generating Xcode project files...</source>
-        <target state="new">Generating Xcode project files...</target>
+        <target state="translated">Xcode 프로젝트 파일을 생성하는 중...</target>
         <note />
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
         <source>Synchronization complete.</source>
-        <target state="new">Synchronization complete.</target>
+        <target state="translated">동기화가 완료되었습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.AssemblyDiagnosticError">
         <source>{0}: {1}</source>
-        <target state="new">{0}: {1}</target>
+        <target state="translated">{0}: {1}</target>
         <note>{0} is the name of the Assembly, {1} is the Diganostic</note>
       </trans-unit>
       <trans-unit id="TypeService.AssemblyUpdateError">
         <source>{0}: Failed to cache new compilation within type system, changes are not preserved.</source>
-        <target state="new">{0}: Failed to cache new compilation within type system, changes are not preserved.</target>
+        <target state="translated">{0}: 형식 시스템 내에서 새 컴파일을 캐시하지 못했습니다. 변경 내용이 유지되지 않습니다.</target>
         <note>{0} is the name of the Assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.CompilationErrorsFound">
         <source>{0}: Compilation errors found</source>
-        <target state="new">{0}: Compilation errors found</target>
+        <target state="translated">{0}: 컴파일 오류가 발견됨</target>
         <note>{0} is the name of the Assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.CompilationNotFound">
         <source>The compilation for {0} could not be located for synchronization.</source>
-        <target state="new">The compilation for {0} could not be located for synchronization.</target>
+        <target state="translated">동기화에 필요한 {0}에 대한 컴파일을 찾을 수 없습니다.</target>
         <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.DuplicateCompilation">
         <source>The compilation for {0} has already been added, ignoring this instance.</source>
-        <target state="new">The compilation for {0} has already been added, ignoring this instance.</target>
+        <target state="translated">{0}에 대한 컴파일이 이미 추가되었으므로 이 인스턴스를 무시합니다.</target>
         <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.DuplicateType">
         <source>Type '{0}' already exists in project.</source>
-        <target state="new">Type '{0}' already exists in project.</target>
+        <target state="translated">'{0}' 형식이 프로젝트에 이미 있습니다.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingMismatch">
         <source>Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.</source>
-        <target state="new">Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.</target>
+        <target state="translated">매핑을 '{0}'에서 '{1}'(으)로, '{2}'에서 '{3}'(으)로 업데이트하려고 할 때 일치하지 않습니다.</target>
         <note>{0}, {1}, {2}, {3} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingNotFound">
         <source>Mapping from of '{0}' to '{1}' already exists.</source>
-        <target state="new">Mapping from of '{0}' to '{1}' already exists.</target>
+        <target state="translated">'{0}'에서 '{1}'(으)로의 매핑이 이미 있습니다.</target>
         <note>{0}, {1} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingUpdateFailed">
         <source>Failed to updated mapping of '{0}' to '{1}'.</source>
-        <target state="new">Failed to updated mapping of '{0}' to '{1}'.</target>
+        <target state="translated">매핑을 '{0}'에서 '{1}'(으)로 업데이트하지 못했습니다.</target>
         <note>{0}, {1} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MissingAssemblyName">
         <source>The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</source>
-        <target state="new">The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</target>
+        <target state="translated">컴파일에 AssemblyName이 없습니다. 동적이며 지원되지 않기 때문일 수 있습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.SyntaxRootNotFound">
         <source>The {0} type could not be synchronized due to missing symbol information.</source>
-        <target state="new">The {0} type could not be synchronized due to missing symbol information.</target>
+        <target state="translated">기호 정보가 누락되어 {0} 형식을 동기화할 수 없습니다.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="TypeService.TypeNotFound">
         <source>The {0} type could not be located for synchronization.</source>
-        <target state="new">The {0} type could not be located for synchronization.</target>
+        <target state="translated">동기화에 필요한 {0} 형식을 찾을 수 없습니다.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="Watch.ErrorMonitoringProjectFiles">
         <source>An error occurred while monitoring file changes in {0}.</source>
-        <target state="new">An error occurred while monitoring file changes in {0}.</target>
+        <target state="translated">{0}의 파일 변경 내용을 모니터링하는 동안 오류가 발생했습니다.</target>
         <note>{0} is the path to the project folder</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeDetected">
         <source>Changes detected for {0} in {1} project.</source>
-        <target state="new">Changes detected for {0} in {1} project.</target>
+        <target state="translated">{1} 프로젝트에서 {0}에 대한 변경 내용이 검색되었습니다.</target>
         <note>{0} is the path to the file that changed, {1} is the name of the project</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeFilter">
         <source>Filtering file changes to files that match {0}.</source>
-        <target state="new">Filtering file changes to files that match {0}.</target>
+        <target state="translated">{0}와(과) 일치하는 파일에 대한 파일 변경 내용을 필터링하는 중입니다.</target>
         <note>{0} is a regex string used to filter files.</note>
       </trans-unit>
       <trans-unit id="Watch.FileRenameDetected">
         <source>File renamed from {0} to {1} in {2} project.</source>
-        <target state="new">File renamed from {0} to {1} in {2} project.</target>
+        <target state="translated">{2} 프로젝트에서 파일 이름이 {0}에서 {1}(으)로 변경되었습니다.</target>
         <note>{0} and {1} are the old and new paths to the file that was renamed, {2} is the name of the project</note>
       </trans-unit>
       <trans-unit id="Watch.HeaderInformation">
         <source>Syncing changes between project '{0}' and '{1}'.</source>
-        <target state="new">Syncing changes between project '{0}' and '{1}'.</target>
+        <target state="translated">'{0}' 프로젝트와 '{1}' 간의 변경 내용을 동기화하는 중입니다.</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
+      </trans-unit>
+      <trans-unit id="Watch.PausingMonitoring">
+        <source>Pausing monitoring</source>
+        <target state="new">Pausing monitoring</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Watch.ResumingMonitoring">
+        <source>Context synced. Resuming monitoring</source>
+        <target state="new">Context synced. Resuming monitoring</target>
+        <note />
       </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
         <source>Monitoring project file changes in {0} started.</source>
-        <target state="new">Monitoring project file changes in {0} started.</target>
+        <target state="translated">{0}의 프로젝트 파일 변경 모니터링을 시작했습니다.</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
       <trans-unit id="Watch.StopMonitoringProject">
         <source>Monitoring project file changes in {0} stopped.</source>
-        <target state="new">Monitoring project file changes in {0} stopped.</target>
+        <target state="translated">{0}의 프로젝트 파일 변경 모니터링을 중지했습니다.</target>
         <note>{0} is the path to the project file</note>
+      </trans-unit>
+      <trans-unit id="Watch.Syncing">
+        <source>Syncing change context</source>
+        <target state="new">Syncing change context</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Watch.WorkerException">
+        <source>Error processing change message {0}: {1}</source>
+        <target state="new">Error processing change message {0}: {1}</target>
+        <note>{0} is the message Id, {1} is the exception message</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.DiagnosticIssue">
         <source>{0}</source>
-        <target state="new">{0}</target>
+        <target state="translated">{0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
         <source>Error: Parsing failed for '{0}' due to '{1}'.</source>
-        <target state="new">Error: Parsing failed for '{0}' due to '{1}'.</target>
+        <target state="translated">오류: '{1}'(으)로 인해 '{0}'에 대한 구문 분석이 실패했습니다.</target>
         <note>{0} is the file path, {1} is the Translation Unit Error</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorProcessing">
         <source>Error processing '{0}' : {1}\n{2}</source>
-        <target state="new">Error processing '{0}' : {1}\n{2}</target>
+        <target state="translated">'{0}'을(를) 처리하는 동안 오류가 발생했습니다. {1}\n{2}</target>
         <note>{0} is the file path, {1} is the exception, {2} is the stack trace</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorUpdatingRoslynType">
         <source>{0} : Error '{1}' : {2}\n{3}</source>
-        <target state="new">{0} : Error '{1}' : {2}\n{3}</target>
+        <target state="translated">{0} : 오류 '{1}' : {2}\n{3}</target>
         <note>{0} is the Function, {1} is the Type, {2} is the exception message, {3} is the stack trace</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FailToLoadXcodeProject">
         <source>Failed to load the Xcode project file at {0}</source>
-        <target state="new">Failed to load the Xcode project file at {0}</target>
+        <target state="translated">{0}의 Xcode 프로젝트 파일 로드 실패</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
         <source>Diagnostics for '{0}':</source>
-        <target state="new">Diagnostics for '{0}':</target>
+        <target state="translated">'{0}'에 대한 진단:</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
         <source>Multiple types found for {0}</source>
-        <target state="new">Multiple types found for {0}</target>
+        <target state="translated">{0}대한 여러 형식이 있음</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.NoTypesFound">
         <source>No types found for {0}</source>
-        <target state="new">No types found for {0}</target>
+        <target state="translated">{0}에 대한 형식을 찾을 수 없음</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
         <source>Processing '{0}'</source>
-        <target state="new">Processing '{0}'</target>
+        <target state="translated">'{0}'을(를) 처리하는 중</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingObjCImplementation">
         <source>Processing ObjCImplementationDecl: {0}</source>
-        <target state="new">Processing ObjCImplementationDecl: {0}</target>
+        <target state="translated">ObjCImplementationDecl을 처리하는 중: {0}</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.SkipProcessing">
         <source>Skipping '{0}' due to one or more errors listed above.</source>
-        <target state="new">Skipping '{0}' due to one or more errors listed above.</target>
+        <target state="translated">위에 나열된 하나 이상의 오류로 인해 '{0}'을(를) 건너뛰는 중입니다.</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.UnexpectedTypesFound">
         <source>Unexpected type found: {0}</source>
-        <target state="new">Unexpected type found: {0}</target>
+        <target state="translated">예기치 않은 형식을 찾았습니다. {0}</target>
         <note>{0} is the non-ObjC type found</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
-        <target state="new">The Xcode project file at {0} does not contain any objects</target>
+        <target state="translated">{0}의 Xcode 프로젝트 파일에 개체가 없음</target>
+        <note>{0} is the path to the Xcode project</note>
+      </trans-unit>
+      <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
+        <source>File not found: {0}</source>
+        <target state="new">File not found: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>
