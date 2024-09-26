@@ -4,6 +4,7 @@
 using System.IO.Abstractions;
 using Marille;
 using Serilog;
+using xcsync.Commands;
 using xcsync.Projects;
 using xcsync.Workers;
 
@@ -17,17 +18,7 @@ class ChangeWorker (IFileSystem FileSystem, ITypeService TypeService, string Pro
 		message.ClrMonitor.StopMonitoring ();
 		message.XcodeMonitor.StopMonitoring ();
 		if (message.Direction == SyncDirection.ToXcode)
-		{
-			if (FileSystem.Directory.Exists(TargetDir) && FileSystem.Directory.EnumerateFileSystemEntries(TargetDir).Any())
-			{
-				FileSystem.Directory.Delete(TargetDir, true);
-			}
-
-			if (!FileSystem.Directory.Exists(TargetDir))
-			{
-				FileSystem.Directory.CreateDirectory(TargetDir);
-			}
-		}
+			XcodeCommand<GenerateCommand>.RecreateDirectory (FileSystem, TargetDir);
 		await new SyncContext (FileSystem, TypeService, message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
 		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
 		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
