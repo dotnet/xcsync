@@ -51,13 +51,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 		}
 
 		if (Force) {
-			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
-				fileSystem.Directory.Delete (targetPath, true);
-			}
-
-			if (!fileSystem.Directory.Exists (targetPath)) {
-				fileSystem.Directory.CreateDirectory (targetPath);
-			}
+			RecreateDirectory (fileSystem, targetPath);
 		} else {
 			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
 				LogDebug (Strings.Errors.Validation.TargetNotEmpty (targetPath));
@@ -70,5 +64,16 @@ class XcodeCommand<T> : BaseCommand<T> {
 			}
 		}
 		return (error, targetPath);
+	}
+
+	public static void RecreateDirectory (IFileSystem fileSystem, string targetPath)
+	{
+		if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
+			fileSystem.Directory.Delete (targetPath, true);
+		}
+
+		if (!fileSystem.Directory.Exists (targetPath)) {
+			fileSystem.Directory.CreateDirectory (targetPath);
+		}
 	}
 }

@@ -4,6 +4,7 @@
 using System.IO.Abstractions;
 using Marille;
 using Serilog;
+using xcsync.Commands;
 using xcsync.Projects;
 using xcsync.Workers;
 
@@ -17,6 +18,8 @@ class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir
 		Logger.Debug (Strings.Watch.PausingMonitoring);
 		message.ClrMonitor.StopMonitoring ();
 		message.XcodeMonitor.StopMonitoring ();
+		if (message.Direction == SyncDirection.ToXcode)
+			XcodeCommand<GenerateCommand>.RecreateDirectory (FileSystem, TargetDir);
 		Logger.Debug (Strings.Watch.Syncing);
 		await new SyncContext (FileSystem, TypeService, message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
 		Logger.Debug (Strings.Watch.ResumingMonitoring);
