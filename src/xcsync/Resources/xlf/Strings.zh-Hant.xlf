@@ -4,77 +4,77 @@
     <body>
       <trans-unit id="Base.CreateDefaultTarget">
         <source>Target path '{0}' does not exist, but is the default location, creating.</source>
-        <target state="new">Target path '{0}' does not exist, but is the default location, creating.</target>
+        <target state="translated">目標路徑 '{0}' 不存在，但它是預設位置，正在建立。</target>
         <note>{0} is the path to target project</note>
       </trans-unit>
       <trans-unit id="Base.EstablishDefaultTarget">
         <source>Target path is the default location or empty, prefixing with '{0}'</source>
-        <target state="new">Target path is the default location or empty, prefixing with '{0}'</target>
+        <target state="translated">目標路徑是預設位置或空白，前置詞為 '{0}'</target>
         <note>{0} is the path to project</note>
       </trans-unit>
       <trans-unit id="Base.FoundProjectFile">
         <source>Found .csproj file '{0}' in path '{1}'</source>
-        <target state="new">Found .csproj file '{0}' in path '{1}'</target>
+        <target state="translated">在路徑 '{1}' 中找到 .csproj 檔案 '{0}'</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Base.ProjectTfms">
         <source>Project target frameworks: '{0}'</source>
-        <target state="new">Project target frameworks: '{0}'</target>
+        <target state="translated">專案目標 Framework: '{0}'</target>
         <note>{0} is list of TFMs the selected project supports</note>
       </trans-unit>
       <trans-unit id="Base.SearchForProjectFiles">
         <source>'{0}' is not a .csproj file, searching for .csproj files in directory</source>
-        <target state="new">'{0}' is not a .csproj file, searching for .csproj files in directory</target>
+        <target state="translated">'{0}' 不是 .csproj 檔案，正在目錄中搜尋 .csproj 檔案</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Base.UseDefaultTfm">
         <source>No target framework moniker specified, using the first one found in the project.</source>
-        <target state="new">No target framework moniker specified, using the first one found in the project.</target>
+        <target state="translated">未指定目標 Framework Moniker，正在使用在專案中找到的第一個目標 Framework Moniker。</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
         <source>generate a Xcode project at the path specified by --target from the project identified by --project</source>
-        <target state="new">generate a Xcode project at the path specified by --target from the project identified by --project</target>
+        <target state="translated">從 --project 識別的專案在 --target 指定的路徑產生 Xcode 專案</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Sync.Description">
         <source>used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</source>
-        <target state="new">used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</target>
+        <target state="translated">用於產生命令之後，以將產生的 Xcode 專案變更同步到 .NET 專案</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
         <source>syncs changes between the .NET project and Xcode project automatically</source>
-        <target state="new">syncs changes between the .NET project and Xcode project automatically</target>
+        <target state="translated">自動同步 .NET 專案與 Xcode 專案之間的變更</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.CsprojNotFound">
         <source>Could not find a .csproj file in path '{0}'</source>
-        <target state="new">Could not find a .csproj file in path '{0}'</target>
+        <target state="translated">在路徑 '{0}' 中找不到 .csproj 檔案</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.InvalidOption">
         <source>Invalid option '{0}' provided: {1}</source>
-        <target state="new">Invalid option '{0}' provided: {1}</target>
+        <target state="translated">提供的選項 '{0}' 無效: {1}</target>
         <note>{0} is name of the command line options, {1} is the value of the option provided by the user</note>
       </trans-unit>
       <trans-unit id="Errors.MultipleProjectFilesFound">
         <source>Multiple .csproj files found in '{0}', please specify which project file to use via the [--project, -p] option: {1}</source>
-        <target state="new">Multiple .csproj files found in '{0}', please specify which project file to use via the [--project, -p] option: {1}</target>
+        <target state="translated">在 '{0}' 中找到多個 .csproj 檔案，請透過 [--project, -p] 選項指定要使用的專案檔案: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.MultipleTfmsFound">
         <source>Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</source>
-        <target state="new">Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</target>
+        <target state="translated">在專案檔案中發現多個目標 Framework。指定要搭配 [--target-framework, -tfm] 選項使用的目標 Framework。</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
         <source>Target platform not found</source>
-        <target state="new">Target platform not found</target>
+        <target state="translated">找不到目標平台</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.TfmNotSupported">
         <source>Target framework is not supported by current .NET project.</source>
-        <target state="new">Target framework is not supported by current .NET project.</target>
+        <target state="translated">目前的 .NET 專案不支援目標 Framework。</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidOS">
@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
         <source>Invalid TFM: Target framework '{0}' does not target an Apple platform</source>
-        <target state="new">Invalid TFM: Target framework '{0}' does not target an Apple platform</target>
+        <target state="translated">無效的 TFM: 目標 Framework '{0}' 未以 Apple 平台為目標</target>
         <note>{0} is name of the target frameworks, e.g net8-ios, net8-windows</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidVerbosity">
@@ -94,87 +94,87 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.MissingValidTargetFrameworkInPath">
         <source>Missing valid target framework in '{0}'.</source>
-        <target state="new">Missing valid target framework in '{0}'.</target>
+        <target state="translated">'{0}' 中遺漏有效的目標架構。</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathDoesNotContainCsproj">
         <source>'{0}' is not a valid path to a .NET project or a directory.</source>
-        <target state="new">'{0}' is not a valid path to a .NET project or a directory.</target>
+        <target state="translated">'{0}' 不是 .NET 專案或目錄的有效路徑。</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathDoesNotExist">
         <source>Path '{0}' does not exist</source>
-        <target state="new">Path '{0}' does not exist</target>
+        <target state="translated">路徑 '{0}' 不存在</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathNameIsEmpty">
         <source>Path name is empty</source>
-        <target state="new">Path name is empty</target>
+        <target state="translated">路徑名稱是空白</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetDoesNotExist">
         <source>Target path '{0}' does not exist, will create directory if [--force, -f] is set.</source>
-        <target state="new">Target path '{0}' does not exist, will create directory if [--force, -f] is set.</target>
+        <target state="translated">目標路徑 '{0}' 不存在，如果有設定 [--force, -f]，則將會建立目錄。</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetIsNotEmpty">
         <source>The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</source>
-        <target state="new">The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</target>
+        <target state="translated">目標路徑 '{0}' 已存在且不是空白。使用 [--force, -f] 來覆寫現有的專案。</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
         <source>Generated Xcode header and implementation files</source>
-        <target state="new">Generated Xcode header and implementation files</target>
+        <target state="translated">產生的 Xcode 標頭和實作檔案</target>
         <note />
       </trans-unit>
       <trans-unit id="Generate.GeneratedProject">
         <source>Generated Xcode project at '{0}'</source>
-        <target state="new">Generated Xcode project at '{0}'</target>
+        <target state="translated">在 '{0}' 產生的 Xcode 專案</target>
         <note>{0} is the path to the generated Xcode project</note>
       </trans-unit>
       <trans-unit id="Generate.HeaderInformation">
         <source>Generating files from project '{0}' to target '{1}'</source>
-        <target state="new">Generating files from project '{0}' to target '{1}'</target>
+        <target state="translated">正在從專案 '{0}' 對目標 '{1}' 產生檔案</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
       <trans-unit id="Generate.OpenProject">
         <source>'{0}' is open in Xcode</source>
-        <target state="new">'{0}' is open in Xcode</target>
+        <target state="translated">'{0}' 已在 Xcode 中開啟</target>
         <note>{0} is the path to the opened project</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
         <source>Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</source>
-        <target state="new">Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</target>
+        <target state="translated">將路徑設定為 .NET SDK，如果沒有提供，則將使用父處理序的路徑，如果它是 'dotnet'，否則將後援至 PATH 上的 'dotnet'。</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Force.Description">
         <source>Force overwrite of an existing Xcode project</source>
-        <target state="new">Force overwrite of an existing Xcode project</target>
+        <target state="translated">強制覆寫現有的 Xcode 專案</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Open.Description">
         <source>Open the generated project in Xcode</source>
-        <target state="new">Open the generated project in Xcode</target>
+        <target state="translated">在 Xcode 中開啟產生的專案</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Project.Description">
         <source>Path to the source .NET .csproj</source>
-        <target state="new">Path to the source .NET .csproj</target>
+        <target state="translated">來源 .NET .csproj 的路徑</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Target.Description">
         <source>Path to the target Xcode project</source>
-        <target state="new">Path to the target Xcode project</target>
+        <target state="translated">目標 Xcode 專案的路徑</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Tfm.Description">
         <source>Specify the target framework moniker</source>
-        <target state="new">Specify the target framework moniker</target>
+        <target state="translated">指定目標 Framework Moniker</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Verbosity.Description">
         <source>Set the verbosity level</source>
-        <target state="new">Set the verbosity level</target>
+        <target state="translated">設定詳細程度層級</target>
         <note />
       </trans-unit>
       <trans-unit id="ProgramHeader">
@@ -186,12 +186,12 @@
       </trans-unit>
       <trans-unit id="Sync.HeaderInformation">
         <source>Syncing files from project '{0}' to target '{1}'</source>
-        <target state="new">Syncing files from project '{0}' to target '{1}'</target>
+        <target state="translated">正在將檔案從專案 '{0}' 同步到目標 '{1}'</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
       <trans-unit id="SyncContext.GeneratingFiles">
         <source>Generating Xcode project files...</source>
-        <target state="new">Generating Xcode project files...</target>
+        <target state="translated">正在產生 Xcode 專案檔案...</target>
         <note />
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
@@ -206,82 +206,82 @@
       </trans-unit>
       <trans-unit id="TypeService.AssemblyUpdateError">
         <source>{0}: Failed to cache new compilation within type system, changes are not preserved.</source>
-        <target state="new">{0}: Failed to cache new compilation within type system, changes are not preserved.</target>
+        <target state="translated">{0}: 無法在類型系統中快取新編譯，不會保留變更。</target>
         <note>{0} is the name of the Assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.CompilationErrorsFound">
         <source>{0}: Compilation errors found</source>
-        <target state="new">{0}: Compilation errors found</target>
+        <target state="translated">{0}: 發現編譯錯誤</target>
         <note>{0} is the name of the Assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.CompilationNotFound">
         <source>The compilation for {0} could not be located for synchronization.</source>
-        <target state="new">The compilation for {0} could not be located for synchronization.</target>
+        <target state="translated">找不到要同步處理的 {0} 編譯。</target>
         <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.DuplicateCompilation">
         <source>The compilation for {0} has already been added, ignoring this instance.</source>
-        <target state="new">The compilation for {0} has already been added, ignoring this instance.</target>
+        <target state="translated">已新增 {0} 的編譯，正在忽略此執行個體。</target>
         <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.DuplicateType">
         <source>Type '{0}' already exists in project.</source>
-        <target state="new">Type '{0}' already exists in project.</target>
+        <target state="translated">類型 '{0}' 已存在於專案中。</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingMismatch">
         <source>Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.</source>
-        <target state="new">Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.</target>
+        <target state="translated">嘗試將 '{0}' 到 '{1}' 的對應更新為 '{2}' 到 '{3}' 時不符。</target>
         <note>{0}, {1}, {2}, {3} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingNotFound">
         <source>Mapping from of '{0}' to '{1}' already exists.</source>
-        <target state="new">Mapping from of '{0}' to '{1}' already exists.</target>
+        <target state="translated">從 '{0}' 到 '{1}' 的對應已存在。</target>
         <note>{0}, {1} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingUpdateFailed">
         <source>Failed to updated mapping of '{0}' to '{1}'.</source>
-        <target state="new">Failed to updated mapping of '{0}' to '{1}'.</target>
+        <target state="translated">無法將 '{0}' 的對應更新為 '{1}'。</target>
         <note>{0}, {1} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MissingAssemblyName">
         <source>The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</source>
-        <target state="new">The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</target>
+        <target state="translated">編譯沒有 AssemblyName，可能是因為它是動態且不受支援。</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.SyntaxRootNotFound">
         <source>The {0} type could not be synchronized due to missing symbol information.</source>
-        <target state="new">The {0} type could not be synchronized due to missing symbol information.</target>
+        <target state="translated">因為缺少符號資訊，所已找不到要同步處理的 {0} 類型。</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="TypeService.TypeNotFound">
         <source>The {0} type could not be located for synchronization.</source>
-        <target state="new">The {0} type could not be located for synchronization.</target>
+        <target state="translated">找不到要同步處理的 {0} 類型。</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="Watch.ErrorMonitoringProjectFiles">
         <source>An error occurred while monitoring file changes in {0}.</source>
-        <target state="new">An error occurred while monitoring file changes in {0}.</target>
+        <target state="translated">監視 {0} 中的檔案變更時發生錯誤。</target>
         <note>{0} is the path to the project folder</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeDetected">
         <source>Changes detected for {0} in {1} project.</source>
-        <target state="new">Changes detected for {0} in {1} project.</target>
+        <target state="translated">在 {0} 專案中偵測到 {1} 的變更。</target>
         <note>{0} is the path to the file that changed, {1} is the name of the project</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeFilter">
         <source>Filtering file changes to files that match {0}.</source>
-        <target state="new">Filtering file changes to files that match {0}.</target>
+        <target state="translated">正在篩選對符合 {0} 的檔案的檔案變更。</target>
         <note>{0} is a regex string used to filter files.</note>
       </trans-unit>
       <trans-unit id="Watch.FileRenameDetected">
         <source>File renamed from {0} to {1} in {2} project.</source>
-        <target state="new">File renamed from {0} to {1} in {2} project.</target>
+        <target state="translated">{2} 專案中的檔案已從 {0} 重新命名為 {1}。</target>
         <note>{0} and {1} are the old and new paths to the file that was renamed, {2} is the name of the project</note>
       </trans-unit>
       <trans-unit id="Watch.HeaderInformation">
         <source>Syncing changes between project '{0}' and '{1}'.</source>
-        <target state="new">Syncing changes between project '{0}' and '{1}'.</target>
+        <target state="translated">正在同步專案 '{0}' 與 '{1}' 之間的變更。</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
       <trans-unit id="Watch.PausingMonitoring">
@@ -296,12 +296,12 @@
       </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
         <source>Monitoring project file changes in {0} started.</source>
-        <target state="new">Monitoring project file changes in {0} started.</target>
+        <target state="translated">已開始監視 {0} 中的專案檔案變更。</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
       <trans-unit id="Watch.StopMonitoringProject">
         <source>Monitoring project file changes in {0} stopped.</source>
-        <target state="new">Monitoring project file changes in {0} stopped.</target>
+        <target state="translated">已停止監視 {0} 中的專案檔案變更。</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
       <trans-unit id="Watch.Syncing">
@@ -321,22 +321,22 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
         <source>Error: Parsing failed for '{0}' due to '{1}'.</source>
-        <target state="new">Error: Parsing failed for '{0}' due to '{1}'.</target>
+        <target state="translated">錯誤: 因為 '{1}'，所以 '{0}' 的剖析失敗。</target>
         <note>{0} is the file path, {1} is the Translation Unit Error</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorProcessing">
         <source>Error processing '{0}' : {1}\n{2}</source>
-        <target state="new">Error processing '{0}' : {1}\n{2}</target>
+        <target state="translated">處理 '{0}' 時發生錯誤: {1}\n{2}</target>
         <note>{0} is the file path, {1} is the exception, {2} is the stack trace</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorUpdatingRoslynType">
         <source>{0} : Error '{1}' : {2}\n{3}</source>
-        <target state="new">{0} : Error '{1}' : {2}\n{3}</target>
+        <target state="translated">{0} : 錯誤 '{1}' : {2}\n{3}</target>
         <note>{0} is the Function, {1} is the Type, {2} is the exception message, {3} is the stack trace</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FailToLoadXcodeProject">
         <source>Failed to load the Xcode project file at {0}</source>
-        <target state="new">Failed to load the Xcode project file at {0}</target>
+        <target state="translated">無法載入位於 {0} 的 Xcode 專案檔案</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
@@ -346,12 +346,12 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
         <source>Multiple types found for {0}</source>
-        <target state="new">Multiple types found for {0}</target>
+        <target state="translated">發現多個 {0} 的類型</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.NoTypesFound">
         <source>No types found for {0}</source>
-        <target state="new">No types found for {0}</target>
+        <target state="translated">找不到 {0} 的類型</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
@@ -366,17 +366,22 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.SkipProcessing">
         <source>Skipping '{0}' due to one or more errors listed above.</source>
-        <target state="new">Skipping '{0}' due to one or more errors listed above.</target>
+        <target state="translated">因為有上列一或多個錯誤，所以正在跳過 '{0}'。</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.UnexpectedTypesFound">
         <source>Unexpected type found: {0}</source>
-        <target state="new">Unexpected type found: {0}</target>
+        <target state="translated">發現非預期的類型: {0}</target>
         <note>{0} is the non-ObjC type found</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
-        <target state="new">The Xcode project file at {0} does not contain any objects</target>
+        <target state="translated">位於 {0} 的 Xcode 專案檔案未包含任何物件</target>
+        <note>{0} is the path to the Xcode project</note>
+      </trans-unit>
+      <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
+        <source>File not found: {0}</source>
+        <target state="new">File not found: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>

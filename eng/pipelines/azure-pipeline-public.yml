@@ -1,22 +1,7 @@
+# AzDo pipeline definition: https://dev.azure.com/dnceng-public/public/_build?definitionId=300
 trigger:
-  batch: false
-  branches:
-    include:
-    - main
-    - prerelease
-    - release
-  paths:
-    include:
-      - '*'
-    exclude:
-      - '**.md'
-      - eng/Version.Details.xml
-      - .github/*
-      - docs/*
-      - LICENSE.txt
-      - PATENTS.TXT
-      - THIRD-PARTY-NOTICES.TXT
-
+  - none
+  
 pr:
   branches:
     include:
@@ -31,13 +16,9 @@ pr:
       - eng/Version.Details.xml
       - .github/*
       - docs/*
-      - LICENSE.txt
-      - PATENTS.TXT
-      - THIRD-PARTY-NOTICES.TXT
 
 variables:
   - template: /eng/pipelines/common-variables.yml@self
-  - template: /eng/common/templates-official/variables/pool-providers.yml@self
 
   - name: _BuildConfig
     value: Release
@@ -48,6 +29,7 @@ variables:
   - name: Build.Arcade.TestResultsPath
     value: $(Build.Arcade.ArtifactsPath)TestResults/$(_BuildConfig)/
 
+    # needed for darc (dependency flow) publishing
   - name: _PublishArgs
     value: ''
   - name: _OfficialBuildIdArgs
@@ -62,7 +44,6 @@ variables:
 
   - name: DotNetVersion
     value: '8.0'
-
 
 stages:
 
@@ -95,7 +76,8 @@ stages:
 
         pool:
           name: Azure Pipelines
-          vmImage: macos-latest-internal
+          vmImage: macos-latest
+          os: macOS
 
         variables:
           - name: _buildScript

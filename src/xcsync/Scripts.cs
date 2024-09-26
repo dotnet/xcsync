@@ -28,6 +28,12 @@ static class Scripts {
 		return exec;
 	}
 
+	public static bool ConvertPbxProjToJson (IFileSystem fileSystem, string projectPath)
+	{
+		var exec = ExecuteCommand ("plutil", ["-convert", "json", projectPath], TimeSpan.FromMinutes (1));
+		return fileSystem.File.Exists (projectPath) && exec.ExitCode == 0;
+	}
+
 #pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
 	public static string SelectXcode ()
 	{
