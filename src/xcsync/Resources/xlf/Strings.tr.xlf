@@ -84,7 +84,7 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidVerbosity">
         <source>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</source>
-        <target state="new">Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</target>
+        <target state="translated">Geçersiz Ayrıntı düzeyi. İzin verilen değerler: Sessiz, Minimal, Normal, Ayrıntılı, Tanılama.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.MissingValidTargetFrameworkInPath">
@@ -175,7 +175,7 @@
       <trans-unit id="ProgramHeader">
         <source>xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
 		</source>
-        <target state="new">xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
+        <target state="translated">xcSync v{0}, (c) Microsoft Corporation. Tüm hakları saklıdır.
 		</target>
         <note>{0} is a numerical based string containing the version number for the command line tool</note>
       </trans-unit>
@@ -191,12 +191,12 @@
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
         <source>Synchronization complete.</source>
-        <target state="new">Synchronization complete.</target>
+        <target state="translated">Eşitleme tamamlandı.</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.AssemblyDiagnosticError">
         <source>{0}: {1}</source>
-        <target state="new">{0}: {1}</target>
+        <target state="translated">{0}: {1}</target>
         <note>{0} is the name of the Assembly, {1} is the Diganostic</note>
       </trans-unit>
       <trans-unit id="TypeService.AssemblyUpdateError">
@@ -291,7 +291,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.DiagnosticIssue">
         <source>{0}</source>
-        <target state="new">{0}</target>
+        <target state="translated">{0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
@@ -316,7 +316,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
         <source>Diagnostics for '{0}':</source>
-        <target state="new">Diagnostics for '{0}':</target>
+        <target state="translated">'{0}' için tanılama:</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
@@ -331,12 +331,12 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
         <source>Processing '{0}'</source>
-        <target state="new">Processing '{0}'</target>
+        <target state="translated">'{0}' işleniyor</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingObjCImplementation">
         <source>Processing ObjCImplementationDecl: {0}</source>
-        <target state="new">Processing ObjCImplementationDecl: {0}</target>
+        <target state="translated">ObjCImplementationDecl İşleniyor: {0}</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.SkipProcessing">
