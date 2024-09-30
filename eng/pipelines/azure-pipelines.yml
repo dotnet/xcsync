@@ -123,7 +123,7 @@ extends:
         - template: /eng/common/templates-official/job/onelocbuild.yml@self
           parameters:
             LclSource: lclFilesfromPackage
-            LclPackageId: 'LCL-JUNO-PROD-XMACCORE'
+            LclPackageId: 'LCL-JUNO-PROD-XCSYNC'
             #LclSource: lclFilesInRepo
             SkipLocProjectJsonGeneration: true
             MirrorRepo: xcsync
