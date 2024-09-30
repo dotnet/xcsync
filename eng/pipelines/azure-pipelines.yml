@@ -171,7 +171,13 @@ extends:
               fetchDepth: 1
               clean: true
 
-            steps:                
+            steps: 
+
+              - pwsh: |
+                  Write-Host "##vso[task.setvariable variable=DYLD_INSERT_LIBRARIES]"
+                displayName: 'Disable CodeQL'
+                name: disableCodeQLOnArm64
+
               - template: /eng/pipelines/templates/buildandtest.yml
                 parameters:
                   dotnetScript: $(Build.SourcesDirectory)/dotnet.sh
