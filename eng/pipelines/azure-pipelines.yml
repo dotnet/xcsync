@@ -119,7 +119,7 @@ extends:
     - stage: Build
       displayName: Build
       jobs:
-      - ${{ if and( notin( variables['Build.Reason'], 'PullRequest' ), eq( variables['Build.SourceBranch'], 'refs/heads/main' ) ) }}:
+      - ${{ if true }}:
         - template: /eng/common/templates-official/job/onelocbuild.yml@self
           parameters:
             LclSource: lclFilesfromPackage
