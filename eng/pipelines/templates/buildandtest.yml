@@ -47,7 +47,7 @@ steps:
               $(_OfficialBuildArgs)
       displayName: 🛠️ Build
 
-  - ${if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
+  - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
     - pwsh: |
         # Get .NET SDK Version from global.json
         $globalJson = Get-Content -Path "global.json" -Raw | ConvertFrom-Json
