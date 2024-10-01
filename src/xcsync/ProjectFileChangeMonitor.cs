@@ -56,7 +56,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 		watcher.Path = fileSystem.Path.GetDirectoryName (project.RootPath)!;
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-		watcher.Filter = "*.*";
+		watcher.Filter = "*.*"; //not used, overridden by fileFilterRegex
 		watcher.IncludeSubdirectories = true;
 
 		watcher.Changed += OnChangedHandler;
