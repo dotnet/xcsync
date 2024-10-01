@@ -48,7 +48,17 @@ steps:
       displayName: 🛠️ Build
 
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
-    - script: dotnet workload install macos ios maccatalyst tvos maui # Neccessary for tests
+    - pwsh: |
+        # Get .NET SDK Version from global.json
+        $globalJson = Get-Content -Path "global.json" -Raw | ConvertFrom-Json
+        $workloadSetVersion = "${$jsonContent.sdk.version}.0"
+
+        # Update/install workloads to the workload set
+        dotnet workload update --source https://api.nuget.org/v3/index.json --version $workloadSetVersion
+        dotnet workload install macos ios maccatalyst tvos maui --source https://api.nuget.org/v3/index.json --version 8.0.402.0 # Neccessary for tests
+
+        # List installed workloads
+        dotnet workload list        
       displayName: Install workloads
 
     - ${{ if ne(parameters.isWindows, 'true') }}:
