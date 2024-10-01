@@ -42,8 +42,6 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 	Regex? fileFilterRegex;
 
-	Regex? exclusionRegex;
-
 	/// <summary>
 	/// Starts monitoring the project file changes.
 	/// </summary>
@@ -58,7 +56,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 		watcher.Path = fileSystem.Path.GetDirectoryName (project.RootPath)!;
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-		watcher.Filter = "*.*"; //this isn't really used since overridden by fileFilterRegex
+		watcher.Filter = "*.*";
 		watcher.IncludeSubdirectories = true;
 
 		watcher.Changed += OnChangedHandler;
@@ -68,9 +66,6 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 		watcher.Error += OnErrorHandler;
 
 		watcher.EnableRaisingEvents = true;
-
-		var exclusionPattern = @".*\.xcodeproj/project\.xcworkspace/*"; // or:  @".*\.xcodeproj/project\.xcworkspace/(xcshareddata|xcuserdata).*";
-		exclusionRegex = new Regex (exclusionPattern, RegexOptions.IgnoreCase);
 
 		var filters = string.Join ("|", this.project.ProjectFilesFilter.Select (f => f.Replace (".", @"\.").Replace ("*", ".*").Replace ("?", ".?")));
 		if (string.IsNullOrEmpty (filters))
@@ -139,8 +134,6 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 			return;
 		}
 
-		if (exclusionRegex?.IsMatch (e.FullPath) ?? false)
-			return;
 		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
 			return;
 
