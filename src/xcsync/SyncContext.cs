@@ -453,6 +453,22 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	{
 		Logger.Information (Strings.Sync.HeaderInformation, TargetDir, ProjectPath);
 
+		// repeated from SyncToXcodeAsync --> refactor to helper method?
+		// by assessing where the current plist/storyboard files are in .NET we can ensure they are maintained in the same location
+		// as opposed to aribitrarily placing them in the root of the project
+		if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
+			return;
+		var filePaths = Scripts.GetFiles (FileSystem, ProjectPath, Framework, targetPlatform);
+		var appleFiles = filePaths.Where (path =>
+					path.EndsWith (".plist", StringComparison.OrdinalIgnoreCase) ||
+					path.EndsWith (".storyboard", StringComparison.OrdinalIgnoreCase) ||
+					path.EndsWith (".xib", StringComparison.OrdinalIgnoreCase)
+				).ToList ();
+
+		foreach (var file in appleFiles) {
+			FileSystem.File.Copy (FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (file)), file, true);
+		}
+
 		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
 
 		var dotNetProject = new ClrProject (FileSystem, Logger, TypeService, projectName, ProjectPath, Framework);
