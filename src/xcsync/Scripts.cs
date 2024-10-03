@@ -157,6 +157,19 @@ static class Scripts {
 		}
 	}
 
+	public static bool IsMauiAppProject (IFileSystem fileSystem, string projPath)
+	{
+		var resultFile = fileSystem.Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:UseMaui,OutputType", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
+		var useMaui = string.CompareOrdinal (jsonObject.SelectToken ("$.Properties.UseMaui")?.ToString ().ToLowerInvariant(), "true") == 0;
+		var outputType = jsonObject.SelectToken ("$.Properties.OutputType")?.ToString ();
+
+		return useMaui && string.CompareOrdinal(outputType, "Exe") == 0;
+	}
+
 	public static string RunAppleScript (string script)
 	{
 		var args = new [] { "-e", script };
