@@ -128,7 +128,7 @@ static class Scripts {
 		   .ToList ();
 	}
 
-	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive)
+	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = false)
 	{
 		// Get information about the source directory
 		var dir = fileSystem.DirectoryInfo.New (sourceDir);
@@ -145,7 +145,7 @@ static class Scripts {
 		// Get the files in the source directory and copy to the destination directory
 		foreach (var file in dir.GetFiles ()) {
 			string targetFilePath = fileSystem.Path.Combine (destinationDir, file.Name);
-			file.CopyTo (targetFilePath);
+			file.CopyTo (targetFilePath, overwrite: overwrite);
 		}
 
 		// If recursive and copying subdirectories, recursively call this method
@@ -157,7 +157,20 @@ static class Scripts {
 		}
 	}
 
-	public static string Run (string script)
+	public static bool IsMauiAppProject (IFileSystem fileSystem, string projPath)
+	{
+		var resultFile = fileSystem.Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:UseMaui,OutputType", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
+		var useMaui = string.CompareOrdinal (jsonObject.SelectToken ("$.Properties.UseMaui")?.ToString ().ToLowerInvariant (), "true") == 0;
+		var outputType = jsonObject.SelectToken ("$.Properties.OutputType")?.ToString ();
+
+		return useMaui && string.CompareOrdinal (outputType, "Exe") == 0;
+	}
+
+	public static string RunAppleScript (string script)
 	{
 		var args = new [] { "-e", script };
 		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
