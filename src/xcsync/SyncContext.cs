@@ -49,7 +49,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
-		(string sdkroot, string deployment) = Framework switch {
+		(string sdkroot, string deployment) = Framework.Split ("-") [1] switch {
 			"macos" => ("macosx", "macosx"),
 			"ios" => ("iphoneos", "iphoneos"),
 			"maccatalyst" => ("iphoneos", "iphoneos"),
