@@ -157,7 +157,7 @@ static class Scripts {
 		}
 	}
 
-	public static string Run (string script)
+	public static string RunAppleScript (string script)
 	{
 		var args = new [] { "-e", script };
 		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
