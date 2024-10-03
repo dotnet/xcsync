@@ -305,7 +305,7 @@
 		<value>Context synced. Resuming monitoring</value>
 	</data>
 	<data name="Watch.WorkerException" xml:space="preserve">
-		<value>Error processing change message {0}: {1}</value>
+		<value>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</value>
 		<comment>{0} is the message Id, {1} is the exception message</comment>
 	</data>
 

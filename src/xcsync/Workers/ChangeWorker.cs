@@ -29,7 +29,7 @@ class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir
 
 	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default)
 	{
-		Logger.Error (exception, Strings.Watch.WorkerException (message.Id, exception.Message));
+		Logger.Fatal (Strings.Watch.WorkerException (message.Id, exception.Message));
 		//TODO: https://github.com/dotnet/xcsync/issues/82
 		return Task.CompletedTask;
 	}
