@@ -204,13 +204,18 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		// single plat project support
 		var assetsFolder = FileSystem.Directory
 			.EnumerateDirectories (appleDirectory, "*.xcassets", SearchOption.TopDirectoryOnly).FirstOrDefault (); //TODO: add support for multiple asset folders
-		if (assetsFolder is not null)
+		if (assetsFolder is not null) {
 			Scripts.CopyDirectory (FileSystem, assetsFolder, FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (assetsFolder)), true);
+			AddAsset (assetsFolder);
+		}
 
 		// maui support
 		foreach (var asset in Scripts.GetAssets (FileSystem, ProjectPath, Framework)) {
 			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
+			AddAsset (asset);
+		}
 
+		void AddAsset (string asset) {
 			pbxFileReference = new PBXFileReference {
 				Isa = nameof (PBXFileReference),
 				LastKnownFileType = "folder.assetcatalog",
