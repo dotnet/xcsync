@@ -23,7 +23,7 @@ using static ClangSharp.Interop.CXTranslationUnit_Flags;
 namespace xcsync.Projects;
 
 partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework) :
-	SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, ["*.xcodeproj", "*.m", "*.h", "*.storyboard"]) {
+	SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, ["*.pbxproj", "*.m", "*.h", "*.storyboard"]) {
 
 	static CXIndex cxIndex = CXIndex.Create ();
 
