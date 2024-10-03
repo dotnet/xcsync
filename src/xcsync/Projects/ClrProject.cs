@@ -12,6 +12,8 @@ namespace xcsync.Projects;
 class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework)
 	: SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, ["*.cs", "*.csproj", "*.sln"]) {
 
+	public bool IsMauiApp { get; private set; }
+
 	public async Task<Project> OpenProject ()
 	{
 
@@ -33,6 +35,8 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 
 			if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
 				return project;
+
+			IsMauiApp = Scripts.IsMauiAppProject (FileSystem, RootPath);
 
 			TypeService.AddCompilation (targetPlatform, compilation);
 		} catch (InvalidOperationException ex) {

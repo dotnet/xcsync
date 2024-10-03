@@ -115,14 +115,17 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 	void LoadSyncableItems (IEnumerable<PBXFileReference> fileReferences, ConcurrentBag<ISyncableItem> syncableItems)
 	{
 		(from fileReference in fileReferences
-		 where fileReference.Path!.EndsWith (".storyboard")
-		 select new SyncableContent (FileSystem.Path.Combine (RootPath, fileReference.Path!)))
+		 where fileReference.Path!.EndsWith (".storyboard") ||
+			   fileReference.Path!.EndsWith (".xib") ||
+			   fileReference.Path!.EndsWith (".plist") ||
+			   fileReference.Path!.EndsWith (".xcassets")
+		 select new SyncableContent (FileSystem.Path.Combine (RootPath, fileReference.Path!), fileReference.Path!))
 	   	.ToList ().ForEach (syncableItems.Add);
 
 		var filePaths = from moduleReference in fileReferences
 						join headerReference in fileReferences on FileSystem.Path.GetFileNameWithoutExtension (moduleReference.Path) equals FileSystem.Path.GetFileNameWithoutExtension (headerReference.Path)
 						where headerReference.Path is not null && moduleReference.Path is not null
-						where string.CompareOrdinal (FileSystem.Path.GetExtension (headerReference.Path)?.ToLower (), ".h") + string.CompareOrdinal (FileSystem.Path.GetExtension (moduleReference.Path)?.ToLower (), ".m") == 0
+						where headerReference.Path!.EndsWith (".h") && moduleReference.Path!.EndsWith (".m")
 						select FileSystem.Path.Combine (RootPath, moduleReference.Path!);
 
 		filePaths.Select ((path) => Tuple.Create (path, TypeService.QueryTypes (null, FileSystem.Path.GetFileNameWithoutExtension (path)).FirstOrDefault ()))

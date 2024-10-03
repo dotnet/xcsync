@@ -204,13 +204,19 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		// single plat project support
 		var assetsFolder = FileSystem.Directory
 			.EnumerateDirectories (appleDirectory, "*.xcassets", SearchOption.TopDirectoryOnly).FirstOrDefault (); //TODO: add support for multiple asset folders
-		if (assetsFolder is not null)
+		if (assetsFolder is not null) {
 			Scripts.CopyDirectory (FileSystem, assetsFolder, FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (assetsFolder)), true);
+			AddAsset (assetsFolder);
+		}
 
 		// maui support
 		foreach (var asset in Scripts.GetAssets (FileSystem, ProjectPath, Framework)) {
 			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
+			AddAsset (asset);
+		}
 
+		void AddAsset (string asset)
+		{
 			pbxFileReference = new PBXFileReference {
 				Isa = nameof (PBXFileReference),
 				LastKnownFileType = "folder.assetcatalog",
@@ -444,7 +450,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		if (Open) {
 			string workspacePath = FileSystem.Path.GetFullPath (FileSystem.Path.Combine (TargetDir, projectName + ".xcodeproj", "project.xcworkspace"));
-			Logger?.Information (Strings.Generate.OpenProject (Scripts.Run (Scripts.OpenXcodeProject (workspacePath))));
+			Logger?.Information (Strings.Generate.OpenProject (Scripts.RunAppleScript (Scripts.OpenXcodeProject (workspacePath))));
 		}
 		return;
 	}
@@ -464,12 +470,32 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
-		foreach (var syncItem in xcodeWorkspace.Items) {
-			_ = syncItem switch {
-				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)),
-				_ => ValueTask.CompletedTask
+		var platformFolder = string.Empty;
+
+		if (dotNetProject.IsMauiApp) {
+			platformFolder = Framework.Split ("-") [1] switch {
+				"ios" => FileSystem.Path.Combine ("Platforms", "iOS"),
+				"maccatalyst" => FileSystem.Path.Combine ("Platforms", "MacCatalyst"),
+				_ => "."
 			};
 		}
+
+#pragma warning disable CA2012 // Use ValueTasks correctly
+		foreach (var syncItem in xcodeWorkspace.Items) {
+			var basePath = string.Empty;
+			if (syncItem is SyncableContent content && (
+				content.SourcePath.EndsWith (".xcassets", StringComparison.OrdinalIgnoreCase) ||
+				content.SourcePath.EndsWith (".plist", StringComparison.OrdinalIgnoreCase)
+			)) {
+				basePath = platformFolder;
+			}
+			await (syncItem switch {
+				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)),
+				SyncableContent file => Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), file.SourcePath, FileSystem.Path.Combine (basePath, file.DestinationPath))),
+				_ => ValueTask.CompletedTask
+			}).ConfigureAwait (false);
+		}
+#pragma warning restore CA2012 // Use ValueTasks correctly
 
 		var typesToWrite = TypeService.QueryTypes (null, null) // All Types
 			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files
@@ -501,6 +527,10 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var fileWorker = new FileWorker (Logger, FileSystem);
 		await Hub.CreateAsync (FileChannel, configuration, fileWorker);
 		await Hub.RegisterAsync (FileChannel, fileWorker);
+
+		var copyWorker = new CopyFileWorker (Logger, FileSystem);
+		await Hub.CreateAsync (FileChannel, configuration, copyWorker);
+		await Hub.RegisterAsync (FileChannel, copyWorker);
 
 		var otlWorker = new ObjCTypesLoader (Logger);
 		await Hub.CreateAsync (SyncChannel, configuration, otlWorker);

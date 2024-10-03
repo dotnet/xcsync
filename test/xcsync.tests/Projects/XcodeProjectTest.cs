@@ -399,11 +399,11 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 			// check if xcode has project open
 
-			string openResult = Scripts.Run (Scripts.CheckXcodeProject (projectPath));
+			string openResult = Scripts.RunAppleScript (Scripts.CheckXcodeProject (projectPath));
 
 			Assert.Equal ("true", openResult);
 		} finally {
-			Scripts.Run (Scripts.CloseXcodeProject (projectPath));
+			Scripts.RunAppleScript (Scripts.CloseXcodeProject (projectPath));
 		}
 	}
 }
