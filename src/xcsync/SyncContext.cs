@@ -215,7 +215,8 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			AddAsset (asset);
 		}
 
-		void AddAsset (string asset) {
+		void AddAsset (string asset)
+		{
 			pbxFileReference = new PBXFileReference {
 				Isa = nameof (PBXFileReference),
 				LastKnownFileType = "folder.assetcatalog",
@@ -485,7 +486,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			if (syncItem is SyncableContent content && (
 				content.SourcePath.EndsWith (".xcassets", StringComparison.OrdinalIgnoreCase) ||
 				content.SourcePath.EndsWith (".plist", StringComparison.OrdinalIgnoreCase)
-			)) {				
+			)) {
 				basePath = platformFolder;
 			}
 			await (syncItem switch {

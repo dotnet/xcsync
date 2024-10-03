@@ -14,7 +14,7 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 		.MinimumLevel.Verbose ()
 		.WriteTo.TestOutput (TestOutput)
 		.CreateLogger ();
-		
+
 	[Fact]
 	public void SelectXcode_ReturnsXcodePath ()
 	{
@@ -36,7 +36,7 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 	{
 		// Arrange
 		var fileSystem = new FileSystem ();
-		var projectName = Guid.NewGuid ().ToString ();		
+		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 

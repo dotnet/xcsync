@@ -50,7 +50,7 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<FileMessa
 			// Gets the bytes from text
 			byte [] data = encoding.GetBytes (message.Content);
 			outStream.Write (data, 0, data.Length);
-			Logger.Information ( "Wrote {Bytes} bytes to {Path}", data.Length, message.Path);
+			Logger.Information ("Wrote {Bytes} bytes to {Path}", data.Length, message.Path);
 
 		} catch (Exception ex) {
 			Logger.Fatal (ex, $"Exception in ConsumeAsync: {ex.Message}");
@@ -89,4 +89,4 @@ class CopyFileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<CopyF
 		Logger.Error (exception, "Error processing file message {Id}", message.Id);
 		return Task.CompletedTask;
 	}
-}	
+}

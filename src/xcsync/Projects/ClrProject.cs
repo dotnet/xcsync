@@ -37,7 +37,7 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 				return project;
 
 			IsMauiApp = Scripts.IsMauiAppProject (FileSystem, RootPath);
-			
+
 			TypeService.AddCompilation (targetPlatform, compilation);
 		} catch (InvalidOperationException ex) {
 			Logger.Error (ex, $"Compilation error in project '{project}': {ex.Message}");
