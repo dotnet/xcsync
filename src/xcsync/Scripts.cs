@@ -128,7 +128,7 @@ static class Scripts {
 		   .ToList ();
 	}
 
-	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive)
+	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = false)
 	{
 		// Get information about the source directory
 		var dir = fileSystem.DirectoryInfo.New (sourceDir);
@@ -145,7 +145,7 @@ static class Scripts {
 		// Get the files in the source directory and copy to the destination directory
 		foreach (var file in dir.GetFiles ()) {
 			string targetFilePath = fileSystem.Path.Combine (destinationDir, file.Name);
-			file.CopyTo (targetFilePath);
+			file.CopyTo (targetFilePath, overwrite: overwrite);
 		}
 
 		// If recursive and copying subdirectories, recursively call this method
