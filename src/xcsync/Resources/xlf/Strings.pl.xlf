@@ -310,8 +310,8 @@
         <note />
       </trans-unit>
       <trans-unit id="Watch.WorkerException">
-        <source>Error processing change message {0}: {1}</source>
-        <target state="new">Error processing change message {0}: {1}</target>
+        <source>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</source>
+        <target state="new">Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</target>
         <note>{0} is the message Id, {1} is the exception message</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.DiagnosticIssue">
