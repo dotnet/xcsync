@@ -156,7 +156,12 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var appleDirectory = FileSystem.Path.Exists (altPath) ? altPath : FileSystem.Path.Combine (".", FileSystem.Path.GetDirectoryName (ProjectPath) ?? string.Empty);
 
 		foreach (var file in appleFiles) {
-			FileSystem.File.Copy (file, FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (file)), true);
+			// get path relative to project, and then copy to target directory to ensure relative paths are maintained during sync
+			var relativePath = FileSystem.Path.GetRelativePath (FileSystem.Path.GetDirectoryName (ProjectPath)!, file);
+			var relativeParentPath = FileSystem.Path.GetDirectoryName (relativePath);
+			if (relativeParentPath is not null)
+				FileSystem.Directory.CreateDirectory (FileSystem.Path.Combine (TargetDir, relativeParentPath));
+			FileSystem.File.Copy (file, FileSystem.Path.Combine (TargetDir, relativePath), true);
 
 			// add to resources build phase
 			pbxFileReference = new PBXFileReference {
