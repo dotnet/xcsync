@@ -125,6 +125,7 @@ static class Scripts {
 		return jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath")
 		   .Select (token => token.ToString ())
 		   .Where (path => !path.Contains ("Platforms") || path.Contains ($"Platforms/{targetPlatform}", StringComparison.OrdinalIgnoreCase))
+		   .Distinct ()
 		   .ToList ();
 	}
 
