@@ -88,6 +88,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NuGet.Frameworks"/>
   </ItemGroup>
   <ItemGroup Label="ClangSharp">
     <PackageReference Include="clangsharp" />

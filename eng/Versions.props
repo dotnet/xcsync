@@ -30,6 +30,7 @@
     <TestableIOSystemIOAbstractionsPackageVersion>21.0.2</TestableIOSystemIOAbstractionsPackageVersion>
     <TestableIOSystemIOAbstractionsWrappersPackageVersion>21.0.2</TestableIOSystemIOAbstractionsWrappersPackageVersion>
     <TestableIOSystemIOAbstractionsAnalyzersPackageVersion>2022.0.0</TestableIOSystemIOAbstractionsAnalyzersPackageVersion>
+    <NuGetFrameworksPackageVersion>6.11.1</NuGetFrameworksPackageVersion>
     <!-- ClangSharp -->
     <clangsharpPackageVersion>18.1.0</clangsharpPackageVersion>
     <libClangRuntimeOsxArm64PackageVersion>18.1.3</libClangRuntimeOsxArm64PackageVersion>
