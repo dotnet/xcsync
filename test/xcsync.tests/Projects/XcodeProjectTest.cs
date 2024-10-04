@@ -4,7 +4,6 @@
 using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using Xamarin;
 using xcsync.Projects;
