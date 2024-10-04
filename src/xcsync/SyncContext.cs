@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
+using System.Runtime.Versioning;
 using Marille;
 using Microsoft.CodeAnalysis;
 using Serilog;
@@ -41,16 +42,16 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	{
 		Logger.Debug (Strings.SyncContext.GeneratingFiles);
 
-		if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
+		if (!xcSync.TryGetTargetPlatform (Logger, Framework.Platform, out string targetPlatform))
 			return;
 
-		var clrProject = new ClrProject (FileSystem, Logger!, TypeService, "CLR", ProjectPath, Framework);
+		var clrProject = new ClrProject (FileSystem, Logger!, TypeService, "CLR", ProjectPath, Framework.ToString ());
 		await clrProject.OpenProject ();
 
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
-		(string sdkroot, string deployment) = Framework.Split ("-") [1] switch {
+		(string sdkroot, string deployment) = Framework.Platform switch {
 			"macos" => ("macosx", "macosx"),
 			"ios" => ("iphoneos", "iphoneos"),
 			"maccatalyst" => ("iphoneos", "iphoneos"),
@@ -139,7 +140,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger?.Debug (Strings.Generate.GeneratedFiles);
 
 		// leverage msbuild to get the list of files in the project
-		var filePaths = Scripts.GetFiles (FileSystem, ProjectPath, Framework, targetPlatform);
+		var filePaths = Scripts.GetFiles (FileSystem, ProjectPath, Framework.Platform, targetPlatform);
 
 		// copy storyboard, entitlements/info.plist files to the target directory 
 		var appleFiles = filePaths.Where (path =>
@@ -217,7 +218,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		}
 
 		// maui support
-		foreach (var asset in Scripts.GetAssets (FileSystem, ProjectPath, Framework)) {
+		foreach (var asset in Scripts.GetAssets (FileSystem, ProjectPath, Framework.ToString ())) {
 			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
 			AddAsset (asset);
 		}
@@ -261,7 +262,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 		xcodeObjects.Add (pbxFrameworksBuildPhase.Token, pbxFrameworksBuildPhase);
 
-		var supportedOSVersion = Scripts.GetSupportedOSVersion (FileSystem, ProjectPath, Framework);
+		var supportedOSVersion = Scripts.GetSupportedOSVersion (FileSystem, ProjectPath, Framework.ToString ());
 
 		var debugBuildConfiguration = new XCBuildConfiguration {
 			Isa = nameof (XCBuildConfiguration),
@@ -468,10 +469,10 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
 
-		var dotNetProject = new ClrProject (FileSystem, Logger, TypeService, projectName, ProjectPath, Framework);
+		var dotNetProject = new ClrProject (FileSystem, Logger, TypeService, projectName, ProjectPath, Framework.ToString ());
 		await dotNetProject.OpenProject ().ConfigureAwait (false);
 
-		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework);
+		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework.ToString ());
 
 		Scripts.ConvertPbxProjToJson (FileSystem, FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj", "project.pbxproj"));
 
@@ -480,7 +481,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var platformFolder = string.Empty;
 
 		if (dotNetProject.IsMauiApp) {
-			platformFolder = Framework.Split ("-") [1] switch {
+			platformFolder = Framework.Platform switch {
 				"ios" => FileSystem.Path.Combine ("Platforms", "iOS"),
 				"maccatalyst" => FileSystem.Path.Combine ("Platforms", "MacCatalyst"),
 				_ => "."
