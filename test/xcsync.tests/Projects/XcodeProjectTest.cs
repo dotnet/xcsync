@@ -4,6 +4,7 @@
 using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using Xamarin;
 using xcsync.Projects;
@@ -338,8 +339,8 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("maccatalyst", "", "net8.0-maccatalyst", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "SceneDelegate" })]
 	[InlineData ("ios", "", "net8.0-ios", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "LaunchScreen.storyboard", "SceneDelegate" })]
 	[InlineData ("tvos", "", "net8.0-tvos", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
-	[InlineData ("maui", "", "net8.0-ios", new [] { "AppDelegate", "Info.plist" })]
-	[InlineData ("maui", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Info.plist" })]
+	[InlineData ("maui", "", "net8.0-ios", new [] { "AppDelegate", "Platforms/iOS/Info.plist" })]
+	[InlineData ("maui", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Platforms/MacCatalyst/Info.plist" })]
 	public async Task IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
 	{
 		// todo: test for copying over assets.xcassets?
