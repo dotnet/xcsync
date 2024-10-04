@@ -157,18 +157,22 @@ static class Scripts {
 		}
 	}
 
-	public static bool IsMauiAppProject (IFileSystem fileSystem, string projPath)
+#pragma warning disable IO0002 // Replace File class with IFileSystem.File for improved testability
+#pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
+	public static bool IsMauiAppProject (string projPath)
 	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
+		var resultFile = Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getProperty:UseMaui,OutputType", $"-getResultOutputFile:{resultFile}" };
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
-		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
+		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
 		var useMaui = string.CompareOrdinal (jsonObject.SelectToken ("$.Properties.UseMaui")?.ToString ().ToLowerInvariant (), "true") == 0;
 		var outputType = jsonObject.SelectToken ("$.Properties.OutputType")?.ToString ();
 
 		return useMaui && string.CompareOrdinal (outputType, "Exe") == 0;
 	}
+#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
+#pragma warning restore IO0002 // Replace File class with IFileSystem.File for improved testability
 
 	public static string RunAppleScript (string script)
 	{

@@ -30,7 +30,7 @@ public class DotnetTest (ITestOutputHelper TestOutput) : Base {
 
 		var logger = Mock.Of<ILogger> ();
 		var typeService = new TypeService (logger);
-		var clrProject = new ClrProject (new MockFileSystem (), logger, typeService, "TestProject", TestProjectPath, "net8.0-macos");
+		var clrProject = new ClrProject (new FileSystem (), logger, typeService, "TestProject", TestProjectPath, "net8.0-macos");
 
 		try {
 			var project = await clrProject.OpenProject ().ConfigureAwait (false);

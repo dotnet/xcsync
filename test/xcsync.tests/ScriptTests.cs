@@ -27,6 +27,18 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 		Assert.EndsWith (".app", xcodePath);
 	}
 
+	[Fact]
+	public void IsMauiAppProject_TestProject_DoesNotFail ()
+	{
+		// Arrange
+
+		// Act
+		bool isMauiAppProject = Scripts.IsMauiAppProject (TestProjectPath);
+
+		// Assert
+		Assert.False (isMauiAppProject);
+	}
+
 	[Theory]
 	[InlineData ("ios", false)]
 	[InlineData ("macos", false)]
@@ -46,7 +58,7 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 		Assert.True (Directory.Exists (tmpDir));
 
 		// Act
-		bool isMauiAppProject = Scripts.IsMauiAppProject (fileSystem, csproj);
+		bool isMauiAppProject = Scripts.IsMauiAppProject (csproj);
 
 		// Assert
 		Assert.Equal (expected, isMauiAppProject);
