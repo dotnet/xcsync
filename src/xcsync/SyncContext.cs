@@ -31,9 +31,9 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		else
 			await SyncFromXcodeAsync (token).ConfigureAwait (false);
 
-		Logger.Debug (Strings.SyncContext.SyncComplete);
-
 		await Hub.CloseAllAsync ();
+
+		Logger.Debug (Strings.SyncContext.SyncComplete);
 	}
 
 	async Task SyncToXcodeAsync (CancellationToken token)
