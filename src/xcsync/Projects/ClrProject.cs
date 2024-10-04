@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using Serilog;
@@ -36,7 +35,7 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 			if (!xcSync.TryGetTargetPlatform (Logger, Framework, out string targetPlatform))
 				return project;
 
-			IsMauiApp = Scripts.IsMauiAppProject (FileSystem, RootPath);
+			IsMauiApp = Scripts.IsMauiAppProject (RootPath);
 
 			TypeService.AddCompilation (targetPlatform, compilation);
 		} catch (InvalidOperationException ex) {
