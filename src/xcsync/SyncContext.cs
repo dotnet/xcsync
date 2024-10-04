@@ -168,7 +168,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 				Isa = nameof (PBXFileReference),
 				LastKnownFileType = "text.plist.xml",
 				Name = FileSystem.Path.GetFileName (file),
-				Path = FileSystem.Path.GetFileName (file),
+				Path = relativePath,
 				SourceTree = "<group>"
 			};
 			xcodeObjects.Add (pbxFileReference.Token, pbxFileReference);
