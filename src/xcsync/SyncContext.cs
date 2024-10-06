@@ -485,7 +485,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			};
 		}
 
-#pragma warning disable CA2012 // Use ValueTasks correctly
+		List<Task> tasks = [];
 		foreach (var syncItem in xcodeWorkspace.Items) {
 			var basePath = string.Empty;
 			if (syncItem is SyncableContent content && (
@@ -494,13 +494,19 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			)) {
 				basePath = platformFolder;
 			}
+			TaskCompletionSource? tcs = null;
 			await (syncItem switch {
-				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)),
+#pragma warning disable CA2012 // Use ValueTasks correctly
+				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), tcs = new TaskCompletionSource(), xcodeWorkspace, syncItem)),
 				SyncableContent file => Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), file.SourcePath, FileSystem.Path.Combine (basePath, file.DestinationPath))),
 				_ => ValueTask.CompletedTask
-			}).ConfigureAwait (false);
-		}
 #pragma warning restore CA2012 // Use ValueTasks correctly
+			}).ConfigureAwait (false);
+			if (tcs is not null) {
+				tasks.Add (tcs.Task);
+			}
+		}
+		Task.WaitAll ([.. tasks], token);
 
 		var typesToWrite = TypeService.QueryTypes (null, null) // All Types
 			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files

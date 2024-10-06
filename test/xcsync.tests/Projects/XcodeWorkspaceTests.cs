@@ -112,14 +112,20 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var loader = new ObjCTypesLoader (testLogger);
 
 		// Act
+		List<Task> tasks = [];
 		foreach (var syncItem in xcodeWorkspace.Items) {
+			TaskCompletionSource? completionSource = null;
 			Task task = syncItem switch {
-				SyncableType type => loader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem), CancellationToken.None),
+				SyncableType type => loader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), completionSource = new (), xcodeWorkspace, syncItem), CancellationToken.None),
 				_ => Task.CompletedTask
 			};
+			if ( completionSource is not null )
+				tasks.Add (completionSource.Task);
+			tasks.Add (task);
 			await task;
 		}
-
+		Task.WaitAll ([.. tasks]);
+		
 		// Assert
 		var typeSymbol = typeService.QueryTypes (null, "ViewController").First ()?.TypeSymbol!;
 		SyntaxTree? syntaxTree = null;
@@ -135,6 +141,31 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var actualType = root?.ToString () ?? string.Empty;
 
 		Assert.Equal (expectedType, actualType);
+	}
+
+	[Theory]
+	[InlineData ("macos", "net8.0-macos")]
+	public async Task SyncAsync_ToXcode_ReturnsExpectedTypeChanges (string projectType, string tfm)
+	{
+
+		// Arrange
+		var fileSystem = new FileSystem ();
+
+		var projectName = Guid.NewGuid ().ToString ();
+
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+
+		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty);
+
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		Directory.CreateDirectory (xcodeDir);
+
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+
+		// Run 'xcsync generate'
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
+		// Run 'xcsync sync'
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.FromXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
 	}
 
 	[Theory]
