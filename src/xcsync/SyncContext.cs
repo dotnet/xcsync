@@ -497,7 +497,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			TaskCompletionSource? tcs = null;
 			await (syncItem switch {
 #pragma warning disable CA2012 // Use ValueTasks correctly
-				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), tcs = new TaskCompletionSource(), xcodeWorkspace, syncItem)),
+				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), tcs = new TaskCompletionSource (), xcodeWorkspace, syncItem)),
 				SyncableContent file => Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), file.SourcePath, FileSystem.Path.Combine (basePath, file.DestinationPath))),
 				_ => ValueTask.CompletedTask
 #pragma warning restore CA2012 // Use ValueTasks correctly

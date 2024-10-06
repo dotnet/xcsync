@@ -119,13 +119,13 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 				SyncableType type => loader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), completionSource = new (), xcodeWorkspace, syncItem), CancellationToken.None),
 				_ => Task.CompletedTask
 			};
-			if ( completionSource is not null )
+			if (completionSource is not null)
 				tasks.Add (completionSource.Task);
 			tasks.Add (task);
 			await task;
 		}
 		Task.WaitAll ([.. tasks]);
-		
+
 		// Assert
 		var typeSymbol = typeService.QueryTypes (null, "ViewController").First ()?.TypeSymbol!;
 		SyntaxTree? syntaxTree = null;
