@@ -113,18 +113,17 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 
 	static void SetTargetFrameworks (string csproj, string [] frameworks)
 	{
-		var doc = System.Xml.Linq.XDocument.Load(csproj);
-		var projectElement = doc.Element("Project");
-		if (projectElement != null)
-		{
-			var targetFrameworkElement = projectElement.Element("PropertyGroup")?.Element("TargetFramework");
+		var doc = System.Xml.Linq.XDocument.Load (csproj);
+		var projectElement = doc.Element ("Project");
+		if (projectElement != null) {
+			var targetFrameworkElement = projectElement.Element ("PropertyGroup")?.Element ("TargetFramework");
 			if (targetFrameworkElement != null) {
 				targetFrameworkElement.Name = "TargetFrameworks";
 			}
 			var targetFrameworksElement = projectElement.Element ("PropertyGroup")?.Element ("TargetFrameworks");
 			if (targetFrameworksElement != null) {
-				targetFrameworksElement.Value = string.Join(";", frameworks);
-				doc.Save(csproj);
+				targetFrameworksElement.Value = string.Join (";", frameworks);
+				doc.Save (csproj);
 			}
 		}
 	}
