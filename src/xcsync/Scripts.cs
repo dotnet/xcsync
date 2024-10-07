@@ -129,7 +129,7 @@ static class Scripts {
 		   .ToList ();
 	}
 
-	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = true)
+	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = false)
 	{
 		// Get information about the source directory
 		var dir = fileSystem.DirectoryInfo.New (sourceDir);
@@ -153,7 +153,7 @@ static class Scripts {
 		if (recursive) {
 			foreach (var subDir in dirs) {
 				string newDestinationDir = fileSystem.Path.Combine (destinationDir, subDir.Name);
-				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, true);
+				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, true, overwrite);
 			}
 		}
 	}
