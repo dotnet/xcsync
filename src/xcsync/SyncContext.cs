@@ -148,16 +148,16 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		// support for maui apps
 		string altPath = targetPlatform switch {
-			"ios" => FileSystem.Path.Combine (FileSystem.Path.GetDirectoryName (ProjectPath)!, "Platforms", "iOS"),
-			"maccatalyst" => FileSystem.Path.Combine (FileSystem.Path.GetDirectoryName (ProjectPath)!, "Platforms", "MacCatalyst"),
+			"ios" => FileSystem.Path.Combine (ProjectDir, "Platforms", "iOS"),
+			"maccatalyst" => FileSystem.Path.Combine (ProjectDir, "Platforms", "MacCatalyst"),
 			_ => ""
 		};
 
-		var appleDirectory = FileSystem.Path.Exists (altPath) ? altPath : FileSystem.Path.Combine (".", FileSystem.Path.GetDirectoryName (ProjectPath) ?? string.Empty);
+		var appleDirectory = FileSystem.Path.Exists (altPath) ? altPath : FileSystem.Path.Combine (".", ProjectDir ?? string.Empty);
 
 		foreach (var file in appleFiles) {
 			// get path relative to project, and then copy to target directory to ensure relative paths are maintained during sync
-			var relativePath = FileSystem.Path.GetRelativePath (FileSystem.Path.GetDirectoryName (ProjectPath)!, file);
+			var relativePath = FileSystem.Path.GetRelativePath (ProjectDir!, file);
 			var relativeParentPath = FileSystem.Path.GetDirectoryName (relativePath);
 			if (relativeParentPath is not null)
 				FileSystem.Directory.CreateDirectory (FileSystem.Path.Combine (TargetDir, relativeParentPath));
@@ -496,7 +496,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			}
 			await (syncItem switch {
 				SyncableType type => Hub.PublishAsync (SyncChannel, new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem)),
-				SyncableContent file => Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), file.SourcePath, FileSystem.Path.Combine (basePath, file.DestinationPath))),
+				SyncableContent file => Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), file.SourcePath, FileSystem.Path.Combine (ProjectDir!, FileSystem.Path.Combine (basePath, file.DestinationPath)))),
 				_ => ValueTask.CompletedTask
 			}).ConfigureAwait (false);
 		}

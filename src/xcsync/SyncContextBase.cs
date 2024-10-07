@@ -16,6 +16,7 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 	public ITypeService TypeService => typeService;
 
 	protected string ProjectPath { get; } = projectPath;
+	protected string ProjectDir => FileSystem.Path.GetDirectoryName (ProjectPath)!;
 	protected string TargetDir { get; } = targetDir;
 	protected string Framework { get; } = framework;
 
