@@ -153,7 +153,7 @@ static class Scripts {
 		if (recursive) {
 			foreach (var subDir in dirs) {
 				string newDestinationDir = fileSystem.Path.Combine (destinationDir, subDir.Name);
-				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, true);
+				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, recursive: recursive, overwrite: overwrite);
 			}
 		}
 	}
