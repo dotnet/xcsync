@@ -95,12 +95,17 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 					.FirstOrDefault (
 						(v) => v.Key == "SDKROOT"
 					).Value?.FirstOrDefault () ?? string.Empty;
-			SdkRoot = (sdk ?? string.Empty) switch {
-				"macosx" => "MacOSX",
-				"iphoneos" => "iPhoneOS",
-				_ => string.Empty
-			};
+			if (!string.IsNullOrEmpty (sdk)) break;
 		}
+		if (string.IsNullOrEmpty (sdk)) {
+			Logger.Warning ("SDKROOT not found in any release configuration, defaulting to 'macosx'");
+			sdk = "macosx";
+		}
+		SdkRoot = sdk switch {
+			"macosx" => "MacOSX",
+			"iphoneos" => "iPhoneOS",
+			_ => "MacOSX"
+		};
 
 		clangCommandLineArgs.AddRange ([
 			"-target",
