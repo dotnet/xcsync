@@ -129,7 +129,7 @@ static class Scripts {
 		   .ToList ();
 	}
 
-	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = false)
+	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = true)
 	{
 		// Get information about the source directory
 		var dir = fileSystem.DirectoryInfo.New (sourceDir);
