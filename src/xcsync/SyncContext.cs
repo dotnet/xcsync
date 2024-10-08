@@ -21,7 +21,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 	public const string NO = nameof (NO);
 
 	protected SyncDirection SyncDirection { get; } = Direction;
-	protected string ProjectDir => FileSystem.Path.GetDirectoryName (ProjectPath)!;
+	protected string ProjectDir => FileSystem.Path.GetDirectoryName (FileSystem.Path.GetFullPath(ProjectPath))!;
 
 	public async Task SyncAsync (CancellationToken token = default)
 	{
