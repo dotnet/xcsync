@@ -67,11 +67,17 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		watcher.EnableRaisingEvents = true;
 
-		var filters = string.Join ("|", this.project.ProjectFilesFilter.Select (f => f.Replace (".", @"\.").Replace ("*", ".*").Replace ("?", ".?")));
-		if (string.IsNullOrEmpty (filters))
-			filters = ".*";
-		fileFilterRegex = new Regex ($"^{filters}$", RegexOptions.IgnoreCase);
-		logger.Debug (Strings.Watch.FileChangeFilter (fileFilterRegex.ToString ()));
+		var filters = this.project
+						.ProjectFilesFilter
+						.Any()
+						? string.Join("|", this.project.ProjectFilesFilter
+														.Select(f => $"^{Regex
+														.Escape(f)
+														.Replace("\\*", ".*")
+														.Replace("\\?", ".?")}$"))
+						: ".*";
+		fileFilterRegex = new Regex(filters, RegexOptions.IgnoreCase);
+		logger.Debug(Strings.Watch.FileChangeFilter(fileFilterRegex.ToString()));
 	}
 
 	/// <summary>
