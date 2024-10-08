@@ -18,7 +18,7 @@ jobs:
     # 1. The comment was made on a PR.
     # 2. The comment was made by @mcumming, @dalexsoto.
     # 3. The comment starts with "/sudo merge" sans the quotes.
-	# 4. The comment contains either "--ff-only" or "--no-ff". The default is "--ff-only".
+    # 4. The comment contains either "--ff-only" or "--no-ff". The default is "--ff-only".
     # 5. The PR is open.
     if: |
        github.event.issue.pull_request != '' && 
