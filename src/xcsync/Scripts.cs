@@ -42,7 +42,7 @@ static class Scripts {
 	}
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 
-	public static List<string> GetTfms (IFileSystem fileSystem, string projPath)
+	public static List<string> GetTargetFrameworksFromProject (IFileSystem fileSystem, string projPath)
 	{
 		var resultFile = fileSystem.Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" };
@@ -153,7 +153,7 @@ static class Scripts {
 		if (recursive) {
 			foreach (var subDir in dirs) {
 				string newDestinationDir = fileSystem.Path.Combine (destinationDir, subDir.Name);
-				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, true, overwrite);
+				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, recursive: recursive, overwrite: overwrite);
 			}
 		}
 	}
