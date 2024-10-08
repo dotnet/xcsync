@@ -42,12 +42,13 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 	[Theory]
 	[InlineData ("ios", false)]
 	[InlineData ("macos", false)]
+	[InlineData ("tvos", false)]
+	[InlineData ("maccatalyst", false)]
 	[InlineData ("maui", true)]
 	[InlineData ("mauilib", false)]
 	public async Task IsMauiAppProject (string projectType, bool expected)
 	{
 		// Arrange
-		var fileSystem = new FileSystem ();
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
