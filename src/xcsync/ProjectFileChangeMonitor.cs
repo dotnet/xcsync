@@ -69,15 +69,15 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		var filters = this.project
 						.ProjectFilesFilter
-						.Any()
-						? string.Join("|", this.project.ProjectFilesFilter
-														.Select(f => $"^{Regex
-														.Escape(f)
-														.Replace("\\*", ".*")
-														.Replace("\\?", ".?")}$"))
+						.Any ()
+						? string.Join ("|", this.project.ProjectFilesFilter
+														.Select (f => $"^{Regex
+														.Escape (f)
+														.Replace ("\\*", ".*")
+														.Replace ("\\?", ".?")}$"))
 						: ".*";
-		fileFilterRegex = new Regex(filters, RegexOptions.IgnoreCase);
-		logger.Debug(Strings.Watch.FileChangeFilter(fileFilterRegex.ToString()));
+		fileFilterRegex = new Regex (filters, RegexOptions.IgnoreCase);
+		logger.Debug (Strings.Watch.FileChangeFilter (fileFilterRegex.ToString ()));
 	}
 
 	/// <summary>
