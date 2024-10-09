@@ -61,7 +61,7 @@ public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testO
 	[InlineData ("maui", "net8.0-ios")]
 	[InlineData ("maui", "net8.0-maccatalyst")]
 	[Trait ("Category", "IntegrationTest")]
-    // Issue #123 : https://github.com/dotnet/xcsync/issues/123
+	// Issue #123 : https://github.com/dotnet/xcsync/issues/123
 	public async Task GenerateThenSync_WhenPwdIsProjectDir_DoesNotThrow (string projectType, string tfm)
 	{
 		// Arrange
