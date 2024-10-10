@@ -5,7 +5,7 @@ public interface IFilesystemEventFilter {
 	bool ProcessRenameEvent (string origin, string destination);
 }
 
-public class ExtensionFilter (params string[] extensionsToMonitor) : IFilesystemEventFilter {
+public class ExtensionFilter (params string [] extensionsToMonitor) : IFilesystemEventFilter {
 	readonly HashSet<string> _extensionsToMonitor = new (extensionsToMonitor, StringComparer.OrdinalIgnoreCase);
 
 	public bool ProcessEvent (string path)
