@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using System.Text.RegularExpressions;
 using Serilog;
 
 namespace xcsync;
@@ -68,7 +67,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		_extensionFilter = project.ProjectFilesFilter;
 
-		logger.Debug (Strings.Watch.FileChangeFilter (_extensionFilter.ToString ()!));
+		logger.Information (Strings.Watch.FileChangeFilter (_extensionFilter.GetExtensionsToMonitorAsString()));
 	}
 
 	/// <summary>

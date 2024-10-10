@@ -52,13 +52,11 @@ public class ProjectFileChangeMonitorTests {
 	}
 
 	[Theory]
-	[InlineData (new string [] {".File" }, @"/repos/repo/project/src", "Some.File")]
-	[InlineData (new string [] { ".resx", ".cs" }, @"/repos/repo/project/src", "Some.File.cs")]
-	[InlineData (new string [] { ".resx", ".cs" }, @"/repos/repo/project/src/Resources", "Some.File.resx")]
-	public void OnFileChanged_ShouldBeCalled_WhenFileChangesDetected (string [] fileFilter, string filePath, string fileName)
+	[InlineData (@"/repos/repo/project/src", "Some.File")]
+	[InlineData (@"/repos/repo/project/src", "Some.File.cs")]
+	[InlineData (@"/repos/repo/project/src/Resources", "Some.File.resx")]
+	public void OnFileChanged_ShouldBeCalled_WhenFileChangesDetected (string filePath, string fileName)
 	{
-		var project = Mock.Of<ISyncableProject> (p => p.ProjectFilesFilter == new ExtensionFilter (fileFilter));
-
 		var fileChanged = false;
 		monitor.OnFileChanged =
 			path => fileChanged = true;

@@ -8,7 +8,7 @@ public interface IFilesystemEventFilter
 
 public class ExtensionFilter (IEnumerable<string> extensionsToMonitor) : IFilesystemEventFilter
 {
-    readonly HashSet<string> _extensionsToMonitor = new HashSet<string> (extensionsToMonitor, StringComparer.OrdinalIgnoreCase);
+    readonly HashSet<string> _extensionsToMonitor = new(extensionsToMonitor, StringComparer.OrdinalIgnoreCase);
 
 	public bool ProcessEvent(string path)
     {
@@ -22,5 +22,7 @@ public class ExtensionFilter (IEnumerable<string> extensionsToMonitor) : IFilesy
 		var destinationExtension = Path.GetExtension(destination);
         return _extensionsToMonitor.Contains(originExtension) || _extensionsToMonitor.Contains(destinationExtension);
     }
+
+	public string GetExtensionsToMonitorAsString () => string.Join (", ", _extensionsToMonitor.Select (ext => ext));
 }
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
