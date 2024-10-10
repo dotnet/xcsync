@@ -137,7 +137,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger?.Debug (Strings.Generate.GeneratedFiles);
 
 		// leverage msbuild to get the list of files in the project
-		var filePaths = Scripts.GetFileItemsFromProject (ProjectPath, Framework targetPlatform);
+		var filePaths = Scripts.GetFileItemsFromProject (ProjectPath, Framework, targetPlatform);
 
 		// copy storyboard, entitlements/info.plist files to the target directory 
 		var appleFiles = filePaths.Where (path =>
