@@ -20,7 +20,7 @@ public class ProjectFileChangeMonitorTests {
 		watcher = Mock.Of<IFileSystemWatcher> ();
 		logger = Mock.Of<ILogger> ();
 		project = Mock.Of<ISyncableProject> ();
-		Mock.Get (project).Setup (p=> p.ProjectFilesFilter).Returns (new ExtensionFilter ([".cs", ".resx", ".File"]));
+		Mock.Get (project).Setup (p => p.ProjectFilesFilter).Returns (new ExtensionFilter ([".cs", ".resx", ".File"]));
 		fileSystem = Mock.Of<IFileSystem> ();
 		Mock.Get (fileSystem).Setup (fs => fs.Path.GetDirectoryName (project.RootPath)).Returns ("/repos/repo/project");
 

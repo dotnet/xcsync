@@ -67,7 +67,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		_extensionFilter = project.ProjectFilesFilter;
 
-		logger.Information (Strings.Watch.FileChangeFilter (_extensionFilter.GetExtensionsToMonitorAsString()));
+		logger.Information (Strings.Watch.FileChangeFilter (_extensionFilter.GetExtensionsToMonitorAsString ()));
 	}
 
 	/// <summary>
