@@ -21,7 +21,7 @@ class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir
 		if (message.Direction == SyncDirection.ToXcode)
 			XcodeCommand<GenerateCommand>.RecreateDirectory (FileSystem, TargetDir);
 		Logger.Debug (Strings.Watch.Syncing);
-		await new SyncContext (FileSystem, new TypeService(Logger!), message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
+		await new SyncContext (FileSystem, new TypeService (Logger!), message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
 		Logger.Debug (Strings.Watch.ResumingMonitoring);
 		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
 		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
