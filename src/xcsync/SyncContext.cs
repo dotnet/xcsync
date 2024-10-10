@@ -138,7 +138,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		Logger?.Debug (Strings.Generate.GeneratedFiles);
 
 		// leverage msbuild to get the list of files in the project
-		var filePaths = Scripts.GetFiles (FileSystem, ProjectPath, Framework, targetPlatform);
+		var filePaths = Scripts.GetFileItemsFromProject (ProjectPath, Framework, targetPlatform);
 
 		// copy storyboard, entitlements/info.plist files to the target directory 
 		var appleFiles = filePaths.Where (path =>
@@ -216,7 +216,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		}
 
 		// maui support
-		foreach (var asset in Scripts.GetAssets (FileSystem, ProjectPath, Framework)) {
+		foreach (var asset in Scripts.GetAssetItemsFromProject (ProjectPath, Framework)) {
 			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
 			AddAsset (asset);
 		}
@@ -260,7 +260,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 		xcodeObjects.Add (pbxFrameworksBuildPhase.Token, pbxFrameworksBuildPhase);
 
-		var supportedOSVersion = Scripts.GetSupportedOSVersion (FileSystem, ProjectPath, Framework);
+		var supportedOSVersion = Scripts.GetSupportedOSVersionForTfmFromProject (ProjectPath, Framework);
 
 		var debugBuildConfiguration = new XCBuildConfiguration {
 			Isa = nameof (XCBuildConfiguration),
@@ -472,7 +472,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework);
 
-		Scripts.ConvertPbxProjToJson (FileSystem, FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj", "project.pbxproj"));
+		Scripts.ConvertPbxProjToJson (FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj", "project.pbxproj"));
 
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
