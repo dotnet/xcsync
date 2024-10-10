@@ -13,7 +13,7 @@ using Xunit.Abstractions;
 namespace xcsync.tests.Commands;
 
 public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
-	[Fact]
+	[Fact (Skip = "https://github.com/dotnet/xcsync/issues/132")]
 	public void TestXcSyncCommandCreation ()
 	{
 		var fileSystem = new MockFileSystem ();
