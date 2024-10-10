@@ -20,7 +20,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		await ConfigureMarilleHub ();
 
 		// Generate initial Xcode project
-		await new SyncContext (FileSystem, new TypeService(Logger!), SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
+		await new SyncContext (FileSystem, new TypeService (Logger!), SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
 		using var clrChanges = new ProjectFileChangeMonitor (FileSystem, FileSystem.FileSystemWatcher.New (), Logger);
 		clrChanges.StartMonitoring (ClrProject, token);
