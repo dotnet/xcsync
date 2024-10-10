@@ -21,6 +21,7 @@
     <PackageVersion Include="TestableIO.System.IO.Abstractions" Version="$(TestableIOSystemIOAbstractionsPackageVersion)" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="$(TestableIOSystemIOAbstractionsWrappersPackageVersion)" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Analyzers" Version="$(TestableIOSystemIOAbstractionsAnalyzersPackageVersion)" />
+    <PackageVersion Include="NuGet.Frameworks" Version="$(NuGetFrameworksPackageVersion)" />
 	  <!-- ClangSharp -->
     <PackageVersion Include="clangsharp" Version="$(ClangSharpPackageVersion)" />
     <PackageVersion Include="libClang.runtime.osx-arm64" Version="$(libClangRuntimeOsxArm64PackageVersion)" />
