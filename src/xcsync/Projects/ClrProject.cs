@@ -9,7 +9,7 @@ using Serilog;
 namespace xcsync.Projects;
 
 class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework)
-	: SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, ["*.cs", "*.csproj", "*.sln"]) {
+	: SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, new ExtensionFilter ([".cs", ".csproj", ".sln"])) {
 
 	public bool IsMauiApp { get; private set; }
 

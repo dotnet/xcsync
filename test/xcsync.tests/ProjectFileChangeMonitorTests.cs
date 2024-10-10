@@ -20,6 +20,7 @@ public class ProjectFileChangeMonitorTests {
 		watcher = Mock.Of<IFileSystemWatcher> ();
 		logger = Mock.Of<ILogger> ();
 		project = Mock.Of<ISyncableProject> ();
+		Mock.Get (project).Setup (p=> p.ProjectFilesFilter).Returns (new ExtensionFilter ([".cs", ".resx", ".File"]));
 		fileSystem = Mock.Of<IFileSystem> ();
 		Mock.Get (fileSystem).Setup (fs => fs.Path.GetDirectoryName (project.RootPath)).Returns ("/repos/repo/project");
 
@@ -51,12 +52,12 @@ public class ProjectFileChangeMonitorTests {
 	}
 
 	[Theory]
-	[InlineData (new string [] { }, @"/repos/repo/project/src", "Some.File")]
-	[InlineData (new string [] { "*.resx", "*.cs" }, @"/repos/repo/project/src", "Some.File.cs")]
-	[InlineData (new string [] { "*/Resources/*.resx", "*.cs" }, @"/repos/repo/project/src/Resources", "Some.File.resx")]
+	[InlineData (new string [] {".File" }, @"/repos/repo/project/src", "Some.File")]
+	[InlineData (new string [] { ".resx", ".cs" }, @"/repos/repo/project/src", "Some.File.cs")]
+	[InlineData (new string [] { ".resx", ".cs" }, @"/repos/repo/project/src/Resources", "Some.File.resx")]
 	public void OnFileChanged_ShouldBeCalled_WhenFileChangesDetected (string [] fileFilter, string filePath, string fileName)
 	{
-		var project = Mock.Of<ISyncableProject> (p => p.ProjectFilesFilter == fileFilter);
+		var project = Mock.Of<ISyncableProject> (p => p.ProjectFilesFilter == new ExtensionFilter (fileFilter));
 
 		var fileChanged = false;
 		monitor.OnFileChanged =

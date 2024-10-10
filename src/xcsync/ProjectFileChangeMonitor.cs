@@ -40,7 +40,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 	bool disposedValue;
 
-	Regex? fileFilterRegex;
+	ExtensionFilter _extensionFilter = new (["."]);
 
 	/// <summary>
 	/// Starts monitoring the project file changes.
@@ -56,7 +56,6 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 		watcher.Path = fileSystem.Path.GetDirectoryName (project.RootPath)!;
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-		watcher.Filter = "*.*"; //not used, overridden by fileFilterRegex
 		watcher.IncludeSubdirectories = true;
 
 		watcher.Changed += OnChangedHandler;
@@ -67,17 +66,9 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		watcher.EnableRaisingEvents = true;
 
-		var filters = this.project
-						.ProjectFilesFilter
-						.Any ()
-						? string.Join ("|", this.project.ProjectFilesFilter
-														.Select (f => $"^{Regex
-														.Escape (f)
-														.Replace ("\\*", ".*")
-														.Replace ("\\?", ".?")}$"))
-						: ".*";
-		fileFilterRegex = new Regex (filters, RegexOptions.IgnoreCase);
-		logger.Debug (Strings.Watch.FileChangeFilter (fileFilterRegex.ToString ()));
+		_extensionFilter = project.ProjectFilesFilter;
+
+		logger.Debug (Strings.Watch.FileChangeFilter (_extensionFilter.ToString ()!));
 	}
 
 	/// <summary>
@@ -122,7 +113,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 			return;
 		}
 
-		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+		if (!_extensionFilter.ProcessRenameEvent (e.OldFullPath, e.FullPath))
 			return;
 
 		logger.Information (Strings.Watch.FileRenamed (e.OldFullPath, e.FullPath, project!.Name));
@@ -140,7 +131,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 			return;
 		}
 
-		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+		if (!_extensionFilter.ProcessEvent (e.FullPath))
 			return;
 
 		logger.Information (Strings.Watch.FileChanged (e.FullPath, project!.Name));
