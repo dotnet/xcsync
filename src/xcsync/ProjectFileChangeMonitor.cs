@@ -39,7 +39,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 	bool disposedValue;
 
-	ExtensionFilter _extensionFilter = new (["."]);
+	ExtensionFilter _extensionFilter = new (".");
 
 	/// <summary>
 	/// Starts monitoring the project file changes.

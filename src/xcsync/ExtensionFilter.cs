@@ -5,7 +5,7 @@ public interface IFilesystemEventFilter {
 	bool ProcessRenameEvent (string origin, string destination);
 }
 
-public class ExtensionFilter (IEnumerable<string> extensionsToMonitor) : IFilesystemEventFilter {
+public class ExtensionFilter (params string[] extensionsToMonitor) : IFilesystemEventFilter {
 	readonly HashSet<string> _extensionsToMonitor = new (extensionsToMonitor, StringComparer.OrdinalIgnoreCase);
 
 	public bool ProcessEvent (string path)
@@ -21,6 +21,6 @@ public class ExtensionFilter (IEnumerable<string> extensionsToMonitor) : IFilesy
 		return _extensionsToMonitor.Contains (originExtension) || _extensionsToMonitor.Contains (destinationExtension);
 	}
 
-	public string GetExtensionsToMonitorAsString () => string.Join (", ", _extensionsToMonitor.Select (ext => ext));
+	public string GetExtensionsToMonitorAsString () => string.Join (", ", _extensionsToMonitor);
 }
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
