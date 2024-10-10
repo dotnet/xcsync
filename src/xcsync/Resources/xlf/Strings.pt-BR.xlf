@@ -77,11 +77,6 @@
         <target state="translated">O projeto .NET atual não dá suporte à estrutura de destino.</target>
         <note />
       </trans-unit>
-      <trans-unit id="Errors.Validation.InvalidOS">
-        <source>The xcsync tool can only be run on macOS.</source>
-        <target state="new">The xcsync tool can only be run on macOS.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
         <source>Invalid TFM: Target framework '{0}' does not target an Apple platform</source>
         <target state="translated">TFM inválido: a estrutura de destino "{0}" não tem como destino uma plataforma da Apple</target>
@@ -89,7 +84,7 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidVerbosity">
         <source>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</source>
-        <target state="new">Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</target>
+        <target state="translated">Detalhamento Inválido. Os valores permitidos são: Quiet, Minimal, Normal, Detailed, Diagnostic.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.MissingValidTargetFrameworkInPath">
@@ -180,7 +175,7 @@
       <trans-unit id="ProgramHeader">
         <source>xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
 		</source>
-        <target state="new">xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
+        <target state="translated">xcSync v{0}, (C) Microsoft Corporation. Todos os direitos reservados.
 		</target>
         <note>{0} is a numerical based string containing the version number for the command line tool</note>
       </trans-unit>
@@ -196,12 +191,12 @@
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
         <source>Synchronization complete.</source>
-        <target state="new">Synchronization complete.</target>
+        <target state="translated">Sincronização concluída.</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.AssemblyDiagnosticError">
         <source>{0}: {1}</source>
-        <target state="new">{0}: {1}</target>
+        <target state="translated">{0}: {1}</target>
         <note>{0} is the name of the Assembly, {1} is the Diganostic</note>
       </trans-unit>
       <trans-unit id="TypeService.AssemblyUpdateError">
@@ -284,16 +279,6 @@
         <target state="translated">Sincronizando alterações entre o projeto "{0}" e "{1}".</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
-      <trans-unit id="Watch.PausingMonitoring">
-        <source>Pausing monitoring</source>
-        <target state="new">Pausing monitoring</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Watch.ResumingMonitoring">
-        <source>Context synced. Resuming monitoring</source>
-        <target state="new">Context synced. Resuming monitoring</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
         <source>Monitoring project file changes in {0} started.</source>
         <target state="translated">O monitoramento de alterações do arquivo de projeto em {0} começou.</target>
@@ -304,19 +289,9 @@
         <target state="translated">O monitoramento de alterações do arquivo de projeto em {0} parou.</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
-      <trans-unit id="Watch.Syncing">
-        <source>Syncing change context</source>
-        <target state="new">Syncing change context</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Watch.WorkerException">
-        <source>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</source>
-        <target state="new">Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</target>
-        <note>{0} is the message Id, {1} is the exception message</note>
-      </trans-unit>
       <trans-unit id="XcodeWorkspace.DiagnosticIssue">
         <source>{0}</source>
-        <target state="new">{0}</target>
+        <target state="translated">{0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
@@ -341,7 +316,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
         <source>Diagnostics for '{0}':</source>
-        <target state="new">Diagnostics for '{0}':</target>
+        <target state="translated">Diagnóstico para "{0}":</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
@@ -356,12 +331,12 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
         <source>Processing '{0}'</source>
-        <target state="new">Processing '{0}'</target>
+        <target state="translated">Processando "{0}"</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingObjCImplementation">
         <source>Processing ObjCImplementationDecl: {0}</source>
-        <target state="new">Processing ObjCImplementationDecl: {0}</target>
+        <target state="translated">Processando ObjCImplementationDecl: {0}</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.SkipProcessing">
@@ -377,11 +352,6 @@
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
         <target state="translated">O arquivo de projeto do Xcode {0} não contém nenhum objeto</target>
-        <note>{0} is the path to the Xcode project</note>
-      </trans-unit>
-      <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
-        <source>File not found: {0}</source>
-        <target state="new">File not found: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>

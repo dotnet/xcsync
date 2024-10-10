@@ -77,11 +77,6 @@
         <target state="translated">Le framework cible n’est pas pris en charge par le projet .NET actuel.</target>
         <note />
       </trans-unit>
-      <trans-unit id="Errors.Validation.InvalidOS">
-        <source>The xcsync tool can only be run on macOS.</source>
-        <target state="new">The xcsync tool can only be run on macOS.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
         <source>Invalid TFM: Target framework '{0}' does not target an Apple platform</source>
         <target state="translated">TFM non valide : le framework cible « {0} » ne cible pas une plateforme Apple</target>
@@ -89,7 +84,7 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidVerbosity">
         <source>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</source>
-        <target state="new">Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</target>
+        <target state="translated">Verbosité invalide. Les valeurs autorisées sont : Silencieux, Minimal, Normal, Détaillé, Diagnostic.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.MissingValidTargetFrameworkInPath">
@@ -180,7 +175,7 @@
       <trans-unit id="ProgramHeader">
         <source>xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
 		</source>
-        <target state="new">xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
+        <target state="translated">xcSync v{0}, (c) Microsoft Corporation. Tous droits réservés.
 		</target>
         <note>{0} is a numerical based string containing the version number for the command line tool</note>
       </trans-unit>
@@ -196,12 +191,12 @@
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
         <source>Synchronization complete.</source>
-        <target state="new">Synchronization complete.</target>
+        <target state="translated">Synchronisation terminée.</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.AssemblyDiagnosticError">
         <source>{0}: {1}</source>
-        <target state="new">{0}: {1}</target>
+        <target state="translated">{0} : {1}</target>
         <note>{0} is the name of the Assembly, {1} is the Diganostic</note>
       </trans-unit>
       <trans-unit id="TypeService.AssemblyUpdateError">
@@ -216,7 +211,7 @@
       </trans-unit>
       <trans-unit id="TypeService.CompilationNotFound">
         <source>The compilation for {0} could not be located for synchronization.</source>
-        <target state="new">The compilation for {0} could not be located for synchronization.</target>
+        <target state="translated">La compilation pour {0} n'a pas pu être localisée pour la synchronisation.</target>
         <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.DuplicateCompilation">
@@ -251,12 +246,12 @@
       </trans-unit>
       <trans-unit id="TypeService.SyntaxRootNotFound">
         <source>The {0} type could not be synchronized due to missing symbol information.</source>
-        <target state="new">The {0} type could not be synchronized due to missing symbol information.</target>
+        <target state="translated">Le type {0} n'a pas pu être synchronisé en raison d'informations de symbole manquantes.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="TypeService.TypeNotFound">
         <source>The {0} type could not be located for synchronization.</source>
-        <target state="new">The {0} type could not be located for synchronization.</target>
+        <target state="translated">Le type {0} n'a pas pu être localisé pour la synchronisation.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="Watch.ErrorMonitoringProjectFiles">
@@ -284,16 +279,6 @@
         <target state="translated">Synchronisation des modifications entre le projet « {0} » et « {1} ».</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
-      <trans-unit id="Watch.PausingMonitoring">
-        <source>Pausing monitoring</source>
-        <target state="new">Pausing monitoring</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Watch.ResumingMonitoring">
-        <source>Context synced. Resuming monitoring</source>
-        <target state="new">Context synced. Resuming monitoring</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
         <source>Monitoring project file changes in {0} started.</source>
         <target state="translated">L’analyse des modifications apportées au fichier projet dans {0} a commencé.</target>
@@ -304,19 +289,9 @@
         <target state="translated">L’analyse des modifications apportées au fichier projet dans {0} s’est arrêtée.</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
-      <trans-unit id="Watch.Syncing">
-        <source>Syncing change context</source>
-        <target state="new">Syncing change context</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Watch.WorkerException">
-        <source>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</source>
-        <target state="new">Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</target>
-        <note>{0} is the message Id, {1} is the exception message</note>
-      </trans-unit>
       <trans-unit id="XcodeWorkspace.DiagnosticIssue">
         <source>{0}</source>
-        <target state="new">{0}</target>
+        <target state="translated">{0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
@@ -341,7 +316,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
         <source>Diagnostics for '{0}':</source>
-        <target state="new">Diagnostics for '{0}':</target>
+        <target state="translated">Diagnostic pour '{0}' :</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
@@ -356,12 +331,12 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
         <source>Processing '{0}'</source>
-        <target state="new">Processing '{0}'</target>
+        <target state="translated">Traitement de « {0} »</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingObjCImplementation">
         <source>Processing ObjCImplementationDecl: {0}</source>
-        <target state="new">Processing ObjCImplementationDecl: {0}</target>
+        <target state="translated">Processing ObjCImplementationDecl: {0}</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.SkipProcessing">
@@ -377,11 +352,6 @@
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
         <target state="translated">Le fichier projet Xcode au {0} ne contient aucun objet</target>
-        <note>{0} is the path to the Xcode project</note>
-      </trans-unit>
-      <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
-        <source>File not found: {0}</source>
-        <target state="new">File not found: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>
