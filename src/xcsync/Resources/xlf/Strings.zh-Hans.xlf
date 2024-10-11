@@ -77,6 +77,11 @@
         <target state="translated">当前 .NET 项目不支持目标框架。</target>
         <note />
       </trans-unit>
+      <trans-unit id="Errors.Validation.InvalidOS">
+        <source>The xcsync tool can only be run on macOS.</source>
+        <target state="new">The xcsync tool can only be run on macOS.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
         <source>Invalid TFM: Target framework '{0}' does not target an Apple platform</source>
         <target state="translated">无效的 TFM: 目标框架 "{0}" 不适用于 Apple 平台</target>
@@ -279,6 +284,16 @@
         <target state="translated">正在项目“{0}”和“{1}”之间同步更改。</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
+      <trans-unit id="Watch.PausingMonitoring">
+        <source>Pausing monitoring</source>
+        <target state="new">Pausing monitoring</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Watch.ResumingMonitoring">
+        <source>Context synced. Resuming monitoring</source>
+        <target state="new">Context synced. Resuming monitoring</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
         <source>Monitoring project file changes in {0} started.</source>
         <target state="translated">已开始监视 {0} 中的项目文件更改。</target>
@@ -288,6 +303,16 @@
         <source>Monitoring project file changes in {0} stopped.</source>
         <target state="translated">已停止监视 {0} 中的项目文件更改。</target>
         <note>{0} is the path to the project file</note>
+      </trans-unit>
+      <trans-unit id="Watch.Syncing">
+        <source>Syncing change context</source>
+        <target state="new">Syncing change context</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Watch.WorkerException">
+        <source>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</source>
+        <target state="new">Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</target>
+        <note>{0} is the message Id, {1} is the exception message</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.DiagnosticIssue">
         <source>{0}</source>
@@ -352,6 +377,11 @@
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
         <target state="translated">{0} 中的 Xcode 项目文件不包含任何对象</target>
+        <note>{0} is the path to the Xcode project</note>
+      </trans-unit>
+      <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
+        <source>File not found: {0}</source>
+        <target state="new">File not found: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>
