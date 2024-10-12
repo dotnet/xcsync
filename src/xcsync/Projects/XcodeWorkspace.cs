@@ -209,7 +209,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			Logger.Error (Strings.XcodeWorkspace.ErrorParsing (filePath, translationUnitError.ToString ()));
 			skipProcessing = true;
 		} else if (handle.NumDiagnostics != 0) {
-			
+
 			Logger.Information (Strings.XcodeWorkspace.FileParsingHasDiagnostics (filePath));
 
 			Logger.Verbose (Strings.XcodeWorkspace.FileDiagnostics (filePath));
