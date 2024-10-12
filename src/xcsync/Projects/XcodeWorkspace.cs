@@ -209,18 +209,21 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			Logger.Error (Strings.XcodeWorkspace.ErrorParsing (filePath, translationUnitError.ToString ()));
 			skipProcessing = true;
 		} else if (handle.NumDiagnostics != 0) {
-			Logger.Warning (Strings.XcodeWorkspace.FileDiagnostics (filePath));
+			
+			Logger.Information (Strings.XcodeWorkspace.FileParsingHasDiagnostics (filePath));
 
+			Logger.Verbose (Strings.XcodeWorkspace.FileDiagnostics (filePath));
 			for (uint i = 0; i < handle.NumDiagnostics; ++i) {
 				using var diagnostic = handle.GetDiagnostic (i);
 
-				if (diagnostic.Severity is CXDiagnostic_Error or CXDiagnostic_Fatal) {
-					Logger.Error (Strings.XcodeWorkspace.DiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()));
-				} else {
-					Logger.Warning (Strings.XcodeWorkspace.DiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()));
-				}
-				// skipProcessing |= diagnostic.Severity == CXDiagnostic_Error;
-				// skipProcessing |= diagnostic.Severity == CXDiagnostic_Fatal;
+				string diagnosticMessage = diagnostic.Severity switch {
+					CXDiagnostic_Error => Strings.XcodeWorkspace.ErrorDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					CXDiagnostic_Fatal => Strings.XcodeWorkspace.FatalDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					CXDiagnostic_Note => Strings.XcodeWorkspace.NoteDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					CXDiagnostic_Warning => Strings.XcodeWorkspace.WarningDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					_ => string.Empty
+				};
+				Logger.Verbose (diagnosticMessage);
 			}
 		}
 

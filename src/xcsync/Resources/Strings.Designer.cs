@@ -106,8 +106,12 @@ static class Strings {
 		internal static string UnexpectedTypesFound (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_UnexpectedTypesFound, objcType);
 		internal static string ErrorUpdatingRoslynType (string roslynTypeName, string objCType, string exceptionMessage, string stackTrace) => string.Format (Resources.Strings.XcodeWorkspace_ErrorUpdatingRoslynType, roslynTypeName, objCType, exceptionMessage, stackTrace);
 		internal static string ErrorParsing (string path, string translationUnitError) => string.Format (Resources.Strings.XcodeWorkspace_ErrorParsing, path, translationUnitError);
+		internal static string FileParsingHasDiagnostics (string path) => string.Format (Resources.Strings.XcodeWorkspace_FileParsingHasDiagnostics, path);
 		internal static string FileDiagnostics (string path) => string.Format (Resources.Strings.XcodeWorkspace_FileDiagnostics, path);
-		internal static string DiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_DiagnosticIssue, diagnostic);
+		internal static string FatalDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_FatalDiagnosticIssue, diagnostic);
+		internal static string ErrorDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_ErrorDiagnosticIssue, diagnostic);
+		internal static string WarningDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_WarningDiagnosticIssue, diagnostic);
+		internal static string NoteDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_NoteDiagnosticIssue, diagnostic);
 		internal static string SkipProcessing (string path) => string.Format (Resources.Strings.XcodeWorkspace_SkipProcessing, path);
 		internal static string ProcessingFile (string path) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingFile, path);
 		internal static string ErrorProcessing (string path, string error, string stackTrace) => string.Format (Resources.Strings.XcodeWorkspace_ErrorProcessing, path, error, stackTrace);

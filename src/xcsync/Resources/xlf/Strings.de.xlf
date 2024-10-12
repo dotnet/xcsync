@@ -314,9 +314,9 @@
         <target state="new">Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</target>
         <note>{0} is the message Id, {1} is the exception message</note>
       </trans-unit>
-      <trans-unit id="XcodeWorkspace.DiagnosticIssue">
-        <source>{0}</source>
-        <target state="translated">{0}</target>
+      <trans-unit id="XcodeWorkspace.ErrorDiagnosticIssue">
+        <source>ERROR: {0}</source>
+        <target state="new">ERROR: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
@@ -339,9 +339,19 @@
         <target state="translated">Fehler beim Laden der Xcode-Projektdatei bei {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
+      <trans-unit id="XcodeWorkspace.FatalDiagnosticIssue">
+        <source>FATAL: {0}</source>
+        <target state="new">FATAL: {0}</target>
+        <note>{0} is the diagnostic for which there are issues</note>
+      </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
         <source>Diagnostics for '{0}':</source>
         <target state="translated">Diagnose für "{0}":</target>
+        <note>{0} is the file path</note>
+      </trans-unit>
+      <trans-unit id="XcodeWorkspace.FileParsingHasDiagnostics">
+        <source>Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</source>
+        <target state="new">Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
@@ -353,6 +363,11 @@
         <source>No types found for {0}</source>
         <target state="translated">Für {0} wurden keine Typen gefunden.</target>
         <note>{0} is the ObjC Type</note>
+      </trans-unit>
+      <trans-unit id="XcodeWorkspace.NoteDiagnosticIssue">
+        <source>NOTE: {0}</source>
+        <target state="new">NOTE: {0}</target>
+        <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
         <source>Processing '{0}'</source>
@@ -373,6 +388,11 @@
         <source>Unexpected type found: {0}</source>
         <target state="translated">Unerwarteter Typ gefunden: {0}</target>
         <note>{0} is the non-ObjC type found</note>
+      </trans-unit>
+      <trans-unit id="XcodeWorkspace.WarningDiagnosticIssue">
+        <source>WARNING: {0}</source>
+        <target state="new">WARNING: {0}</target>
+        <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
