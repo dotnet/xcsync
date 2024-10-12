@@ -132,10 +132,10 @@ class TypeService (ILogger Logger) : ITypeService {
 		var newModel = compilation.ReplaceSyntaxTree (root.SyntaxTree, newSyntax.SyntaxTree);
 
 		if (newModel.GetDiagnostics ().Any (diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)) {
-			Logger.Error (Strings.TypeService.CompilationErrorsFound (newModel.AssemblyName!));
+			Logger.Verbose (Strings.TypeService.CompilationErrorsFound (newModel.AssemblyName!));
 			foreach (var diagnostic in newModel.GetDiagnostics ()) {
 				if (diagnostic.Severity == DiagnosticSeverity.Error) {
-					Logger.Error (Strings.TypeService.AssemblyDiagnosticError (newModel.AssemblyName!, diagnostic.ToString ()));
+					Logger.Verbose (Strings.TypeService.AssemblyDiagnosticError (newModel.AssemblyName!, diagnostic.ToString ()));
 				}
 			}
 		}
