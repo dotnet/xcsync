@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using System.Text.RegularExpressions;
 using Serilog;
 
 namespace xcsync;
@@ -40,7 +39,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 	bool disposedValue;
 
-	Regex? fileFilterRegex;
+	ExtensionFilter _extensionFilter = new (".");
 
 	/// <summary>
 	/// Starts monitoring the project file changes.
@@ -56,7 +55,6 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 		watcher.Path = fileSystem.Path.GetDirectoryName (project.RootPath)!;
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-		watcher.Filter = "*.*"; //not used, overridden by fileFilterRegex
 		watcher.IncludeSubdirectories = true;
 
 		watcher.Changed += OnChangedHandler;
@@ -67,11 +65,9 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 
 		watcher.EnableRaisingEvents = true;
 
-		var filters = string.Join ("|", this.project.ProjectFilesFilter.Select (f => f.Replace (".", @"\.").Replace ("*", ".*").Replace ("?", ".?")));
-		if (string.IsNullOrEmpty (filters))
-			filters = ".*";
-		fileFilterRegex = new Regex ($"^{filters}$", RegexOptions.IgnoreCase);
-		logger.Debug (Strings.Watch.FileChangeFilter (fileFilterRegex.ToString ()));
+		_extensionFilter = project.ProjectFilesFilter;
+
+		logger.Information (Strings.Watch.FileChangeFilter (_extensionFilter.GetExtensionsToMonitorAsString ()));
 	}
 
 	/// <summary>
@@ -116,7 +112,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 			return;
 		}
 
-		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+		if (!_extensionFilter.ProcessRenameEvent (e.OldFullPath, e.FullPath))
 			return;
 
 		logger.Information (Strings.Watch.FileRenamed (e.OldFullPath, e.FullPath, project!.Name));
@@ -134,7 +130,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 			return;
 		}
 
-		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+		if (!_extensionFilter.ProcessEvent (e.FullPath))
 			return;
 
 		logger.Information (Strings.Watch.FileChanged (e.FullPath, project!.Name));
