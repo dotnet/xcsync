@@ -396,12 +396,28 @@
         <value>Error: Parsing failed for '{0}' due to '{1}'.</value>
         <comment>{0} is the file path, {1} is the Translation Unit Error</comment>
     </data>
+    <data name="XcodeWorkspace.FileParsingHasDiagnostics" xml:space="preserve">
+        <value>Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</value>
+        <comment>{0} is the file path</comment>
+    </data>
     <data name="XcodeWorkspace.FileDiagnostics" xml:space="preserve">
         <value>Diagnostics for '{0}':</value>
         <comment>{0} is the file path</comment>
     </data>
-    <data name="XcodeWorkspace.DiagnosticIssue" xml:space="preserve">
-        <value>{0}</value>
+    <data name="XcodeWorkspace.ErrorDiagnosticIssue" xml:space="preserve">
+        <value>ERROR: {0}</value>
+        <comment>{0} is the diagnostic for which there are issues</comment>
+    </data>
+    <data name="XcodeWorkspace.WarningDiagnosticIssue" xml:space="preserve">
+        <value>WARNING: {0}</value>
+        <comment>{0} is the diagnostic for which there are issues</comment>
+    </data>
+    <data name="XcodeWorkspace.NoteDiagnosticIssue" xml:space="preserve">
+        <value>NOTE: {0}</value>
+        <comment>{0} is the diagnostic for which there are issues</comment>
+    </data>
+    <data name="XcodeWorkspace.FatalDiagnosticIssue" xml:space="preserve">
+        <value>FATAL: {0}</value>
         <comment>{0} is the diagnostic for which there are issues</comment>
     </data>
     <data name="XcodeWorkspace.SkipProcessing" xml:space="preserve">
