@@ -3,6 +3,7 @@
 
 using System.IO.Abstractions;
 using Marille;
+using NuGet.Frameworks;
 using Serilog;
 using xcsync.Projects;
 
@@ -17,7 +18,7 @@ class SyncContextBase (IFileSystem fileSystem, ITypeService typeService, string 
 
 	protected string ProjectPath { get; } = projectPath;
 	protected string TargetDir { get; } = targetDir;
-	protected string Framework { get; } = framework;
+	protected NuGetFramework Framework { get; } = NuGetFramework.Parse (framework);
 
 	protected Hub Hub = new ();
 	// hub needs to be created, registered to a specific topic, published
