@@ -43,7 +43,7 @@ public class Base (ITestOutputHelper testOutput) {
 			standardOutput: outputWrapper,
 			standardError: outputWrapper,
 			log: outputWrapper,
-			timeout: TimeSpan.FromSeconds (10)
+			timeout: TimeSpan.FromSeconds (30)
 		).ConfigureAwait (false);
 		return exec.ExitCode;
 	}

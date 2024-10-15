@@ -113,8 +113,9 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 		xcodeObjects.Add (pbxGroup.Token, pbxGroup);
 
-		foreach (var t in TypeService.QueryTypes ()) {
-			if (t is null) continue;
+		foreach (var t in TypeService.QueryTypes ().Where (t => t is not null && t.IsInSource)) {
+
+			if (t is null) continue; // Only needed to keep the compiler happy
 
 			// all NSObjects get a corresponding .h + .m file generated
 			// generated .h + .m files are added to the xcode project deps
