@@ -153,11 +153,10 @@ class TypeService (ILogger Logger) : ITypeService {
 
 	void AddTypesFromCompilation (string targetPlatform, Compilation compilation)
 	{
-		// limit scope of namespaces to project, do not include referenced assemblies, etc.
+		// limit scope of namespaces to only those that conatin NSObject derived types.
 		var namespaces = compilation.GlobalNamespace.GetNamespaceMembers ()
-			.Where (ns => ns.GetMembers ()
-				.Any (member => member.Locations
-					.Any (location => location.IsInSource)));
+			.Where (ns => ns.GetTypeMembers ()
+				.Any(xcSync.IsNsoDerived));
 
 		if (namespaces is null)
 			return;
@@ -166,7 +165,7 @@ class TypeService (ILogger Logger) : ITypeService {
 			foreach (var type in ns.GetTypeMembers ().Where (xcSync.IsNsoDerived)) {
 				var nsType = ConvertToTypeMapping (targetPlatform, type);
 				if (nsType is not null) {
-					AddType (nsType with { IsInSource = true });
+					AddType (nsType with { IsInSource = type.Locations.Any (l => l.IsInSource) });
 				}
 			}
 		}
