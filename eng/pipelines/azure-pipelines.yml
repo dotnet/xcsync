@@ -124,10 +124,7 @@ extends:
           parameters:
             LclSource: lclFilesfromPackage
             LclPackageId: 'LCL-JUNO-PROD-XMACCORE'
-            #LclSource: lclFilesInRepo
-            SkipLocProjectJsonGeneration: true
             MirrorRepo: xcsync
-            MirrorBranch: main
 
       - template: /eng/common/templates-official/jobs/jobs.yml@self
         parameters:

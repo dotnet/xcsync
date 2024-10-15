@@ -12,7 +12,7 @@ class SyncableProject : ISyncableProject {
 
 	public string RootPath { get; init; }
 
-	public string [] ProjectFilesFilter { get; init; }
+	public ExtensionFilter ProjectFilesFilter { get; init; }
 
 	protected IFileSystem FileSystem { get; init; }
 
@@ -24,7 +24,7 @@ class SyncableProject : ISyncableProject {
 
 	Task? initTask;
 
-	public SyncableProject (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string rootPath, string framework, string [] projectFilesFilter)
+	public SyncableProject (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string rootPath, string framework, ExtensionFilter projectFilesFilter)
 	{
 		FileSystem = fileSystem;
 		Logger = logger;
