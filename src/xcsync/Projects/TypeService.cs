@@ -153,7 +153,7 @@ class TypeService (ILogger Logger) : ITypeService {
 
 	void AddTypesFromCompilation (string targetPlatform, Compilation compilation)
 	{
-		// limit scope of namespaces to only those that conatin NSObject derived types.
+		// limit scope of namespaces to only those that contain NSObject derived types.
 		var namespaces = compilation.GlobalNamespace.GetNamespaceMembers ()
 			.Where (ns => ns.GetTypeMembers ()
 				.Any (xcSync.IsNsoDerived));
