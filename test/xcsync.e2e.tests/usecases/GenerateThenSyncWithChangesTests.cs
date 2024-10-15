@@ -20,11 +20,13 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 
 	public static IEnumerable<object []> AddXcodeDotnetChanges =>
 	[
-		["macos", "net8.0-macos", 
-			(ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm), 
+		["macos",
+			"net8.0-macos",
+			(ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm),
 			(ITestOutputHelper testOutput, string path, string projectType, string tfm, string projectName) => AddDotnetChanges (testOutput, path, projectType, tfm, projectName)],
-		["tvos", "net8.0-tvos", 
-			(ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm), 
+		["tvos",
+			"net8.0-tvos",
+			(ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm),
 			(ITestOutputHelper testOutput, string path, string projectType, string tfm, string projectName) => AddDotnetChanges (testOutput, path, projectType, tfm, projectName)],
 	];
 
