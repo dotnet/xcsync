@@ -20,8 +20,12 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 
 	public static IEnumerable<object []> AddXcodeDotnetChanges =>
 	[
-		["macos", "net8.0-macos", (ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm), (ITestOutputHelper testOutput, string path, string projectType, string tfm, string projectName) => AddDotnetChanges (testOutput, path, projectType, tfm, projectName)],
-		["tvos", "net8.0-tvos", (ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm), (ITestOutputHelper testOutput, string path, string projectType, string tfm, string projectName) => AddDotnetChanges (testOutput, path, projectType, tfm, projectName)],
+		["macos", "net8.0-macos", 
+			(ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm), 
+			(ITestOutputHelper testOutput, string path, string projectType, string tfm, string projectName) => AddDotnetChanges (testOutput, path, projectType, tfm, projectName)],
+		["tvos", "net8.0-tvos", 
+			(ITestOutputHelper testOutput, string path, string projectType, string tfm) => AddControlAndOutletChanges (testOutput, path, projectType, tfm), 
+			(ITestOutputHelper testOutput, string path, string projectType, string tfm, string projectName) => AddDotnetChanges (testOutput, path, projectType, tfm, projectName)],
 	];
 
 	[Theory]
@@ -91,10 +95,10 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Initial commit").ConfigureAwait (false);
 
 		// Act
-		Assert.Equal (0, await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false));
-		// Assert that the changes are present in the .NET project source files
-		(success, failMessage) = await CheckGitForChanges ($"{projectType},{tfm}", tmpDir);
-		Assert.True (success, failMessage);
+		Assert.Equal (0, await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm, "-v", "Detailed").ConfigureAwait (false));
+		// Assert that there are no changes present in the .NET project source files
+		(success, failMessage) = await CheckGitForChanges ($"generate-1,{projectType},{tfm}", tmpDir);
+		Assert.False (success, failMessage);
 
 		await Git (TestOutput, "-C", tmpDir, "add", ".").ConfigureAwait (false);
 		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Xcode Project Generation").ConfigureAwait (false);
@@ -103,30 +107,30 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 		await Git (TestOutput, "-C", tmpDir, "add", ".").ConfigureAwait (false);
 		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Xcode Project Changes").ConfigureAwait (false);
 
-		Assert.Equal (0, await Xcsync (TestOutput, "sync", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false));
-		// Assert that the changes are present in the .NET project source files
-		(success, failMessage) = await CheckGitForChanges ($"{projectType},{tfm}", tmpDir);
+		Assert.Equal (0, await Xcsync (TestOutput, "sync", "--project", csproj, "--target", xcodeDir, "-tfm", tfm, "-v", "Detailed").ConfigureAwait (false));
+		// Assert that there are changes present in the .NET project source files
+		(success, failMessage) = await CheckGitForChanges ($"sync-1,{projectType},{tfm}", tmpDir);
 		Assert.True (success, failMessage);
 
 		await dotnetChanges (TestOutput, tmpDir, projectType, tfm, projectName).ConfigureAwait (false);
 		await Git (TestOutput, "-C", tmpDir, "add", ".").ConfigureAwait (false);
 		await Git (TestOutput, "-C", tmpDir, "commit", "-m", "Dotnet Project Changes").ConfigureAwait (false);
 
-		Assert.Equal (0, await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm).ConfigureAwait (false));
+		Assert.Equal (0, await Xcsync (TestOutput, "generate", "--project", csproj, "--target", xcodeDir, "-tfm", tfm, "-v", "Detailed", "-f").ConfigureAwait (false));
+		Assert.Equal (0, await Xcsync (TestOutput, "sync", "--project", csproj, "--target", xcodeDir, "-tfm", tfm, "-v", "Detailed").ConfigureAwait (false));
 
 		// Assert
-		(success, failMessage) = await CheckGitForChanges ($"{projectType},{tfm}", tmpDir);
+		// Assert that there are no changes present in the .NET project source files
+		(success, failMessage) = await CheckGitForChanges ($"sync-2,{projectType},{tfm}", tmpDir);
 		Assert.True (success, failMessage);
 	}
 
 	async Task<(bool, string)> CheckGitForChanges (string label, string projectDir)
 	{
-		var failMessage = string.Empty;
 		var commandOutput = new CaptureOutput (TestOutput);
 		var changesPresent = await Git (commandOutput, "-C", projectDir, "diff-index", "--quiet", "HEAD", "--exit-code", "--").ConfigureAwait (false);
-		if (changesPresent == 0)
-			failMessage =  $"[{label}] : Git diff-index failed, there are no changes in the source files.\n{commandOutput.Output}";
-		return (changesPresent == 0, failMessage);
+		var failMessage = $"[{label}] :  Git diff-index exited with {changesPresent}.\n{commandOutput.Output}";
+		return (changesPresent != 0, failMessage);
 	}
 
 	static async Task AddDotnetChanges (ITestOutputHelper testOutput, string tmpDir, string projectType, string tfm, string projectName)
