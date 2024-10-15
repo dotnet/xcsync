@@ -156,7 +156,7 @@ class TypeService (ILogger Logger) : ITypeService {
 		// limit scope of namespaces to only those that conatin NSObject derived types.
 		var namespaces = compilation.GlobalNamespace.GetNamespaceMembers ()
 			.Where (ns => ns.GetTypeMembers ()
-				.Any(xcSync.IsNsoDerived));
+				.Any (xcSync.IsNsoDerived));
 
 		if (namespaces is null)
 			return;

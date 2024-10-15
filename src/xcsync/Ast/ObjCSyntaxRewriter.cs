@@ -142,10 +142,9 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Parsing property type '{objcProperty.Type.AsString}'");
 			// TODO: This is a *very* primitive way to get the property type and will need improvement
 			// TODO: Need a solution to handle the case where the property type is not found  or is null in the type mapping
-			var propertyType = objcProperty.Type switch { 
-				{ Kind: CXType_ObjCObjectPointer } => typeService
-					.QueryTypes (null, objcProperty.Type.AsString.Split (' ') [0])
-					.First()?.ClrType ?? string.Empty,
+			var propertyType = objcProperty.Type switch { { Kind: CXType_ObjCObjectPointer } => typeService
+															  .QueryTypes (null, objcProperty.Type.AsString.Split (' ') [0])
+															  .First ()?.ClrType ?? string.Empty,
 				_ => throw new NotImplementedException ($"Unsupported property type {objcProperty.Type.KindSpelling}")
 			};
 
