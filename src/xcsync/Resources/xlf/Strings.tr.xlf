@@ -79,7 +79,7 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidOS">
         <source>The xcsync tool can only be run on macOS.</source>
-        <target state="new">The xcsync tool can only be run on macOS.</target>
+        <target state="translated">Xcsync aracı yalnızca macOS üzerinde çalıştırılabilir.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
@@ -286,12 +286,12 @@
       </trans-unit>
       <trans-unit id="Watch.PausingMonitoring">
         <source>Pausing monitoring</source>
-        <target state="new">Pausing monitoring</target>
+        <target state="translated">İzleme duraklatılıyor</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ResumingMonitoring">
         <source>Context synced. Resuming monitoring</source>
-        <target state="new">Context synced. Resuming monitoring</target>
+        <target state="translated">Bağlam eşitlendi. İzleme sürdürülüyor</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
@@ -306,17 +306,17 @@
       </trans-unit>
       <trans-unit id="Watch.Syncing">
         <source>Syncing change context</source>
-        <target state="new">Syncing change context</target>
+        <target state="translated">Değişiklik bağlamı eşitleniyor</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.WorkerException">
         <source>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</source>
-        <target state="new">Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</target>
+        <target state="translated">{0}: {1} değişiklik iletisi işlenirken hata oluştu. Lütfen buradan bir hata raporu oluşturun: https://aka.ms/xcsync-issue</target>
         <note>{0} is the message Id, {1} is the exception message</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorDiagnosticIssue">
         <source>ERROR: {0}</source>
-        <target state="new">ERROR: {0}</target>
+        <target state="translated">HATA: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
@@ -341,7 +341,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FatalDiagnosticIssue">
         <source>FATAL: {0}</source>
-        <target state="new">FATAL: {0}</target>
+        <target state="translated">ÖNEMLİ: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
@@ -351,7 +351,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileParsingHasDiagnostics">
         <source>Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</source>
-        <target state="new">Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</target>
+        <target state="translated">Oluşturulan '{0}' iletilerini görüntülemek için Ayrıntılı günlüğe kaydedin.</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
@@ -366,7 +366,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.NoteDiagnosticIssue">
         <source>NOTE: {0}</source>
-        <target state="new">NOTE: {0}</target>
+        <target state="translated">NOT: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
@@ -391,7 +391,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.WarningDiagnosticIssue">
         <source>WARNING: {0}</source>
-        <target state="new">WARNING: {0}</target>
+        <target state="translated">UYARI: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
@@ -401,7 +401,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
         <source>File not found: {0}</source>
-        <target state="new">File not found: {0}</target>
+        <target state="translated">Dosya bulunamadı: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>
