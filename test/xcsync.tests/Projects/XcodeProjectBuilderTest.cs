@@ -60,4 +60,21 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 		Assert.Throws<DirectoryNotFoundException> ( act);
 	}
 
+	[Fact]
+	public void Build_WithDirectory_ReturnsXcodeProjectFile ()
+	{
+		// Arrange
+		const string directory = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
+		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
+			.WithDirectory (directory);
+
+		// Act
+		var project = builder.Build ();
+
+		// Assert
+		Assert.NotNull (project);
+		Assert.Equal (directory, project.Path);
+		Assert.NotNull  (project.PbxProjectFile);
+		Assert.Equal (directory + "/project.pbxproj", project.PbxProjectFile.Filename);
+	}
 }
