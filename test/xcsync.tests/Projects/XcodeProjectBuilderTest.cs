@@ -77,4 +77,38 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 		Assert.NotNull  (project.PbxProjectFile);
 		Assert.Equal (directory + "/project.pbxproj", project.PbxProjectFile.Filename);
 	}
+
+	[Fact]
+	public void Build_UseArchiveVersion_SetsArchiveVersion ()
+	{
+		// Arrange
+		const string directory = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
+		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
+			.WithDirectory (directory)
+			.UseArchiveVersion (1);
+
+		// Act
+		var project = builder.Build ();
+
+		// Assert
+		Assert.NotNull (project);
+		Assert.Equal (1, project.PbxProjectFile.ArchiveVersion);
+	}
+
+	[Fact]
+	public void Build_UseObjectVersion_SetsObjectVersion ()
+	{
+		// Arrange
+		const string directory = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
+		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
+			.WithDirectory (directory)
+			.UseObjectVersion (1);
+
+		// Act
+		var project = builder.Build ();
+
+		// Assert
+		Assert.NotNull (project);
+		Assert.Equal (1, project.PbxProjectFile.ObjectVersion);
+	}
 }

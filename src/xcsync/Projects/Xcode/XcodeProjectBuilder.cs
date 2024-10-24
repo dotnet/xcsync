@@ -20,6 +20,8 @@ class XcodeProjectBuilder {
 	public IFileSystem FileSystem { get; }
 
 	FilePath projectPath;
+	int objectVersion;
+	int archiveVersion;
 
 	public XcodeProjectBuilder WithDirectory (string directory)
 	{
@@ -30,6 +32,24 @@ class XcodeProjectBuilder {
 		this.projectPath = projectPath;
 		return this;
 	}
+	
+	public XcodeProjectBuilder UseObjectVersion (int version)
+	{
+		if (version < 0)
+			throw new ArgumentOutOfRangeException (nameof (version), "The object version must be a positive integer.");
+		
+		objectVersion = version;
+		return this;
+	}
+
+	public XcodeProjectBuilder UseArchiveVersion (int version)
+	{
+		if (version < 0)
+			throw new ArgumentOutOfRangeException (nameof (version), "The object version must be a positive integer.");
+
+		archiveVersion = version;
+		return this;
+	}
 
 	public Model.XcodeProject Build ()
 	{
@@ -37,5 +57,11 @@ class XcodeProjectBuilder {
 			throw new DirectoryNotFoundException ("A directory must be provided to build an Xcode project.");
 
 		return new Model.XcodeProject (projectPath);
+		var xcodeProject = new Model.XcodeProject (projectPath);
+
+		xcodeProject.PbxProjectFile.ArchiveVersion = archiveVersion;
+		xcodeProject.PbxProjectFile.ObjectVersion = objectVersion;
+
+		return xcodeProject;
 	}
 }
