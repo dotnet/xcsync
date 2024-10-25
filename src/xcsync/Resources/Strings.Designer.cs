@@ -54,7 +54,10 @@ static class Strings {
 		internal static string UseDefaultTfm => Resources.Strings.Base_UseDefaultTfm;
 		internal static string EstablishDefaultTarget (string path) => string.Format (Resources.Strings.Base_EstablishDefaultTarget, path);
 		internal static string CreateDefaultTarget (string path) => string.Format (Resources.Strings.Base_CreateDefaultTarget, path);
+		internal static string DotnetPath (string path) => string.Format (Resources.Strings.Base_DotnetPath, path);
+		internal static string XcodePath (string path) => string.Format (Resources.Strings.Base_XcodePath, path);
 	}
+	
 	internal static class Generate {
 		internal static string HeaderInformation => Resources.Strings.Generate_HeaderInformation;
 		internal static string GeneratedFiles => Resources.Strings.Generate_GeneratedFiles;

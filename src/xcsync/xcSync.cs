@@ -20,6 +20,7 @@ namespace xcsync;
 static class xcSync {
 
 	public static string DotnetPath { get; set; } = string.Empty;
+	public static string XcodePath { get; set; } = string.Empty;
 
 	public static ApplePlatforms ApplePlatforms { get; } = new ();
 

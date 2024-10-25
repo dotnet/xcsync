@@ -5,6 +5,7 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Serilog;
 
@@ -72,6 +73,14 @@ class BaseCommand<T> : Command {
 	protected virtual void AddValidators ()
 	{
 		AddValidator ((result) => {
+
+			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				result.ErrorMessage = Strings.Errors.Validation.InvalidOS;
+				return;
+			}
+
+			xcSync.XcodePath = Scripts.SelectXcode ();
+			Logger?.Information (Strings.Base.XcodePath (xcSync.XcodePath));
 
 			var validation = ValidateCommand (result);
 

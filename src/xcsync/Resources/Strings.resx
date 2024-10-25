@@ -242,6 +242,14 @@
 		<value>Target path '{0}' does not exist, but is the default location, creating.</value>
 		<comment>{0} is the path to target project</comment>
 	</data>
+	<data name="Base.DotnetPath" xml:space="preserve">
+		<value>Using the `dotnet` located at {0}.</value>
+		<comment>{0} is the path to dotnet</comment>
+	</data>
+	<data name="Base.XcodePath" xml:space="preserve">
+		<value>Using Xcode from {0}.</value>
+		<comment>{0} is the path to Xcode</comment>
+	</data>
 
 	<!-- Generate Messages -->
 	<data name="Generate.HeaderInformation" xml:space="preserve">
