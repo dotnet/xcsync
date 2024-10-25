@@ -31,9 +31,9 @@ static class xcSync {
 	{
 		ConfigureLogging ();
 
-		RegisterMSBuild ();
-
 		WriteHeader ();
+
+		RegisterMSBuild ();
 
 		var parser = new CommandLineBuilder (new XcSyncCommand (FileSystem))
 			.UseDefaults ()
