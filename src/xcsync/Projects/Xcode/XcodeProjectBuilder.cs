@@ -3,6 +3,7 @@
 
 using System.IO.Abstractions;
 using Serilog;
+using xcsync.Projects.Xcode.Model;
 
 namespace xcsync.Projects.Xcode;
 
@@ -22,6 +23,8 @@ class XcodeProjectBuilder {
 	FilePath projectPath;
 	int objectVersion;
 	int archiveVersion;
+
+	(string name, PbxGuid guid) app;
 
 	public XcodeProjectBuilder WithDirectory (string directory)
 	{
@@ -51,17 +54,53 @@ class XcodeProjectBuilder {
 		return this;
 	}
 
+	public XcodeProjectBuilder AddApplication(string name, string guid = "")
+	{
+		if (app != default)
+			throw new InvalidOperationException("An application has already been added to the project.");
+			
+		if (string.IsNullOrEmpty(name))
+			throw new ArgumentException("An application name must be provided.", nameof(name));
+
+		if (string.IsNullOrEmpty(guid))
+			guid = PbxGuid.NewGuid().ToString();
+
+		app = (name, new PbxGuid(guid));
+		return this;
+	}
+
 	public Model.XcodeProject Build ()
 	{
 		if (projectPath.IsNull)
 			throw new DirectoryNotFoundException ("A directory must be provided to build an Xcode project.");
 
-		return new Model.XcodeProject (projectPath);
 		var xcodeProject = new Model.XcodeProject (projectPath);
 
 		xcodeProject.PbxProjectFile.ArchiveVersion = archiveVersion;
 		xcodeProject.PbxProjectFile.ObjectVersion = objectVersion;
 
+		AddAppPbxObject (xcodeProject);
+
 		return xcodeProject;
+	}
+
+	void AddAppPbxObject(Model.XcodeProject xcodeProject)
+	{
+		var projectName = this.projectPath.NameWithoutExtension;
+
+		(string appName, PbxGuid appGuid) = this.app;
+
+		if (string.IsNullOrEmpty(appName))
+			appName = $"{projectName}";
+		
+		var app = new PbxFileReference (xcodeProject.PbxProjectFile, appGuid, new Xamarin.MacDev.PDictionary {
+			{"isa", "PBXFileReference"},
+			{ "explicitFileType", "wrapper.application" },
+			{ "name", $"{appName}.app" },
+			{ "path", $"{appName}.app" },
+			{ "sourceTree", "BUILT_PRODUCTS_DIR" },
+			{ "includeInIndex", "0" },
+		});
+		xcodeProject.PbxProjectFile.AddObject (app);
 	}
 }

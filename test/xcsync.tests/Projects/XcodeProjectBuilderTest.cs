@@ -3,12 +3,18 @@
 
 using System.IO.Abstractions;
 using Serilog;
+using Xamarin.MacDev;
 using xcsync.Projects.Xcode;
 using Xunit.Abstractions;
 
 namespace xcsync.tests.Projects;
 
 public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
+
+	const string GuidValue1 = "1234567890ABCDEF1234567890ABCDEF";
+	const string GuidValue2 = "ABCDEF1234567890ABCDEF1234567890";
+
+	const string TestXcodeProjectPath = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
 
 	readonly ILogger testLogger = new LoggerConfiguration ()
 	.MinimumLevel.Verbose ()
@@ -34,16 +40,15 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 	public void WithDirectory_WithValidDirectory_DoesNotThrow ()
 	{
 		// Arrange
-		const string directory = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
 		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ());
 
 		// Act
-		builder.WithDirectory (directory);
+		builder.WithDirectory (TestXcodeProjectPath);
 		var project = builder.Build ();
 
 		// Assert		
 		Assert.NotNull (project);
-		Assert.Equal (directory, project.Path);
+		Assert.Equal (TestXcodeProjectPath, project.Path);
 	}
 
 
@@ -64,27 +69,25 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 	public void Build_WithDirectory_ReturnsXcodeProjectFile ()
 	{
 		// Arrange
-		const string directory = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
 		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
-			.WithDirectory (directory);
+			.WithDirectory (TestXcodeProjectPath);
 
 		// Act
 		var project = builder.Build ();
 
 		// Assert
 		Assert.NotNull (project);
-		Assert.Equal (directory, project.Path);
+		Assert.Equal (TestXcodeProjectPath, project.Path);
 		Assert.NotNull  (project.PbxProjectFile);
-		Assert.Equal (directory + "/project.pbxproj", project.PbxProjectFile.Filename);
+		Assert.Equal (TestXcodeProjectPath + "/project.pbxproj", project.PbxProjectFile.Filename);
 	}
 
 	[Fact]
 	public void Build_UseArchiveVersion_SetsArchiveVersion ()
 	{
 		// Arrange
-		const string directory = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
 		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
-			.WithDirectory (directory)
+			.WithDirectory (TestXcodeProjectPath)
 			.UseArchiveVersion (1);
 
 		// Act
@@ -99,9 +102,8 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 	public void Build_UseObjectVersion_SetsObjectVersion ()
 	{
 		// Arrange
-		const string directory = "/User/Home/someuser/source/TempProjectName/TempProjectName.xcodeproj";
 		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
-			.WithDirectory (directory)
+			.WithDirectory (TestXcodeProjectPath)
 			.UseObjectVersion (1);
 
 		// Act
@@ -110,5 +112,59 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 		// Assert
 		Assert.NotNull (project);
 		Assert.Equal (1, project.PbxProjectFile.ObjectVersion);
+	}
+
+	[Fact]
+	public void Build_WithoutCallAddApplication_AddsValidAppFileReference ()
+	{
+		// Arrange
+		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
+			.WithDirectory (TestXcodeProjectPath);
+
+		// Act
+		var project = builder.Build ();
+		var app = project.PbxProjectFile.Objects.FirstOrDefault (o =>
+			 o.Properties ["name"] is PString { Value: "TempProjectName.app" }
+		);
+
+		// Assert
+		Assert.NotNull (project);
+		Assert.NotNull (app);
+	}
+
+	[Fact]
+	public void Build_WithAddApplication_AddsAppFileReferenceUsingNameAndGuid ()
+	{
+		// Arrange
+		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
+			.WithDirectory (TestXcodeProjectPath)
+			.AddApplication ("ProjectName", GuidValue1);
+
+		// Act
+		var project = builder.Build ();
+		var app = project.PbxProjectFile.Objects.FirstOrDefault (o =>
+			 o.Properties ["explicitFileType"] is PString { Value: "wrapper.application" }
+		);
+
+		// Assert
+		Assert.NotNull (project);
+		Assert.NotNull (app);
+		Assert.Equal (GuidValue1, app.Guid);
+		Assert.Equal ("ProjectName.app", (app.Properties ["name"] as PString)?.Value);
+	}
+
+	[Fact]
+	public void AddApplication_CalledMoreThanOnce_ThrowsInvalidOperationException ()
+	{
+		// Arrange
+		var builder = new XcodeProjectBuilder (testLogger, new FileSystem ())
+			.WithDirectory (TestXcodeProjectPath)
+			.AddApplication ("ProjectName", GuidValue1);
+
+		// Act
+		void act () => builder.AddApplication ("ProjectName2", GuidValue2);
+
+		// Assert
+		Assert.Throws<InvalidOperationException> (act);
 	}
 }
