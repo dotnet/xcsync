@@ -12,6 +12,18 @@ The xcsync .NET tool enables developers to leverage Xcode for managing Apple spe
 
 The xcsync library and tool source and tests are contained in this repo.
 
+## Installation and Usage
+.NET xcsync is published to the [NuGet.org Gallery](https://www.nuget.org/packages/dotnet-xcsync) as a [.NET Tool](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools). To install the latest preview of .NET xcsync, use the `dotnet tool install` comamnd as shown:
+> dotnet tool install --global dotnet-xcsync --prerelease
+
+You can then run the tool from a project folder like so:
+> xcsync generate
+
+or
+> xcsync sync
+
+Run the `xcsync` command without any arguments to display the help.
+
 ## Using latest daily builds
 
 Follow instructions in [docs/using-latest-daily.md](docs/using-latest-daily.md) to get started using xcsync with the latest daily build.
