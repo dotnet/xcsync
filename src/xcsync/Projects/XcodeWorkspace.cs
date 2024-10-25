@@ -111,7 +111,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			"-target",
 			$"arm64-apple-{sdk}",
 			"-isysroot",
-			FileSystem.Path.Combine (Scripts.SelectXcode (), "Contents", "Developer", "Platforms", $"{SdkRoot}.platform", "Developer", "SDKs", $"{SdkRoot}.sdk"),
+			FileSystem.Path.Combine (xcSync.XcodePath, "Contents", "Developer", "Platforms", $"{SdkRoot}.platform", "Developer", "SDKs", $"{SdkRoot}.sdk"),
 		]);
 
 		LoadSyncableItems (fileReferences, syncableItems);

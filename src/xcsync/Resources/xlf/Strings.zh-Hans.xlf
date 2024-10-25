@@ -7,6 +7,11 @@
         <target state="translated">目标路径“{0}”不存在，但却是默认位置，正在创建。</target>
         <note>{0} is the path to target project</note>
       </trans-unit>
+      <trans-unit id="Base.DotnetPath">
+        <source>Using the `dotnet` located at {0}.</source>
+        <target state="new">Using the `dotnet` located at {0}.</target>
+        <note>{0} is the path to dotnet</note>
+      </trans-unit>
       <trans-unit id="Base.EstablishDefaultTarget">
         <source>Target path is the default location or empty, prefixing with '{0}'</source>
         <target state="translated">目标路径是默认位置或为空，前缀为 "{0}"</target>
@@ -31,6 +36,11 @@
         <source>No target framework moniker specified, using the first one found in the project.</source>
         <target state="translated">未指定目标框架名字对象，正在使用在项目中找到的第一个。</target>
         <note />
+      </trans-unit>
+      <trans-unit id="Base.XcodePath">
+        <source>Using Xcode from {0}.</source>
+        <target state="new">Using Xcode from {0}.</target>
+        <note>{0} is the path to Xcode</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
         <source>generate a Xcode project at the path specified by --target from the project identified by --project</source>

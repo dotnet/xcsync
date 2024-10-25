@@ -7,6 +7,11 @@
         <target state="translated">Le chemin d’accès cible « {0} » n’existe pas, mais il s’agit de l’emplacement par défaut en cours de création.</target>
         <note>{0} is the path to target project</note>
       </trans-unit>
+      <trans-unit id="Base.DotnetPath">
+        <source>Using the `dotnet` located at {0}.</source>
+        <target state="new">Using the `dotnet` located at {0}.</target>
+        <note>{0} is the path to dotnet</note>
+      </trans-unit>
       <trans-unit id="Base.EstablishDefaultTarget">
         <source>Target path is the default location or empty, prefixing with '{0}'</source>
         <target state="translated">Le chemin cible est l’emplacement par défaut ou vide, avec un préfixe avec « {0} »</target>
@@ -31,6 +36,11 @@
         <source>No target framework moniker specified, using the first one found in the project.</source>
         <target state="translated">Aucun moniker de framework cible spécifié, à l’aide du premier moniker trouvé dans le projet.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="Base.XcodePath">
+        <source>Using Xcode from {0}.</source>
+        <target state="new">Using Xcode from {0}.</target>
+        <note>{0} is the path to Xcode</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
         <source>generate a Xcode project at the path specified by --target from the project identified by --project</source>

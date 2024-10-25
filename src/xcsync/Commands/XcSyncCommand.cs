@@ -42,18 +42,12 @@ class XcSyncCommand : RootCommand {
 
 		SharedOptions.DotnetPath.AddValidator (result => {
 			xcSync.DotnetPath = result.GetValueForOption (SharedOptions.DotnetPath) ?? string.Empty;
-			Logger?.Debug ("Using the `dotnet` located at {0}", xcSync.DotnetPath);
+			Logger?.Information (Strings.Base.DotnetPath (xcSync.DotnetPath));
 		});
 
 		AddCommand (new GenerateCommand (fileSystem, Logger));
 		AddCommand (new SyncCommand (fileSystem, Logger));
 		if (!string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("EnableXcsyncWatch")))
 			AddCommand (new WatchCommand (fileSystem, Logger));
-
-		AddValidator (result => {
-			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				result.ErrorMessage = Strings.Errors.Validation.InvalidOS;
-			}
-		});
 	}
 }
