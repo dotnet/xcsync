@@ -35,12 +35,12 @@ class XcodeProjectBuilder {
 		this.projectPath = projectPath;
 		return this;
 	}
-	
+
 	public XcodeProjectBuilder UseObjectVersion (int version)
 	{
 		if (version < 0)
 			throw new ArgumentOutOfRangeException (nameof (version), "The object version must be a positive integer.");
-		
+
 		objectVersion = version;
 		return this;
 	}
@@ -54,18 +54,18 @@ class XcodeProjectBuilder {
 		return this;
 	}
 
-	public XcodeProjectBuilder AddApplication(string name, string guid = "")
+	public XcodeProjectBuilder AddApplication (string name, string guid = "")
 	{
 		if (app != default)
-			throw new InvalidOperationException("An application has already been added to the project.");
-			
-		if (string.IsNullOrEmpty(name))
-			throw new ArgumentException("An application name must be provided.", nameof(name));
+			throw new InvalidOperationException ("An application has already been added to the project.");
 
-		if (string.IsNullOrEmpty(guid))
-			guid = PbxGuid.NewGuid().ToString();
+		if (string.IsNullOrEmpty (name))
+			throw new ArgumentException ("An application name must be provided.", nameof (name));
 
-		app = (name, new PbxGuid(guid));
+		if (string.IsNullOrEmpty (guid))
+			guid = PbxGuid.NewGuid ().ToString ();
+
+		app = (name, new PbxGuid (guid));
 		return this;
 	}
 
@@ -84,15 +84,15 @@ class XcodeProjectBuilder {
 		return xcodeProject;
 	}
 
-	void AddAppPbxObject(Model.XcodeProject xcodeProject)
+	void AddAppPbxObject (Model.XcodeProject xcodeProject)
 	{
 		var projectName = this.projectPath.NameWithoutExtension;
 
 		(string appName, PbxGuid appGuid) = this.app;
 
-		if (string.IsNullOrEmpty(appName))
+		if (string.IsNullOrEmpty (appName))
 			appName = $"{projectName}";
-		
+
 		var app = new PbxFileReference (xcodeProject.PbxProjectFile, appGuid, new Xamarin.MacDev.PDictionary {
 			{"isa", "PBXFileReference"},
 			{ "explicitFileType", "wrapper.application" },

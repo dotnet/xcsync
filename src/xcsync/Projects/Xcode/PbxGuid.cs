@@ -54,7 +54,7 @@ public readonly struct PbxGuid : IEquatable<PbxGuid> {
 		return str;
 	}
 
-	public static implicit operator PbxGuid (string guid) => new(guid);
+	public static implicit operator PbxGuid (string guid) => new (guid);
 
 	public static implicit operator PString (PbxGuid guid)
 	{

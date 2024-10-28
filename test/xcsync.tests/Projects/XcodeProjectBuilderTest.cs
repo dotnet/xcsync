@@ -33,7 +33,7 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 		void act () => builder.WithDirectory (directory);
 
 		// Assert
-		Assert.Throws<ArgumentException> ( act);
+		Assert.Throws<ArgumentException> (act);
 	}
 
 	[Fact]
@@ -62,7 +62,7 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 		void act () => builder.Build ();
 
 		// Assert
-		Assert.Throws<DirectoryNotFoundException> ( act);
+		Assert.Throws<DirectoryNotFoundException> (act);
 	}
 
 	[Fact]
@@ -78,7 +78,7 @@ public class XcodeProjectBuilderTest (ITestOutputHelper TestOutput) : Base {
 		// Assert
 		Assert.NotNull (project);
 		Assert.Equal (TestXcodeProjectPath, project.Path);
-		Assert.NotNull  (project.PbxProjectFile);
+		Assert.NotNull (project.PbxProjectFile);
 		Assert.Equal (TestXcodeProjectPath + "/project.pbxproj", project.PbxProjectFile.Filename);
 	}
 

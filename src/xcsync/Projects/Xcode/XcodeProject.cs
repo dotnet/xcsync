@@ -12,7 +12,7 @@ record class XcodeProject {
 		Path = path;
 
 		var pbxprojFilename = this.Path.Combine ("project.pbxproj");
-	
+
 		PbxProjectFile = new PbxProjectFile (pbxprojFilename);
 	}
 
