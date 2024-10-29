@@ -12,7 +12,7 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool Open = false)
+class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool Open = false, bool force = false)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string FileChannel = "Files";
@@ -48,6 +48,14 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var clrProject = new ClrProject (FileSystem, Logger!, TypeService, "CLR", ProjectPath, Framework.ToString ());
 		await clrProject.OpenProject ();
 
+		var projectName = FileSystem.Path.GetFileNameWithoutExtension(ProjectPath);
+		string projectFilesPath = FileSystem.Path.GetFullPath(FileSystem.Path.Combine(TargetDir, projectName));
+
+		if (force) {
+			// remove existing xcode project
+			FileSystem.Directory.Delete (projectFilesPath, true);
+		}
+
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
 
 		// match target platform to build settings id
@@ -59,7 +67,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			_ => ("", ""),
 		};
 
-		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
 
 		// create in memory representation of Xcode assets
 		var xcodeObjects = new Dictionary<string, XcodeObject> ();
