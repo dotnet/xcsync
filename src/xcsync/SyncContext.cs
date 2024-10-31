@@ -51,7 +51,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var projectName = FileSystem.Path.GetFileNameWithoutExtension(ProjectPath);
 		string projectFilesPath = FileSystem.Path.GetFullPath(FileSystem.Path.Combine(TargetDir, projectName));
 
-		if (force) {
+		if (force && FileSystem.Directory.Exists(projectFilesPath)) {
 			// remove existing xcode project
 			FileSystem.Directory.Delete (projectFilesPath, true);
 		}

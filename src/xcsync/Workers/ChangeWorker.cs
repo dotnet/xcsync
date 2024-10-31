@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using Marille;
 using Serilog;
-using xcsync.Commands;
 using xcsync.Projects;
 using xcsync.Workers;
 
@@ -18,10 +16,8 @@ class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir
 		Logger.Debug (Strings.Watch.PausingMonitoring);
 		message.ClrMonitor.StopMonitoring ();
 		message.XcodeMonitor.StopMonitoring ();
-		if (message.Direction == SyncDirection.ToXcode)
-			XcodeCommand<GenerateCommand>.RecreateDirectory (FileSystem, TargetDir);
 		Logger.Debug (Strings.Watch.Syncing);
-		await new SyncContext (FileSystem, new TypeService (Logger), message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
+		await new SyncContext (FileSystem, new TypeService (Logger), message.Direction, ProjectPath, TargetDir, Framework, Logger, Open: false, force: message.Direction == SyncDirection.ToXcode).SyncAsync (cancellationToken);
 		Logger.Debug (Strings.Watch.ResumingMonitoring);
 		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
 		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
