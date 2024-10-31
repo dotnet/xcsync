@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.IO.Abstractions;
 using Xamarin;
 using Xunit.Abstractions;
 
@@ -226,7 +227,8 @@ $@"// --------------------------------------------------------------------------
 			throw new DirectoryNotFoundException ("Could not find the output folder for test run.");
 
 		var fullPathToDiff = Path.Combine (rootFolder, diff);
-		var diffContents = await File.ReadAllTextAsync (fullPathToDiff); var projectName = Path.GetFileName (Path.GetDirectoryName (Path.GetDirectoryName (tmpDir)));
+		var diffContents = await File.ReadAllTextAsync (fullPathToDiff);
+		var projectName = Path.GetFileName (Path.GetDirectoryName (Path.GetDirectoryName (tmpDir)));
 		var pbxproj = await File.ReadAllTextAsync (Path.Combine (tmpDir, $"{projectName}.xcodeproj/project.pbxproj"));
 
 		diffContents = diffContents.Replace ("{{PROJECT}}", projectName);
