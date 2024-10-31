@@ -48,10 +48,10 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var clrProject = new ClrProject (FileSystem, Logger!, TypeService, "CLR", ProjectPath, Framework.ToString ());
 		await clrProject.OpenProject ();
 
-		var projectName = FileSystem.Path.GetFileNameWithoutExtension(ProjectPath);
-		string projectFilesPath = FileSystem.Path.GetFullPath(FileSystem.Path.Combine(TargetDir, projectName));
+		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
+		string projectFilesPath = FileSystem.Path.GetFullPath (FileSystem.Path.Combine (TargetDir, projectName));
 
-		if (force && FileSystem.Directory.Exists(projectFilesPath)) {
+		if (force && FileSystem.Directory.Exists (projectFilesPath)) {
 			// remove existing xcode project
 			FileSystem.Directory.Delete (projectFilesPath, true);
 		}

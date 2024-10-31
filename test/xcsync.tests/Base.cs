@@ -82,7 +82,7 @@ public class Base : IDisposable {
 	}
 
 	class OutputCapture : TextWriter {
-		readonly StringBuilder output = new();
+		readonly StringBuilder output = new ();
 
 		public override void WriteLine (string? value)
 		{
