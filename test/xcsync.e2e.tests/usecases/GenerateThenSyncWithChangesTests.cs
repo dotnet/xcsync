@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.IO.Abstractions;
 using Xamarin;
 using Xunit.Abstractions;
 
@@ -42,7 +41,7 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 
 		Directory.CreateDirectory (xcodeDir);
 
@@ -85,7 +84,7 @@ public partial class GenerateThenSyncWithChangesTests (ITestOutputHelper testOut
 
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 
 		Directory.CreateDirectory (xcodeDir);
 

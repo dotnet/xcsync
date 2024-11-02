@@ -57,6 +57,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="xcsync.tests" />
+    <InternalsVisibleTo Include="xcsync.e2e.tests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" /> <!-- Needed for Moq -->
   </ItemGroup>
 

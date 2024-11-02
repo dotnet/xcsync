@@ -25,7 +25,7 @@ public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testO
 
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 
 		Directory.CreateDirectory (xcodeDir);
 
@@ -70,7 +70,7 @@ public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testO
 
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
-		var xcodeDir = Path.Combine ("obj", "xcode");
+		var xcodeDir = Path.Combine ("obj", "xcsync");
 
 		Directory.CreateDirectory (Path.Combine (tmpDir, xcodeDir));
 
@@ -124,7 +124,7 @@ public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testO
 			var csproj = Path.Combine (repoRootDir, projectRelativePath);
 			var csprojDir = Path.GetDirectoryName (csproj) ?? repoRootDir;
 
-			var xcodeDir = Path.Combine (csprojDir, "obj", "xcode");
+			var xcodeDir = Path.Combine (csprojDir, "obj", "xcsync");
 			Directory.CreateDirectory (xcodeDir);
 
 			await DotnetNew (TestOutput, "gitignore", csprojDir, string.Empty).ConfigureAwait (false);

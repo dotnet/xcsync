@@ -42,7 +42,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty);
 		var newProject = projectType;
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 		Directory.CreateDirectory (xcodeDir);
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
@@ -86,7 +86,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty);
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 		Directory.CreateDirectory (xcodeDir);
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
@@ -157,7 +157,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty);
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 		Directory.CreateDirectory (xcodeDir);
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
@@ -177,7 +177,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var pbxProjFileData = await File.ReadAllTextAsync (pbjProjFile);
 		var fileSystem = new MockFileSystem ();
 		var projectName = Guid.NewGuid ().ToString ();
-		var xcodeDir = Path.Combine ("obj", "xcode");
+		var xcodeDir = Path.Combine ("obj", "xcsync");
 
 		var projectPath = Path.Combine (xcodeDir, $"{projectName}.xcodeproj");
 
@@ -202,7 +202,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var logger = new Mock<ILogger> ();
 
 		var projectName = Guid.NewGuid ().ToString ();
-		var xcodeDir = Path.Combine ("obj", "xcode");
+		var xcodeDir = Path.Combine ("obj", "xcsync");
 
 		var pbxProjFile = Path.Combine (xcodeDir, $"{projectName}.xcodeproj", "project.pbxproj");
 
