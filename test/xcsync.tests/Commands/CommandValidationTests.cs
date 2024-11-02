@@ -53,6 +53,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 		Assert.True (File.Exists (csproj));
 
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (csproj, "net8.0-ios");
 		var fileSystem = new FileSystem ();
 		var logger = new XunitLogger (TestOutput);
 		var command = new GenerateCommand (fileSystem, logger);
@@ -60,7 +61,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		// ensure the default target directory is created relative to the project directory, not the pwd
 		Assert.Equal (0, exitCode);
-		Assert.True (Directory.Exists (Path.Combine (tmpDir, "obj", "xcode")));
+		Assert.True (Directory.Exists (Path.Combine (tmpDir, intermediateOutputPath, "xcode")));
 	}
 
 	[Theory]
@@ -279,11 +280,13 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.True (Directory.Exists (tmpDir));
 		var fullProjectPath = fileSystem.Path.Combine (tmpDir, $"{projectName}.csproj");
 
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (fullProjectPath, "net8.0-ios");
+
 		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
 		var args = new string [] {
 			"--project", fullProjectPath,
 			"--target-framework-moniker", "net8.0-ios",
-			"--target", "obj/xcode"
+			"--target", $"{intermediateOutputPath}/xcode"
 		 };
 
 		var console = new CapturingConsole ();

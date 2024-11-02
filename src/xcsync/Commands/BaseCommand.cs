@@ -12,7 +12,7 @@ using Serilog;
 namespace xcsync.Commands;
 
 class BaseCommand<T> : Command {
-	protected const string DefaultXcodeOutputFolder = "obj/xcode";
+	protected const string DefaultXcodeOutputFolder = "xcode";
 	protected static ILogger? Logger { get; private set; }
 
 	/// <summary>
@@ -49,7 +49,7 @@ class BaseCommand<T> : Command {
 	protected Option<string> target = new (
 		["--target", "-t"],
 		description: Strings.Options.TargetDescription,
-		getDefaultValue: () => $".{Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
+		getDefaultValue: () => $"$(IntermediateOutputPath){Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
 
 	public BaseCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (name, description)
 	{
@@ -103,10 +103,10 @@ class BaseCommand<T> : Command {
 		(error, string newProjectPath) = TryValidateProjectPath (projectPath);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, moniker, targetPath, error); }
 
-		(error, string newTfm) = TryValidateTfm (projectPath, moniker);
+		(error, string newTfm) = TryValidateTfm (newProjectPath, moniker);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, moniker, targetPath, error); }
 
-		(error, string newTargetPath) = TryValidateTargetPath (projectPath, targetPath);
+		(error, string newTargetPath) = TryValidateTargetPath (newProjectPath, newTfm, targetPath);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, newTfm, targetPath, error); }
 
 		return new ValidationResult (newProjectPath, newTfm, newTargetPath, error);
@@ -197,11 +197,13 @@ class BaseCommand<T> : Command {
 		return (error, tfm);
 	}
 
-	protected virtual (string, string) TryValidateTargetPath (string projectPath, string targetPath)
+	protected virtual (string, string) TryValidateTargetPath (string projectPath, string tfm, string targetPath)
 	{
 		string error = string.Empty;
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (projectPath, tfm).Trim ();
+		LogVerbose ("IntermediateOuputPath = {IntermediateOutputPath}", intermediateOutputPath);
 
-		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
+		if (targetPath.EndsWith (fileSystem.Path.Combine (intermediateOutputPath, DefaultXcodeOutputFolder), StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
 			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
 			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
 

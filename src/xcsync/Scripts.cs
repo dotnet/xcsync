@@ -179,6 +179,17 @@ static class Scripts {
 		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
 	}
 
+	public static string GetIntermediateOutputPath (string projPath, string tfm)
+	{
+		const string IntermediateOutputPath = nameof (IntermediateOutputPath);
+		var resultFile = Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, $"-property:TargetFramework={tfm}", $"-getProperty:{IntermediateOutputPath}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		var result = File.ReadAllText (resultFile).TrimEnd ('/', '\\', '\n');
+
+		return result ?? string.Empty;
+	}
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 #pragma warning restore IO0002 // Replace File class with IFileSystem.File for improved testability
 

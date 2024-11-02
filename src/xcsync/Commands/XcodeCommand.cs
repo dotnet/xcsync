@@ -41,14 +41,13 @@ class XcodeCommand<T> : BaseCommand<T> {
 		base.AddValidators ();
 	}
 
-	protected override (string, string) TryValidateTargetPath (string projectPath, string targetPath)
+	protected override (string, string) TryValidateTargetPath (string projectPath, string tfm, string targetPath)
 	{
 		string error = string.Empty;
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (projectPath, tfm);
+		LogVerbose ("IntermediateOuputPath = {IntermediateOutputPath}", intermediateOutputPath);
 
-		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
-			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
-		}
+		targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath));
 
 		if (!Force) {
 			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
