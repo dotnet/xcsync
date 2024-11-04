@@ -64,6 +64,74 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.True (Directory.Exists (Path.Combine (tmpDir, intermediateOutputPath, "xcode")));
 	}
 
+	[Fact]
+	public async Task GenerateCommand_WhenTargetDirectoryNotDefaultAndNotForce_ThrowsIfNotInProjectFolder ()
+	{
+		var projectName = Guid.NewGuid ().ToString ();
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+		var outDir = Cache.CreateTemporaryDirectory ();
+
+		await DotnetNew (TestOutput, "ios", tmpDir);
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+		Assert.True (File.Exists (csproj));
+
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (csproj, "net8.0-ios");
+		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+		var command = new GenerateCommand (fileSystem, logger);
+		int exitCode = command.Invoke ($"--project {csproj} --target {Path.Combine (outDir, "xcode")}");
+
+		Assert.Equal (1, exitCode);
+		Assert.False (Directory.Exists (Path.Combine (tmpDir, intermediateOutputPath, "xcode")));
+	}
+
+	[Fact]
+	public async Task GenerateCommand_WhenTargetDirectoryNotDefaultAndNotForce_ThrowsIfNotEmpty ()
+	{
+		var projectName = Guid.NewGuid ().ToString ();
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+		var outDir = Cache.CreateTemporaryDirectory ();
+		Directory.CreateDirectory (Path.Combine (outDir, "xcode"));
+		File.WriteAllText (Path.Combine (outDir, "xcode", "file.txt"), "content");
+
+		await DotnetNew (TestOutput, "ios", tmpDir);
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+		Assert.True (File.Exists (csproj));
+
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (csproj, "net8.0-ios");
+		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+		var command = new GenerateCommand (fileSystem, logger);
+		int exitCode = command.Invoke ($"--project {csproj} --target {Path.Combine (outDir, "xcode")}");
+
+		Assert.Equal (1, exitCode);
+		Assert.False (Directory.Exists (Path.Combine (tmpDir, intermediateOutputPath, "xcode")));
+		var files = Directory.GetFiles (Path.Combine (outDir, "xcode"));
+		Assert.Single (files);
+		Assert.Equal ("file.txt", Path.GetFileName (files [0]));
+	}
+
+	[Fact]
+	public async Task GenerateCommand_WhenTargetDirectoryNotDefaultAndForce_Success ()
+	{
+		var projectName = Guid.NewGuid ().ToString ();
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+		var outDir = Cache.CreateTemporaryDirectory ();
+
+		await DotnetNew (TestOutput, "ios", tmpDir);
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+		Assert.True (File.Exists (csproj));
+
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (csproj, "net8.0-ios");
+		var fileSystem = new FileSystem ();
+		var logger = new XunitLogger (TestOutput);
+		var command = new GenerateCommand (fileSystem, logger);
+		int exitCode = command.Invoke ($"--project {csproj} --target {Path.Combine (outDir, "xcode")} -f");
+
+		Assert.Equal (0, exitCode);
+		Assert.True (Directory.Exists (Path.Combine (outDir, "xcode")));
+	}
+
 	[Theory]
 	[InlineData ("macos", "", "", "")]
 	[InlineData ("macos", "net8.0-macos", "", "")]
