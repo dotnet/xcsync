@@ -220,8 +220,13 @@ $@"// --------------------------------------------------------------------------
 
 	static async Task AddControlAndOutletChangesFromDiff (ITestOutputHelper testOutput, string diff, string tmpDir, string projectType, string tfm)
 	{
-		var diffContents = await File.ReadAllTextAsync (diff);
-		var projectName = Path.GetFileName (Path.GetDirectoryName (Path.GetDirectoryName (tmpDir)));
+		var rootFolder = Directory.GetParent (Cache.GetRoot ())?.FullName ?? string.Empty;
+		// This should never be the case, but just in case it is...
+		if (string.IsNullOrEmpty (rootFolder))
+			throw new DirectoryNotFoundException ("Could not find the output folder for test run.");
+
+		var fullPathToDiff = Path.Combine (rootFolder, diff);
+		var diffContents = await File.ReadAllTextAsync (fullPathToDiff); var projectName = Path.GetFileName (Path.GetDirectoryName (Path.GetDirectoryName (tmpDir)));
 		var pbxproj = await File.ReadAllTextAsync (Path.Combine (tmpDir, $"{projectName}.xcodeproj/project.pbxproj"));
 
 		diffContents = diffContents.Replace ("{{PROJECT}}", projectName);

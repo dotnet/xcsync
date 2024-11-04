@@ -48,6 +48,8 @@ namespace Xamarin {
 			Directory.CreateDirectory (root);
 		}
 
+		public static string GetRoot () => root;
+
 		[DllImport ("libc", SetLastError = true)]
 		static extern int mkdir (string path, ushort mode);
 
