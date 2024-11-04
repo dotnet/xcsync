@@ -49,7 +49,7 @@ namespace Xamarin {
 		}
 
 		public static string GetRoot () => root;
-		
+
 		[DllImport ("libc", SetLastError = true)]
 		static extern int mkdir (string path, ushort mode);
 
