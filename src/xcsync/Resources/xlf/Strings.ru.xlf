@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="Base.DotnetPath">
         <source>Using the `dotnet` located at {0}.</source>
-        <target state="new">Using the `dotnet` located at {0}.</target>
+        <target state="translated">Использование платформы dotnet, расположенной по пути {0}.</target>
         <note>{0} is the path to dotnet</note>
       </trans-unit>
       <trans-unit id="Base.EstablishDefaultTarget">
@@ -39,7 +39,7 @@
       </trans-unit>
       <trans-unit id="Base.XcodePath">
         <source>Using Xcode from {0}.</source>
-        <target state="new">Using Xcode from {0}.</target>
+        <target state="translated">Использование среды Xcode, расположенной по пути {0}.</target>
         <note>{0} is the path to Xcode</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
