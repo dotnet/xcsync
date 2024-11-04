@@ -85,7 +85,7 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 		var expected = frameworks.Split (';');
 
 		// Act
-		var projectFrameworks = Scripts.GetTargetFrameworksFromProject (new FileSystem (), csproj);
+		var projectFrameworks = Scripts.GetTargetFrameworksFromProject (csproj);
 
 		// Assert
 		Assert.Equal (expected, projectFrameworks);
@@ -105,7 +105,7 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 		SetTargetFrameworks (csproj, []);
 
 		// Act
-		var frameworks = Scripts.GetTargetFrameworksFromProject (new FileSystem (), csproj);
+		var frameworks = Scripts.GetTargetFrameworksFromProject (csproj);
 
 		// Assert
 		Assert.NotNull (frameworks);
@@ -136,6 +136,6 @@ public class ScriptsTests (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine ("path/to/unknown/project.csproj");
 
 		// Act & Assert
-		Assert.Throws<InvalidOperationException> (() => Scripts.GetTargetFrameworksFromProject (new FileSystem (), csproj));
+		Assert.Throws<InvalidOperationException> (() => Scripts.GetTargetFrameworksFromProject (csproj));
 	}
 }
