@@ -171,7 +171,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 			var relativeParentPath = FileSystem.Path.GetDirectoryName (relativePath);
 			if (relativeParentPath is not null)
 				FileSystem.Directory.CreateDirectory (FileSystem.Path.Combine (TargetDir, relativeParentPath));
-			FileSystem.File.Copy (file, FileSystem.Path.Combine (TargetDir, relativePath), true);
+			await Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), file, FileSystem.Path.Combine (TargetDir, relativePath)));
 
 			// add to resources build phase
 			pbxFileReference = new PBXFileReference {
@@ -220,13 +220,13 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var assetsFolder = FileSystem.Directory
 			.EnumerateDirectories (appleDirectory, "*.xcassets", SearchOption.TopDirectoryOnly).FirstOrDefault (); //TODO: add support for multiple asset folders
 		if (assetsFolder is not null) {
-			Scripts.CopyDirectory (FileSystem, assetsFolder, FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (assetsFolder)), true);
+			await Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), assetsFolder, FileSystem.Path.Combine (TargetDir, FileSystem.Path.GetFileName (assetsFolder))));
 			AddAsset (assetsFolder);
 		}
 
 		// maui support
 		foreach (var asset in Scripts.GetAssetItemsFromProject (ProjectPath, Framework.ToString ())) {
-			Scripts.CopyDirectory (FileSystem, asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets"), true);
+			await Hub.PublishAsync (FileChannel, new CopyFileMessage (Guid.NewGuid ().ToString (), asset, FileSystem.Path.Combine (TargetDir, "Assets.xcassets")));
 			AddAsset (asset);
 		}
 
