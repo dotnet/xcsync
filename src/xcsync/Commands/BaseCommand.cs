@@ -225,7 +225,7 @@ class BaseCommand<T> : Command {
 
 		tfms = [];
 		try {
-			tfms = Scripts.GetTargetFrameworksFromProject (fileSystem, csproj);
+			tfms = Scripts.GetTargetFrameworksFromProject (csproj);
 
 			return tfms.Count > 0;
 		} catch (Exception ex) {

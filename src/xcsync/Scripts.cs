@@ -28,105 +28,11 @@ static class Scripts {
 		return exec;
 	}
 
-	public static bool ConvertPbxProjToJson (IFileSystem fileSystem, string projectPath)
+	public static string RunAppleScript (string script)
 	{
-		var exec = ExecuteCommand ("plutil", ["-convert", "json", projectPath], TimeSpan.FromMinutes (1));
-		return fileSystem.File.Exists (projectPath) && exec.ExitCode == 0;
-	}
-
-#pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
-	public static string SelectXcode ()
-	{
-		var exec = ExecuteCommand ("xcode-select", ["-p"], TimeSpan.FromMinutes (1));
-		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
-	}
-#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
-
-	public static List<string> GetTargetFrameworksFromProject (IFileSystem fileSystem, string projPath)
-	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
-		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" };
-
-		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
-
-		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
-
-		List<string> tfms = [];
-
-		var tfmsToken = jsonObject.SelectToken ("$.Properties.TargetFrameworks");
-
-		if (tfmsToken is not null)
-			tfms = tfmsToken
-				.ToString ()
-				.Split (';')
-				.Where (tfm => !string.IsNullOrWhiteSpace (tfm))
-				.ToList ();
-
-		var tfmToken = jsonObject.SelectToken ("$.Properties.TargetFramework")?.ToString ();
-
-		if (!string.IsNullOrEmpty (tfmToken))
-			// to deal w nullability
-			tfms = [.. tfms, tfmToken];
-
-		return tfms;
-	}
-
-	public static string GetSupportedOSVersion (IFileSystem fileSystem, string projPath, string tfm)
-	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
-		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
-
-		return fileSystem.File.ReadAllText (resultFile).Trim ('\n');
-	}
-
-	public static HashSet<string> GetAssets (IFileSystem fileSystem, string projPath, string tfm)
-	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
-		//maybe add support for ImageAsset? But right now doesn't seem v necessary? (Default is BundleResource)
-		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
-
-		// dynamic cuz don't wanna create a whole class to rep the incoming json
-		dynamic data = JsonConvert.DeserializeObject (fileSystem.File.ReadAllText (resultFile))!;
-		var bundleResources = data.Items.BundleResource;
-		HashSet<string> assetPaths = new ();
-
-		// iterate through bundle resources , specific to tfm, and compute the appropriate asset paths
-		foreach (var item in bundleResources) {
-			var id = item.Identity.ToString ().Replace ('\\', '/');
-			if (id.Contains ("Assets.xcassets")) {
-				if (!fileSystem.Path.IsPathRooted (id))
-					// Combine with the project path if it's not a full path
-					id = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projPath), id);
-
-				// Strip off anything after ".xcassets"
-				var index = id.IndexOf (".xcassets", StringComparison.Ordinal);
-				if (index > -1)
-					id = id.Substring (0, index + ".xcassets".Length);
-
-				assetPaths.Add (id);
-			}
-		}
-		return assetPaths;
-	}
-
-	public static List<string> GetFiles (IFileSystem fileSystem, string projPath, string tfm, string targetPlatform)
-	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
-		var args = new [] { "msbuild", projPath, "-getItem:Compile,None", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
-
-		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
-
-		// Combine the search for Compile and None tokens into one operation
-		var tokens = jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath");
-
-		return jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath")
-		   .Select (token => token.ToString ())
-		   .Where (path => !path.Contains ("Platforms") || path.Contains ($"Platforms/{targetPlatform}", StringComparison.OrdinalIgnoreCase))
-		   .Distinct ()
-		   .ToList ();
+		var args = new [] { "-e", script };
+		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
+		return exec.StandardOutput?.ToString ()?.Trim ('\n')!;
 	}
 
 	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = false)
@@ -160,6 +66,100 @@ static class Scripts {
 
 #pragma warning disable IO0002 // Replace File class with IFileSystem.File for improved testability
 #pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
+
+	public static bool ConvertPbxProjToJson (string projectPath)
+	{
+		var exec = ExecuteCommand ("plutil", ["-convert", "json", projectPath], TimeSpan.FromMinutes (1));
+		return File.Exists (projectPath) && exec.ExitCode == 0;
+	}
+
+	public static string GetSupportedOSVersionForTfmFromProject (string projPath, string tfm)
+	{
+		var resultFile = Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		return File.ReadAllText (resultFile).Trim ('\n');
+	}
+
+	public static List<string> GetTargetFrameworksFromProject (string projPath)
+	{
+		var resultFile = Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" };
+
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
+
+		List<string> tfms = [];
+
+		var tfmsToken = jsonObject.SelectToken ("$.Properties.TargetFrameworks");
+
+		if (tfmsToken is not null)
+			tfms = tfmsToken
+				.ToString ()
+				.Split (';')
+				.Where (tfm => !string.IsNullOrWhiteSpace (tfm))
+				.ToList ();
+
+		var tfmToken = jsonObject.SelectToken ("$.Properties.TargetFramework")?.ToString ();
+
+		if (!string.IsNullOrEmpty (tfmToken))
+			// to deal w nullability
+			tfms = [.. tfms, tfmToken];
+
+		return tfms;
+	}
+
+	public static HashSet<string> GetAssetItemsFromProject (string projPath, string tfm)
+	{
+		var resultFile = Path.GetTempFileName ();
+		//maybe add support for ImageAsset? But right now doesn't seem v necessary? (Default is BundleResource)
+		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		// dynamic cuz don't wanna create a whole class to rep the incoming json
+		dynamic data = JsonConvert.DeserializeObject (File.ReadAllText (resultFile))!;
+		var bundleResources = data.Items.BundleResource;
+		HashSet<string> assetPaths = new ();
+
+		// iterate through bundle resources , specific to tfm, and compute the appropriate asset paths
+		foreach (var item in bundleResources) {
+			var id = item.Identity.ToString ().Replace ('\\', '/');
+			if (id.Contains ("Assets.xcassets")) {
+				if (!Path.IsPathRooted (id))
+					// Combine with the project path if it's not a full path
+					id = Path.Combine (Path.GetDirectoryName (projPath), id);
+
+				// Strip off anything after ".xcassets"
+				var index = id.IndexOf (".xcassets", StringComparison.Ordinal);
+				if (index > -1)
+					id = id.Substring (0, index + ".xcassets".Length);
+
+				assetPaths.Add (id);
+			}
+		}
+		return assetPaths;
+	}
+
+	public static List<string> GetFileItemsFromProject (string projPath, string tfm, string targetPlatform)
+	{
+		var resultFile = Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getItem:Compile,None", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
+
+		// Combine the search for Compile and None tokens into one operation
+		var tokens = jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath");
+
+		return jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath")
+		   .Select (token => token.ToString ())
+		   .Where (path => !path.Contains ("Platforms") || path.Contains ($"Platforms/{targetPlatform}", StringComparison.OrdinalIgnoreCase))
+		   .Distinct ()
+		   .ToList ();
+	}
+
 	public static bool IsMauiAppProject (string projPath)
 	{
 		var resultFile = Path.GetTempFileName ();
@@ -172,15 +172,15 @@ static class Scripts {
 
 		return useMaui && string.CompareOrdinal (outputType, "Exe") == 0;
 	}
+
+	public static string SelectXcode ()
+	{
+		var exec = ExecuteCommand ("xcode-select", ["-p"], TimeSpan.FromMinutes (1));
+		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
+	}
+
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 #pragma warning restore IO0002 // Replace File class with IFileSystem.File for improved testability
-
-	public static string RunAppleScript (string script)
-	{
-		var args = new [] { "-e", script };
-		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
-		return exec.StandardOutput?.ToString ()?.Trim ('\n')!;
-	}
 
 	public static string OpenXcodeProject (string workspacePath) =>
 		$@"
