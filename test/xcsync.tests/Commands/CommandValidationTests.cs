@@ -56,9 +56,10 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var fileSystem = new FileSystem ();
 		var logger = new XunitLogger (TestOutput);
 		var command = new GenerateCommand (fileSystem, logger);
-		command.Invoke ($"--project {csproj} -f");
+		int exitCode = command.Invoke ($"--project {csproj} -f");
 
 		// ensure the default target directory is created relative to the project directory, not the pwd
+		Assert.Equal (0, exitCode);
 		Assert.True (Directory.Exists (Path.Combine (tmpDir, "obj", "xcode")));
 	}
 
