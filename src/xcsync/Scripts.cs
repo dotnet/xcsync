@@ -115,31 +115,38 @@ static class Scripts {
 	{
 		var resultFile = Path.GetTempFileName ();
 		//maybe add support for ImageAsset? But right now doesn't seem v necessary? (Default is BundleResource)
-		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		var args = new [] { "msbuild", projPath, "-getItem:BundleResource,ImageAsset", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		// dynamic cuz don't wanna create a whole class to rep the incoming json
 		dynamic data = JsonConvert.DeserializeObject (File.ReadAllText (resultFile))!;
-		var bundleResources = data.Items.BundleResource;
-		HashSet<string> assetPaths = new ();
 
-		// iterate through bundle resources , specific to tfm, and compute the appropriate asset paths
-		foreach (var item in bundleResources) {
-			var id = item.Identity.ToString ().Replace ('\\', '/');
-			if (id.Contains ("Assets.xcassets")) {
-				if (!Path.IsPathRooted (id))
-					// Combine with the project path if it's not a full path
-					id = Path.Combine (Path.GetDirectoryName (projPath), id);
+		HashSet<string> assetPaths = [];
 
-				// Strip off anything after ".xcassets"
-				var index = id.IndexOf (".xcassets", StringComparison.Ordinal);
-				if (index > -1)
-					id = id.Substring (0, index + ".xcassets".Length);
+		GetAssetPaths (projPath, data.Items.BundleResource, assetPaths);
+		GetAssetPaths (projPath, data.Items.ImageAsset, assetPaths);
 
-				assetPaths.Add (id);
+		return assetPaths;
+
+		static void GetAssetPaths (string projPath, dynamic bundleResources, HashSet<string> assetPaths)
+		{
+			// iterate through bundle resources , specific to tfm, and compute the appropriate asset paths
+			foreach (var item in bundleResources) {
+				var id = item.Identity.ToString ().Replace ('\\', '/');
+				if (id.Contains ("Assets.xcassets")) {
+					if (!Path.IsPathRooted (id))
+						// Combine with the project path if it's not a full path
+						id = Path.Combine (Path.GetDirectoryName (projPath), id);
+
+					// Strip off anything after ".xcassets"
+					var index = id.IndexOf (".xcassets", StringComparison.Ordinal);
+					if (index > -1)
+						id = id.Substring (0, index + ".xcassets".Length);
+
+					assetPaths.Add (id);
+				}
 			}
 		}
-		return assetPaths;
 	}
 
 	public static List<string> GetFileItemsFromProject (string projPath, string tfm, string targetPlatform)
