@@ -113,11 +113,6 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 				.WithTrailingTrivia (trailingTrivia)
 				// .AddModifiers (Token (SyntaxKind.PublicKeyword))
 				.AddModifiers (Token (SyntaxKind.PartialKeyword))
-							.AddAttributeLists (
-				AttributeList (SingletonSeparatedList (
-					Attribute (IdentifierName ("Register"),
-						AttributeArgumentList (SingletonSeparatedList (
-							AttributeArgument (LiteralExpression (SyntaxKind.StringLiteralExpression, Literal (objcImpl.Name)))))))))
 				.AddMembers (releaseDesignerOutletsMethod);
 
 			// Create a compilation unit with the namespace
