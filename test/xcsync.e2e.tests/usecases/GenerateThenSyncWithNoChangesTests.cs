@@ -101,7 +101,7 @@ public partial class GenerateThenSyncWithNoChangesTests (ITestOutputHelper testO
 	}
 
 
-	[Theory (Skip = "Needs work")]
+	[Theory]
 	[InlineData ("https://github.com/haritha-mohan/vision-analyzer", new [] { "VisionAnalyzer/VisionAnalyzer.csproj" })]
 	[Trait ("Category", "IntegrationTest")]
 	public async Task GenerateThenSyncFromGitRepo_WithNoChanges_GeneratesNoChangesAsync (string repoUrl, string [] projects)

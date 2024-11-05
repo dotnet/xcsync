@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Runtime.InteropServices;
 using System.Text;
 using Serilog;
 using Xamarin.Utils;
@@ -10,8 +9,6 @@ using Xunit.Abstractions;
 namespace xcsync.e2e.tests;
 
 public class Base (ITestOutputHelper testOutput) {
-	protected static readonly string DotNetExe;
-
 	protected readonly ITestOutputHelper TestOutput = testOutput;
 
 	protected readonly ILogger TestLogger = new LoggerConfiguration ()
@@ -23,44 +20,11 @@ public class Base (ITestOutputHelper testOutput) {
 	protected static readonly string GitExe = "git";
 	protected static readonly string PatchExe = "patch";
 
-	static Base ()
-	{
-		var output = new OutputCapture ();
-		var command = RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ? "where" : "which";
-		var exec = Execution.RunAsync (command, arguments: ["dotnet"], standardOutput: output).Result;
-		if (exec.ExitCode != 0)
-			throw new Exception ("Failed to find path to dotnet.");
-		// Set the path to the dotnet executable
-		DotNetExe = output.ToString ().Trim ();
-	}
+	protected static async Task<int> Dotnet (ITestOutputHelper output, string path, string command = "") => await Run (output, path, "dotnet", command);
 
-	class OutputCapture : TextWriter {
-		readonly StringBuilder output = new ();
+	protected static async Task<int> DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run (output, path, "dotnet", "new", template, "-o", path, templateOptions);
 
-		public override void WriteLine (string? value)
-		{
-			if (value != null) {
-				output.AppendLine (value);
-			}
-		}
-
-		public override Encoding Encoding {
-			get {
-				return Encoding.UTF8;
-			}
-		}
-
-		public override string ToString ()
-		{
-			return output.ToString ();
-		}
-	}
-
-	protected static async Task<int> Dotnet (ITestOutputHelper output, string path, string command = "") => await Run (output, path, DotNetExe, command);
-
-	protected static async Task<int> DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run (output, path, DotNetExe, "new", template, "-o", path, templateOptions);
-
-	protected static async Task<int> DotnetFormat (ITestOutputHelper output, string path) => await Run (output, path, DotNetExe, "format", "--include-generated", "--no-restore");
+	protected static async Task<int> DotnetFormat (ITestOutputHelper output, string path) => await Run (output, path, "dotnet", "format", "--include-generated", "--no-restore");
 
 	protected static async Task<int> Xcsync (ITestOutputHelper output, params string [] arguments) => await Run (output, Directory.GetCurrentDirectory (), XcsyncExe, arguments);
 
@@ -70,8 +34,8 @@ public class Base (ITestOutputHelper testOutput) {
 
 	static async Task<int> Run (ITestOutputHelper output, string path, string executable, params string [] arguments)
 	{
+		output.WriteLine ($"\rRunning: {path}/{executable} {string.Join (" ", arguments)}");
 		var outputWrapper = new LoggingOutputWriter (output);
-		output.WriteLine ($"\r* {path}% {executable} {string.Join (" ", arguments)}");
 		var exec = await Execution.RunAsync (
 			executable,
 			arguments,

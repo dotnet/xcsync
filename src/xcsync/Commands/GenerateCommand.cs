@@ -20,7 +20,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 	{
 		Logger?.Information (Strings.Generate.HeaderInformation, ProjectPath, TargetPath);
 
-		var sync = new SyncContext (fileSystem, new TypeService (Logger!), SyncDirection.ToXcode, ProjectPath, TargetPath, Tfm, Logger!, Open, Force);
+		var sync = new SyncContext (fileSystem, new TypeService (Logger!), SyncDirection.ToXcode, ProjectPath, TargetPath, Tfm, Logger!, Open);
 		await sync.SyncAsync ().ConfigureAwait (false);
 	}
 }
