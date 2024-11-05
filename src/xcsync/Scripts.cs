@@ -115,7 +115,7 @@ static class Scripts {
 	{
 		var resultFile = Path.GetTempFileName ();
 		//maybe add support for ImageAsset? But right now doesn't seem v necessary? (Default is BundleResource)
-		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		var args = new [] { "msbuild", projPath, "-getItem:BundleResource,ImageAsset", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		// dynamic cuz don't wanna create a whole class to rep the incoming json
