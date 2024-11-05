@@ -186,9 +186,6 @@ static class Scripts {
 		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
 	}
 
-#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
-#pragma warning restore IO0002 // Replace File class with IFileSystem.File for improved testability
-
 	public static string OpenXcodeProject (string workspacePath) =>
 		$@"
 			set workspacePath to ""{workspacePath}""
