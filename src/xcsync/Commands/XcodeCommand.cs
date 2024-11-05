@@ -51,7 +51,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 		}
 
 		if (Force) {
-			RecreateDirectory (fileSystem, targetPath);
+			RecreateDirectory (fileSystem, projectPath, targetPath);
 		} else {
 			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
 				LogDebug (Strings.Errors.Validation.TargetNotEmpty (targetPath));
@@ -66,9 +66,14 @@ class XcodeCommand<T> : BaseCommand<T> {
 		return (error, targetPath);
 	}
 
-	public static void RecreateDirectory (IFileSystem fileSystem, string targetPath)
+	public static void RecreateDirectory (IFileSystem fileSystem, string projectPath, string targetPath)
 	{
 		if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
+			// utilize apple script to close existing xcode project if open in xcode
+			// quite performant, prevents UI freakout, enables smooth smooth development
+			string xcodeProjPath = fileSystem.Path.GetFullPath (fileSystem.Path.Combine (targetPath, fileSystem.Path.GetFileNameWithoutExtension(projectPath) + ".xcodeproj"));
+			Scripts.RunAppleScript (Scripts.CloseXcodeProject (xcodeProjPath));
+
 			fileSystem.Directory.Delete (targetPath, true);
 		}
 
