@@ -41,6 +41,7 @@ static class Strings {
 
 		internal static string InvalidOption (string option, string error) => string.Format (Resources.Strings.Errors_InvalidOption, option, error);
 		internal static string MultipleProjectFilesFound (string path, string projectFilesFound) => string.Format (Resources.Strings.Errors_MultipleProjectFilesFound, path, projectFilesFound);
+		internal static string PbxprojNotFound (string path) => string.Format (Resources.Strings.Errors_PbxprojNotFound, path);
 		internal static string CsprojNotFound (string path) => string.Format (Resources.Strings.Errors_CsprojNotFound, path);
 		internal static string MultipleTfmsFound => Resources.Strings.Errors_MultipleTfmsFound;
 		internal static string TargetPlatformNotFound => Resources.Strings.Errors_TargetPlatformNotFound;

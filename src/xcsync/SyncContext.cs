@@ -470,9 +470,17 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var dotNetProject = new ClrProject (FileSystem, Logger, TypeService, projectName, ProjectPath, Framework.ToString ());
 		await dotNetProject.OpenProject ().ConfigureAwait (false);
 
-		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework.ToString ());
 
-		Scripts.ConvertPbxProjToJson (FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj", "project.pbxproj"));
+		var xcodeproj = FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj");
+		var pbxProjPath = FileSystem.Path.Combine (xcodeproj, "project.pbxproj");
+		if (!FileSystem.File.Exists(pbxProjPath)) 
+		{
+			LogFatal(Strings.SyncContext.PbxprojNotFound(xcodeproj));
+			return;
+		}
+		Scripts.ConvertPbxProjToJson (pbxProjPath);
+
+		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework.ToString ());
 
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
