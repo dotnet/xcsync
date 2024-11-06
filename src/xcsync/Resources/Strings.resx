@@ -194,6 +194,10 @@
 		<value>Target path '{0}' does not exist, will create directory if [--force, -f] is set.</value>
 		<comment>{0} is the path to the file or directory</comment>
 	</data>
+	<data name="Errors.Validation.TargetIsNotValidXcodeProjectFolder" xml:space="preserve">
+		<value>Target path '{0}' does not exist, or is not a valid Xcode project folder.</value>
+		<comment>{0} is the path to the file or directory</comment>
+	</data>
 	<data name="Errors.Validation.PathDoesNotContainCsproj" xml:space="preserve">
 		<value>'{0}' is not a valid path to a .NET project or a directory.</value>
 		<comment>{0} is the path to the file or directory</comment>

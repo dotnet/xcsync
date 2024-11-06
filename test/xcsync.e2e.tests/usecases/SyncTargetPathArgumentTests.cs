@@ -6,24 +6,40 @@ using Xunit.Abstractions;
 
 namespace xcsync.e2e.tests.UseCases;
 
-public partial class TargetPathTests :
+public partial class SyncTargetPathArgumentTests :
 	Base,
-	IClassFixture<TargetPathTests.TargetPathTestsFixture>,
+	IClassFixture<SyncTargetPathArgumentTests.TargetPathTestsFixture>,
 	IDisposable {
 	string targetPath = string.Empty;
 	readonly TargetPathTestsFixture fixture;
 
 	[Theory]
-	[InlineData ("", 0, true)]
+	[InlineData ("", 1, false)]
 	[InlineData ("artifacts/xcsync", 1, false)]
-	[InlineData ("{IntermediateOutputPath}/xcsync", 0, true)]
+	[InlineData ("{IntermediateOutputPath}/xcsync", 1, false)]
 	[InlineData ("{CacheRoot}/artifacts/xcsync", 1, false)]
 	[Trait ("Category", "IntegrationTest")]
-	public async Task TargetPath_NoForceAndFolderDoesNotExist (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
+	public async Task TargetPath_FolderDoesNotExist (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
 	{
 		await TargetPath_BaseTest (targetPath, expectedExitCode, expectedDirectortyExists,
 			() => [],
 			(path) => { }
+		);
+	}
+
+	[Theory]
+	[InlineData ("", 1, true)]
+	[InlineData ("artifacts/xcsync", 1, true)]
+	[InlineData ("{IntermediateOutputPath}/xcsync", 1, true)]
+	[InlineData ("{CacheRoot}/artifacts/xcsync", 1, true)]
+	[Trait ("Category", "IntegrationTest")]
+	public async Task TargetPath_FolderExistsAndIsEmpty (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
+	{
+		await TargetPath_BaseTest (targetPath, expectedExitCode, expectedDirectortyExists,
+			() => [],
+			(path) => {
+				Directory.CreateDirectory (path);
+			}
 		);
 	}
 
@@ -33,12 +49,25 @@ public partial class TargetPathTests :
 	[InlineData ("{IntermediateOutputPath}/xcsync", 0, true)]
 	[InlineData ("{CacheRoot}/artifacts/xcsync", 0, true)]
 	[Trait ("Category", "IntegrationTest")]
-	public async Task TargetPath_NoForceAndFolderExistsAndIsEmpty (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
+	public async Task TargetPath_FolderExistsAndIsValid (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
 	{
+		var pbxprojContent = @"
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+	};
+}
+";
 		await TargetPath_BaseTest (targetPath, expectedExitCode, expectedDirectortyExists,
 			() => [],
 			(path) => {
 				Directory.CreateDirectory (path);
+				Directory.CreateDirectory (Path.Combine (path, $"{Path.GetFileName(fixture.RootPath)!}.xcodeproj"));
+				File.WriteAllTextAsync (Path.Combine (path, $"{Path.GetFileName (fixture.RootPath)!}.xcodeproj", "project.pbxproj"), pbxprojContent).Wait ();
 			}
 		);
 	}
@@ -49,60 +78,13 @@ public partial class TargetPathTests :
 	[InlineData ("{IntermediateOutputPath}/xcsync", 1, true)]
 	[InlineData ("{CacheRoot}/artifacts/xcsync", 1, true)]
 	[Trait ("Category", "IntegrationTest")]
-	public async Task TargetPath_NoForceAndFolderExistsAndIsNotEmpty (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
+	public async Task TargetPath_FolderExistsAndIsNotValid (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
 	{
 		await TargetPath_BaseTest (targetPath, expectedExitCode, expectedDirectortyExists,
 			() => [],
 			(path) => {
 				Directory.CreateDirectory (path);
-				File.WriteAllText (Path.Combine (path, "file.txt"), "content");
-			}
-		);
-	}
-
-	[Theory]
-	[InlineData ("", 0, true)]
-	[InlineData ("artifacts/xcsync", 0, true)]
-	[InlineData ("{IntermediateOutputPath}/xcsync", 0, true)]
-	[InlineData ("{CacheRoot}/artifacts/xcsync", 0, true)]
-	[Trait ("Category", "IntegrationTest")]
-	public async Task TargetPath_WithForceAndFolderDoesNotExist (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
-	{
-		await TargetPath_BaseTest (targetPath, expectedExitCode, expectedDirectortyExists,
-			() => ["--force"],
-			(path) => { }
-		);
-	}
-
-	[Theory]
-	[InlineData ("", 0, true)]
-	[InlineData ("artifacts/xcsync", 0, true)]
-	[InlineData ("{IntermediateOutputPath}/xcsync", 0, true)]
-	[InlineData ("{CacheRoot}/artifacts/xcsync", 0, true)]
-	[Trait ("Category", "IntegrationTest")]
-	public async Task TargetPath_WithForceAndFolderExistsAndIsEmpty (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
-	{
-		await TargetPath_BaseTest (targetPath, expectedExitCode, expectedDirectortyExists,
-			() => ["--force"],
-			(path) => {
-				Directory.CreateDirectory (path);
-			}
-		);
-	}
-
-	[Theory]
-	[InlineData ("", 0, true)]
-	[InlineData ("artifacts/xcsync", 0, true)]
-	[InlineData ("{IntermediateOutputPath}/xcsync", 0, true)]
-	[InlineData ("{CacheRoot}/artifacts/xcsync", 0, true)]
-	[Trait ("Category", "IntegrationTest")]
-	public async Task TargetPath_WithForceAndFolderExistsAndIsNotEmpty (string targetPath, int expectedExitCode, bool expectedDirectortyExists)
-	{
-		await TargetPath_BaseTest (targetPath, expectedExitCode, expectedDirectortyExists,
-			() => ["--force"],
-			(path) => {
-				Directory.CreateDirectory (path);
-				File.WriteAllText (Path.Combine (path, "file.txt"), "content");
+				File.WriteAllTextAsync (Path.Combine (path, "file.txt"), "content").Wait (); 
 			}
 		);
 	}
@@ -134,7 +116,7 @@ public partial class TargetPathTests :
 			IntermediateOutputPath = Scripts.GetIntermediateOutputPath (csproj, tfm);
 
 			Args = [
-				"generate",
+				"sync",
 				"--project",
 				csproj,
 				"-tfm",
@@ -177,7 +159,7 @@ public partial class TargetPathTests :
 		Assert.Equal (expectedDirectortyExists, Directory.Exists (rootedTargetPath));
 	}
 
-	public TargetPathTests (ITestOutputHelper testOutput, TargetPathTests.TargetPathTestsFixture fixture) : base (testOutput)
+	public SyncTargetPathArgumentTests (ITestOutputHelper testOutput, TargetPathTestsFixture fixture) : base (testOutput)
 	{
 		this.fixture = fixture;
 		this.fixture.InitAsync (testOutput).Wait ();
@@ -186,16 +168,15 @@ public partial class TargetPathTests :
 	public void Dispose ()
 	{
 		// Cleanup
-		SafeDirectoryDelete (Path.Combine (fixture.RootPath, fixture.IntermediateOutputPath));
-		if (Path.IsPathRooted (targetPath)) {
-			SafeDirectoryDelete (targetPath);
-		} else {
-			var targetRoot = Path.GetDirectoryName (targetPath)?.Split (Path.DirectorySeparatorChar) [0];
-			if (targetRoot != null) {
-				var rootedTarget = Path.Combine (fixture.RootPath, targetRoot);
-				SafeDirectoryDelete (rootedTarget);
-			}
-		}
+		// SafeDirectoryDelete (Path.Combine (fixture.RootPath, fixture.IntermediateOutputPath));
+		// var rootedTarget = targetPath;
+		// if (!Path.IsPathRooted (targetPath)) {
+		// 	var targetRoot = Path.GetDirectoryName (targetPath)?.Split (Path.DirectorySeparatorChar) [0];
+		// 	if (targetRoot != null) {
+		// 		rootedTarget = Path.Combine (fixture.RootPath, targetRoot);
+		// 	}
+		// }
+		// SafeDirectoryDelete (rootedTarget);
 
 		GC.SuppressFinalize (this);
 	}
@@ -212,7 +193,7 @@ public partial class TargetPathTests :
 				try {
 					Directory.Move (root, movedRoot);
 					ThreadPool.QueueUserWorkItem ((v) => {
-						Directory.Delete (movedRoot, true);
+						try { Directory.Delete (movedRoot, true); } catch { }
 					});
 				} catch {
 					// Just delete the root if we can't move the temporary directory.

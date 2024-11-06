@@ -209,19 +209,12 @@ class BaseCommand<T> : Command {
 			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath));
 		}
 
-		if (targetPath.EndsWith (fileSystem.Path.Combine (intermediateOutputPath, DefaultXcodeOutputFolder), StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
+		var xcodeProj = fileSystem.Path.Combine (targetPath, $"{fileSystem.Path.GetFileNameWithoutExtension (projectPath)}.xcodeproj");
+		var pbxproj = fileSystem.Path.Combine (xcodeProj, "project.pbxproj");
 
-			if (!fileSystem.Directory.Exists (targetPath)) {
-				Console.WriteLine ($"<< creating {targetPath} >>");
-				LogDebug (Strings.Base.CreateDefaultTarget (targetPath));
-				fileSystem.Directory.CreateDirectory (targetPath);
-			}
-		}
-
-		if (!fileSystem.Directory.Exists (targetPath)) {
-			LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
-			error = Strings.Errors.Validation.TargetDoesNotExist (targetPath);
+		if (!fileSystem.Directory.Exists (targetPath) || !fileSystem.Directory.Exists (xcodeProj) || !fileSystem.File.Exists (pbxproj)) {
+			LogDebug (Strings.Errors.Validation.TargetIsNotValidXcodeProjectFolder (targetPath));
+			error = Strings.Errors.Validation.TargetIsNotValidXcodeProjectFolder (targetPath);
 			return (error, targetPath);
 		}
 
