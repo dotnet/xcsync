@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Serilog;
 using xcsync.Projects;
 
 namespace xcsync;

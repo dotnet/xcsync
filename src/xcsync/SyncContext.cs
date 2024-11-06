@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using System.Runtime.Versioning;
 using Marille;
 using Microsoft.CodeAnalysis;
 using Serilog;

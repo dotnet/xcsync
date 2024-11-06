@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using Marille;
 using Serilog;
 using xcsync.Commands;
 using xcsync.Projects;
