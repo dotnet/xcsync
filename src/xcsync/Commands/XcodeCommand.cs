@@ -73,7 +73,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 		if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
 			// utilize apple script to close existing xcode project if open in xcode
 			// quite performant, prevents UI freakout, enables smooth smooth development
-			string xcodeProjPath = fileSystem.Path.GetFullPath (fileSystem.Path.Combine (targetPath, fileSystem.Path.GetFileNameWithoutExtension(projectPath) + ".xcodeproj"));
+			string xcodeProjPath = fileSystem.Path.GetFullPath (fileSystem.Path.Combine (targetPath, fileSystem.Path.GetFileNameWithoutExtension (projectPath) + ".xcodeproj"));
 			logger.Debug ("Closing Xcode project at {xcodeProjPath}", xcodeProjPath);
 			Scripts.RunAppleScript (Scripts.CloseXcodeProject (xcodeProjPath));
 
