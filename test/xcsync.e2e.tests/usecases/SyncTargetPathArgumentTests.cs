@@ -66,7 +66,7 @@ public partial class SyncTargetPathArgumentTests :
 			() => [],
 			(path) => {
 				Directory.CreateDirectory (path);
-				Directory.CreateDirectory (Path.Combine (path, $"{Path.GetFileName(fixture.RootPath)!}.xcodeproj"));
+				Directory.CreateDirectory (Path.Combine (path, $"{Path.GetFileName (fixture.RootPath)!}.xcodeproj"));
 				File.WriteAllTextAsync (Path.Combine (path, $"{Path.GetFileName (fixture.RootPath)!}.xcodeproj", "project.pbxproj"), pbxprojContent).Wait ();
 			}
 		);
@@ -84,7 +84,7 @@ public partial class SyncTargetPathArgumentTests :
 			() => [],
 			(path) => {
 				Directory.CreateDirectory (path);
-				File.WriteAllTextAsync (Path.Combine (path, "file.txt"), "content").Wait (); 
+				File.WriteAllTextAsync (Path.Combine (path, "file.txt"), "content").Wait ();
 			}
 		);
 	}
