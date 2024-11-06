@@ -8,6 +8,7 @@ using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Serilog;
+using Serilog.Events;
 
 namespace xcsync.Commands;
 
@@ -51,6 +52,22 @@ class BaseCommand<T> : Command {
 		description: Strings.Options.TargetDescription,
 		getDefaultValue: () => $".{Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
 
+	protected Option<Verbosity> verbose =
+		new (["--verbosity", "-v"],
+			getDefaultValue: () => Verbosity.Normal) {
+			IsRequired = false,
+			Arity = ArgumentArity.ZeroOrOne,
+			Description = Strings.Options.VerbosityDescription
+		};
+
+	protected Option<string> dotnet =
+		new (["--dotnet-path", "-d"],
+			getDefaultValue: () => string.Empty) {
+			IsRequired = false,
+			Arity = ArgumentArity.ZeroOrOne,
+			Description = Strings.Options.DotnetPathDescription
+		};
+
 	public BaseCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (name, description)
 	{
 		Logger = logger;
@@ -67,12 +84,13 @@ class BaseCommand<T> : Command {
 		Add (project);
 		Add (tfm);
 		Add (target);
+		Add (verbose);
+		Add (dotnet);
 	}
 
 	protected virtual void AddValidators ()
 	{
 		AddValidator ((result) => {
-
 			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
 				result.ErrorMessage = Strings.Errors.Validation.InvalidOS;
 				return;
@@ -90,7 +108,7 @@ class BaseCommand<T> : Command {
 		});
 	}
 
-	internal record struct ValidationResult (string ProjectPath, string Tfm, string TargetPath, string Error);
+	internal record struct ValidationResult (string ProjectPath, string Tfm, string TargetPath, Verbosity Verbosity, string DotnetPath, string Error);
 
 	internal ValidationResult ValidateCommand (CommandResult result)
 	{
@@ -98,17 +116,46 @@ class BaseCommand<T> : Command {
 		var projectPath = result.GetValueForOption (project) ?? string.Empty;
 		var targetPath = result.GetValueForOption (target) ?? string.Empty;
 		var moniker = result.GetValueForOption (tfm) ?? string.Empty;
+		var verbosity = result.GetValueForOption (verbose);
+		var dotnetPath = result.GetValueForOption (dotnet) ?? string.Empty;
+
+		// order matters, we need to validate verbosity first so that its value is used by the logger for the rest of the validation
+		(error, Verbosity newVerbosity) = TryValidateVerbosity (verbosity);
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, moniker, targetPath, verbosity, dotnetPath, error); }
 
 		(error, string newProjectPath) = TryValidateProjectPath (projectPath);
-		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, moniker, targetPath, error); }
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, moniker, targetPath, verbosity, dotnetPath, error); }
 
 		(error, string newTfm) = TryValidateTfm (projectPath, moniker);
-		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, moniker, targetPath, error); }
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, moniker, targetPath, verbosity, dotnetPath, error); }
 
 		(error, string newTargetPath) = TryValidateTargetPath (projectPath, targetPath);
-		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, newTfm, targetPath, error); }
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, newTfm, targetPath, verbosity, dotnetPath, error); }
 
-		return new ValidationResult (newProjectPath, newTfm, newTargetPath, error);
+		(error, string newDotnetPath) = TryValidateDotnetPath (dotnetPath);
+		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, newTfm, newTargetPath, newVerbosity, dotnetPath, error); }
+
+		return new ValidationResult (newProjectPath, newTfm, newTargetPath, newVerbosity, dotnetPath, error);
+	}
+
+	protected virtual (string, Verbosity) TryValidateVerbosity (Verbosity verbosity)
+	{
+		Logger.Information ("this is verbosity before validating: " + xcSync.LogLevelSwitch.MinimumLevel);
+		try {
+			xcSync.LogLevelSwitch.MinimumLevel = verbosity switch {
+				Verbosity.Quiet => LogEventLevel.Error,
+				Verbosity.Minimal => LogEventLevel.Error,
+				Verbosity.Normal => LogEventLevel.Information,
+				Verbosity.Detailed => LogEventLevel.Debug,
+				Verbosity.Diagnostic => LogEventLevel.Verbose,
+				_ => LogEventLevel.Information,
+			};
+		} catch (InvalidOperationException) {
+			return (Strings.Errors.Validation.InvalidVerbosity, verbosity);
+		}
+
+		Logger.Information ("verbosity now used by logger: " + xcSync.LogLevelSwitch.MinimumLevel);
+		return (string.Empty, verbosity);
 	}
 
 	protected virtual (string, string) TryValidateProjectPath (string projectPath)
@@ -217,6 +264,13 @@ class BaseCommand<T> : Command {
 		}
 
 		return (error, targetPath);
+	}
+
+	protected virtual (string, string) TryValidateDotnetPath (string dotnetPath)
+	{
+		xcSync.DotnetPath = dotnetPath;
+		Logger.Information (Strings.Base.DotnetPath (xcSync.DotnetPath));
+		return (string.Empty, dotnetPath);
 	}
 
 	internal bool TryGetTfmFromProject (string csproj, [NotNullWhen (true)] out List<string> tfms)

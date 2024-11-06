@@ -38,6 +38,8 @@ class XcodeCommand<T> : BaseCommand<T> {
 			Force = result.GetValueForOption (force);
 			Open = result.GetValueForOption (open);
 		});
+		// order matters
+		// for ex, if force is set the target validation is impacted
 		base.AddValidators ();
 	}
 

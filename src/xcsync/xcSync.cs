@@ -24,8 +24,8 @@ static class xcSync {
 
 	public static ApplePlatforms ApplePlatforms { get; } = new ();
 
-	static internal readonly LoggingLevelSwitch LogLevelSwitch = new (LogEventLevel.Information);
-	public static ILogger? Logger { get; internal set; }
+	static internal LoggingLevelSwitch LogLevelSwitch = new (LogEventLevel.Information);
+	public static ILogger Logger = ConfigureLogging ();
 	public static IFileSystem FileSystem { get; } = new FileSystem ();
 
 	public static async Task Main (string [] args)
@@ -36,7 +36,7 @@ static class xcSync {
 
 		RegisterMSBuild ();
 
-		var parser = new CommandLineBuilder (new XcSyncCommand (FileSystem))
+		var parser = new CommandLineBuilder (new XcSyncCommand (FileSystem, Logger))
 			.UseDefaults ()
 			.Build ();
 
@@ -50,18 +50,18 @@ static class xcSync {
 				.OrderByDescending (instance => instance.Version);
 
 			foreach (var instance in msbuildInstances)
-				Logger?.Debug ("Found MSBuild instance {0} at {1}", instance.Version, instance.MSBuildPath);
+				Logger.Debug ("Found MSBuild instance {0} at {1}", instance.Version, instance.MSBuildPath);
 			var msbuildInstance = msbuildInstances.First ();
 
 			// Register a specific instance of MSBuild
 			MSBuildLocator.RegisterInstance (msbuildInstance);
-			Logger?.Debug ("Registered MSBuild instance {0} at {1}", msbuildInstance.Version, msbuildInstance.MSBuildPath);
+			Logger.Debug ("Registered MSBuild instance {0} at {1}", msbuildInstance.Version, msbuildInstance.MSBuildPath);
 		}
 	}
 
-	static void ConfigureLogging ()
+	static Logger ConfigureLogging ()
 	{
-		Logger = new LoggerConfiguration ()
+		return new LoggerConfiguration ()
 					.MinimumLevel.ControlledBy (LogLevelSwitch)
 					.Enrich.WithThreadName ()
 					.Enrich.WithThreadId ()
@@ -71,7 +71,7 @@ static class xcSync {
 	}
 
 	static void WriteHeader () => WriteLine ($"xcSync v{typeof (xcSync).Assembly.GetName ().Version}, (c) Microsoft Corporation. All rights reserved.\n");
-	static void WriteLine (string messageTemplate, params object? []? properyValues) => Logger?.Information (messageTemplate, properyValues);
+	static void WriteLine (string messageTemplate, params object? []? properyValues) => Logger.Information (messageTemplate, properyValues);
 
 	static public bool TryGetTargetPlatform (ILogger logger, string tfm, [NotNullWhen (true)] out string targetPlatform)
 	{
@@ -84,7 +84,7 @@ static class xcSync {
 			}
 		}
 
-		logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
+		logger.Fatal (Strings.Errors.TargetPlatformNotFound);
 		return false;
 	}
 
