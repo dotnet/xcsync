@@ -476,9 +476,8 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		var xcodeproj = FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj");
 		var pbxProjPath = FileSystem.Path.Combine (xcodeproj, "project.pbxproj");
-		if (!FileSystem.File.Exists(pbxProjPath)) 
-		{
-			LogFatal(Strings.SyncContext.PbxprojNotFound(xcodeproj));
+		if (!FileSystem.File.Exists (pbxProjPath)) {
+			LogFatal (Strings.SyncContext.PbxprojNotFound (xcodeproj));
 			return;
 		}
 		Scripts.ConvertPbxProjToJson (pbxProjPath);
