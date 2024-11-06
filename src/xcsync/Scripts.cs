@@ -79,7 +79,12 @@ static class Scripts {
 		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
-		return File.ReadAllText (resultFile).Trim ('\n');
+		var result = File.ReadAllText (resultFile).Trim ('\n');
+		
+		SafeFileDelete (resultFile);
+
+		return result;
+
 	}
 
 	public static List<string> GetTargetFrameworksFromProject (string projPath)
@@ -90,6 +95,8 @@ static class Scripts {
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
+
+		SafeFileDelete (resultFile);
 
 		List<string> tfms = [];
 
@@ -120,6 +127,8 @@ static class Scripts {
 
 		// dynamic cuz don't wanna create a whole class to rep the incoming json
 		dynamic data = JsonConvert.DeserializeObject (File.ReadAllText (resultFile))!;
+
+		SafeFileDelete (resultFile);
 
 		HashSet<string> assetPaths = [];
 
@@ -157,6 +166,8 @@ static class Scripts {
 
 		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
 
+		SafeFileDelete (resultFile);
+
 		// Combine the search for Compile and None tokens into one operation
 		var tokens = jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath");
 
@@ -174,6 +185,9 @@ static class Scripts {
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
+
+		SafeFileDelete (resultFile);
+
 		var useMaui = string.CompareOrdinal (jsonObject.SelectToken ("$.Properties.UseMaui")?.ToString ().ToLowerInvariant (), "true") == 0;
 		var outputType = jsonObject.SelectToken ("$.Properties.OutputType")?.ToString ();
 
@@ -195,7 +209,17 @@ static class Scripts {
 
 		var result = File.ReadAllText (resultFile).TrimEnd ('/', '\\', '\n').Replace ('\\', Path.DirectorySeparatorChar);
 
+		SafeFileDelete (resultFile);
+
 		return result ?? string.Empty;
+	}
+
+	static void SafeFileDelete (string file) {
+		try {
+			File.Delete (file);
+		} catch (Exception ex) {
+			xcSync.Logger?.Debug (ex, "Failed to delete temporary file: {0}", file);
+		}
 	}
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 #pragma warning restore IO0002 // Replace File class with IFileSystem.File for improved testability
