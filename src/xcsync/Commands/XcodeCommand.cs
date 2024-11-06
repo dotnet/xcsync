@@ -45,9 +45,12 @@ class XcodeCommand<T> : BaseCommand<T> {
 	{
 		string error = string.Empty;
 		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (projectPath, tfm);
-		LogVerbose ("IntermediateOuputPath = {IntermediateOutputPath}", intermediateOutputPath);
 
-		targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath));
+		targetPath = targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath);
+
+		if (!fileSystem.Path.IsPathRooted (targetPath)) {
+			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath));
+		}
 
 		if (!Force) {
 			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {

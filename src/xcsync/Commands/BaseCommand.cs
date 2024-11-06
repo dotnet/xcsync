@@ -200,14 +200,20 @@ class BaseCommand<T> : Command {
 	protected virtual (string, string) TryValidateTargetPath (string projectPath, string tfm, string targetPath)
 	{
 		string error = string.Empty;
+
 		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (projectPath, tfm).Trim ();
-		LogVerbose ("IntermediateOuputPath = {IntermediateOutputPath}", intermediateOutputPath);
+
+		targetPath = targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath);
+
+		if (!fileSystem.Path.IsPathRooted (targetPath)) {
+			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath));
+		}
 
 		if (targetPath.EndsWith (fileSystem.Path.Combine (intermediateOutputPath, DefaultXcodeOutputFolder), StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
 			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
-			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
 
 			if (!fileSystem.Directory.Exists (targetPath)) {
+				Console.WriteLine ($"<< creating {targetPath} >>");
 				LogDebug (Strings.Base.CreateDefaultTarget (targetPath));
 				fileSystem.Directory.CreateDirectory (targetPath);
 			}
