@@ -74,7 +74,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 		var frameworkGroup = (from groups in Project.Objects.Values
 							  where groups.Isa == "PBXGroup" && groups is PBXGroup { Name: "Frameworks" }
-							  select groups as PBXGroup).First ().Children.AsQueryable ();
+							  select groups as PBXGroup).FirstOrDefault ()?.Children.AsQueryable () ?? Array.Empty<string> ().AsQueryable ();
 
 		var fileReferences = from fileRef in Project.Objects.Values
 							 where fileRef.Isa == "PBXFileReference"
