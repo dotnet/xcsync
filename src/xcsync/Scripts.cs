@@ -80,7 +80,7 @@ static class Scripts {
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		var result = File.ReadAllText (resultFile).Trim ('\n');
-		
+
 		SafeFileDelete (resultFile);
 
 		return result;
@@ -214,7 +214,8 @@ static class Scripts {
 		return result ?? string.Empty;
 	}
 
-	static void SafeFileDelete (string file) {
+	static void SafeFileDelete (string file)
+	{
 		try {
 			File.Delete (file);
 		} catch (Exception ex) {
