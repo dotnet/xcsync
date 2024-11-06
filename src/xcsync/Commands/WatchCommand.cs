@@ -25,7 +25,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 			keepRunning = false;
 		};
 
-		LogInformation ("Continuously syncing files between project '{projectPath}' and target '{targetPath} for '{tfm}' platform, press [ESC] to end.", ProjectPath, TargetPath, Tfm);
+		Logger.Information ("Continuously syncing files between project '{projectPath}' and target '{targetPath} for '{tfm}' platform, press [ESC] to end.", ProjectPath, TargetPath, Tfm);
 		using var cts = new CancellationTokenSource ();
 
 		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!);
@@ -35,7 +35,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 			try {
 				await sync.SyncAsync (cts.Token).ConfigureAwait (false);
 			} catch (OperationCanceledException) {
-				LogInformation ("Stopping synchronization and completing remaining jobs.");
+				Logger.Information ("Stopping synchronization and completing remaining jobs.");
 			}
 		});
 

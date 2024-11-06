@@ -13,7 +13,7 @@ namespace xcsync.Commands;
 
 class BaseCommand<T> : Command {
 	protected const string DefaultXcodeOutputFolder = "obj/xcode";
-	protected static ILogger? Logger { get; private set; }
+	protected ILogger Logger { get; private set; }
 
 	/// <summary>
 	/// Path to the source .NET .csproj
@@ -33,7 +33,7 @@ class BaseCommand<T> : Command {
 	/// <summary>
 	/// Target Apple Platform (ex: ios)
 	/// </summary>
-	protected string TargetPlatform => TryGetTargetPlatform (Tfm, out string targetPlatform) ? targetPlatform : string.Empty;
+	protected string TargetPlatform => TryGetTargetPlatform (Tfm, Logger, out string targetPlatform) ? targetPlatform : string.Empty;
 	protected readonly IFileSystem fileSystem;
 
 	protected Option<string> project = new (
@@ -53,8 +53,7 @@ class BaseCommand<T> : Command {
 
 	public BaseCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (name, description)
 	{
-		Logger = logger ?? xcSync.Logger?
-			.ForContext ("SourceContext", typeof (T).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
+		Logger = logger;
 
 		this.fileSystem = fileSystem ?? throw new ArgumentNullException (nameof (fileSystem));
 
@@ -80,7 +79,7 @@ class BaseCommand<T> : Command {
 			}
 
 			xcSync.XcodePath = Scripts.SelectXcode ();
-			Logger?.Information (Strings.Base.XcodePath (xcSync.XcodePath));
+			Logger.Information (Strings.Base.XcodePath (xcSync.XcodePath));
 
 			var validation = ValidateCommand (result);
 
@@ -118,36 +117,36 @@ class BaseCommand<T> : Command {
 		var updatedPath = projectPath;
 
 		if (!fileSystem.Path.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && !fileSystem.File.Exists (projectPath) && !fileSystem.Directory.Exists (projectPath)) {
-			LogDebug (Strings.Errors.Validation.PathDoesNotContainCsproj (projectPath));
+			Logger.Debug (Strings.Errors.Validation.PathDoesNotContainCsproj (projectPath));
 			error = Strings.Errors.Validation.PathDoesNotContainCsproj (projectPath);
 			return (error, projectPath);
 		}
 
 		if (!fileSystem.Path.GetExtension (projectPath).Equals (".csproj", StringComparison.OrdinalIgnoreCase) && fileSystem.Directory.Exists (projectPath)) {
 			// We have been given a directory, let's see if we can find a .csproj file
-			LogDebug (Strings.Base.SearchForProjectFiles (projectPath));
+			Logger.Debug (Strings.Base.SearchForProjectFiles (projectPath));
 
 			var csprojFiles = fileSystem.Directory.EnumerateFiles (projectPath, "*.csproj", SearchOption.TopDirectoryOnly)
 												  .Select ((path) => fileSystem.Path.GetRelativePath (fileSystem.Path.Combine (".", fileSystem.Path.GetDirectoryName (projectPath) ?? string.Empty), path))
 												  .ToArray ();
 
 			if (csprojFiles.Length == 0) {
-				LogDebug (Strings.Errors.CsprojNotFound (projectPath));
+				Logger.Debug (Strings.Errors.CsprojNotFound (projectPath));
 				error = Strings.Errors.CsprojNotFound (projectPath);
 				return (error, projectPath);
 			}
 			if (csprojFiles.Length > 1) {
-				LogDebug (Strings.Errors.MultipleProjectFilesFound (projectPath, string.Join (", ", csprojFiles)));
+				Logger.Debug (Strings.Errors.MultipleProjectFilesFound (projectPath, string.Join (", ", csprojFiles)));
 				error = Strings.Errors.MultipleProjectFilesFound (projectPath, string.Join (", ", csprojFiles));
 				return (error, projectPath);
 			}
 
-			LogDebug (Strings.Base.FoundProjectFile (csprojFiles [0], projectPath));
+			Logger.Debug (Strings.Base.FoundProjectFile (csprojFiles [0], projectPath));
 			updatedPath = csprojFiles [0];
 		}
 
 		if (!fileSystem.File.Exists (updatedPath)) {
-			LogDebug (Strings.Errors.Validation.PathDoesNotExist (updatedPath));
+			Logger.Debug (Strings.Errors.Validation.PathDoesNotExist (updatedPath));
 			error = Strings.Errors.Validation.PathDoesNotExist (updatedPath);
 			return (error, projectPath);
 		}
@@ -161,26 +160,26 @@ class BaseCommand<T> : Command {
 		string error = string.Empty;
 
 		if (!TryGetTfmFromProject (projectPath, out var supportedTfmsInProject)) {
-			LogDebug (Strings.Errors.Validation.MissingTfmInPath (projectPath));
+			Logger.Debug (Strings.Errors.Validation.MissingTfmInPath (projectPath));
 			error = Strings.Errors.Validation.MissingTfmInPath (projectPath);
 			return (error, tfm);
 		}
 
-		LogDebug (Strings.Base.ProjectTfms (string.Join (", ", supportedTfmsInProject)));
+		Logger.Debug (Strings.Base.ProjectTfms (string.Join (", ", supportedTfmsInProject)));
 
 		if (string.IsNullOrEmpty (tfm) && supportedTfmsInProject.Count > 1) {
-			LogDebug (Strings.Errors.MultipleTfmsFound);
+			Logger.Debug (Strings.Errors.MultipleTfmsFound);
 			error = Strings.Errors.MultipleTfmsFound;
 			return (error, tfm);
 		}
 
 		if (string.IsNullOrEmpty (tfm) && supportedTfmsInProject.Count == 1) {
-			LogDebug (Strings.Base.UseDefaultTfm);
+			Logger.Debug (Strings.Base.UseDefaultTfm);
 			tfm = supportedTfmsInProject [0];
 		}
 
 		if (!supportedTfmsInProject.Contains (tfm)) {
-			LogDebug (Strings.Errors.TfmNotSupported);
+			Logger.Debug (Strings.Errors.TfmNotSupported);
 			error = Strings.Errors.TfmNotSupported;
 			return (error, tfm);
 		}
@@ -188,7 +187,7 @@ class BaseCommand<T> : Command {
 		var currentTfm = supportedTfmsInProject.Count == 1 ? supportedTfmsInProject [0] : tfm;
 
 		if (!IsValidTfm (currentTfm, xcSync.ApplePlatforms.Keys.ToArray ())) {
-			LogDebug (Strings.Errors.Validation.InvalidTfm (currentTfm));
+			Logger.Debug (Strings.Errors.Validation.InvalidTfm (currentTfm));
 			error = Strings.Errors.Validation.InvalidTfm (currentTfm);
 			return (error, currentTfm);
 		}
@@ -202,17 +201,17 @@ class BaseCommand<T> : Command {
 		string error = string.Empty;
 
 		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
+			Logger.Verbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
 			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
 
 			if (!fileSystem.Directory.Exists (targetPath)) {
-				LogDebug (Strings.Base.CreateDefaultTarget (targetPath));
+				Logger.Debug (Strings.Base.CreateDefaultTarget (targetPath));
 				fileSystem.Directory.CreateDirectory (targetPath);
 			}
 		}
 
 		if (!fileSystem.Directory.Exists (targetPath)) {
-			LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
+			Logger.Debug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
 			error = Strings.Errors.Validation.TargetDoesNotExist (targetPath);
 			return (error, targetPath);
 		}
@@ -229,7 +228,7 @@ class BaseCommand<T> : Command {
 
 			return tfms.Count > 0;
 		} catch (Exception ex) {
-			Logger?.Error (ex, "Failed to get TFM's from project {project}", csproj);
+			Logger.Error (ex, "Failed to get TFM's from project {project}", csproj);
 			return false;
 		}
 	}
@@ -244,7 +243,7 @@ class BaseCommand<T> : Command {
 		return isValid;
 	}
 
-	static bool TryGetTargetPlatform (string tfm, [NotNullWhen (true)] out string targetPlatform)
+	static bool TryGetTargetPlatform (string tfm, ILogger logger, [NotNullWhen (true)] out string targetPlatform)
 	{
 		targetPlatform = string.Empty;
 
@@ -255,14 +254,7 @@ class BaseCommand<T> : Command {
 			}
 		}
 
-		Logger?.Fatal (Strings.Errors.TargetPlatformNotFound);
+		logger.Fatal (Strings.Errors.TargetPlatformNotFound);
 		return false;
 	}
-
-	static protected void LogVerbose (string messageTemplate, params object? []? properyValues) => Logger?.Verbose (messageTemplate, properyValues);
-	static protected void LogDebug (string messageTemplate, params object? []? properyValues) => Logger?.Debug (messageTemplate, properyValues);
-	static protected void LogInformation (string messageTemplate, params object? []? properyValues) => Logger?.Information (messageTemplate, properyValues);
-	static protected void LogError (string messageTemplate, params object? []? properyValues) => Logger?.Error (messageTemplate, properyValues);
-	static protected void LogFatal (string messageTemplate, params object? []? properyValues) => Logger?.Fatal (messageTemplate, properyValues);
-
 }

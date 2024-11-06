@@ -46,32 +46,33 @@ class XcodeCommand<T> : BaseCommand<T> {
 		string error = string.Empty;
 
 		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
+			Logger.Verbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
 			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
 		}
 
 		if (Force) {
-			RecreateDirectory (fileSystem, projectPath, targetPath);
+			RecreateDirectory (fileSystem, projectPath, targetPath, Logger);
 		} else {
 			if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
-				LogDebug (Strings.Errors.Validation.TargetNotEmpty (targetPath));
+				Logger.Debug (Strings.Errors.Validation.TargetNotEmpty (targetPath));
 				error = Strings.Errors.Validation.TargetNotEmpty (targetPath);
 			}
 
 			if (!fileSystem.Directory.Exists (targetPath) && string.Compare (targetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
-				LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
+				Logger.Debug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
 				error = Strings.Errors.Validation.TargetDoesNotExist (targetPath);
 			}
 		}
 		return (error, targetPath);
 	}
 
-	public static void RecreateDirectory (IFileSystem fileSystem, string projectPath, string targetPath)
+	public static void RecreateDirectory (IFileSystem fileSystem, string projectPath, string targetPath, ILogger logger)
 	{
 		if (fileSystem.Directory.Exists (targetPath) && fileSystem.Directory.EnumerateFileSystemEntries (targetPath).Any ()) {
 			// utilize apple script to close existing xcode project if open in xcode
 			// quite performant, prevents UI freakout, enables smooth smooth development
 			string xcodeProjPath = fileSystem.Path.GetFullPath (fileSystem.Path.Combine (targetPath, fileSystem.Path.GetFileNameWithoutExtension(projectPath) + ".xcodeproj"));
+			logger.Debug ("Closing Xcode project at {xcodeProjPath}", xcodeProjPath);
 			Scripts.RunAppleScript (Scripts.CloseXcodeProject (xcodeProjPath));
 
 			fileSystem.Directory.Delete (targetPath, true);

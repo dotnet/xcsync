@@ -11,7 +11,7 @@ namespace xcsync.Commands;
 
 class XcSyncCommand : RootCommand {
 
-	public static ILogger? Logger { get; private set; }
+	public ILogger Logger { get; private set; }
 
 	public XcSyncCommand (IFileSystem fileSystem, ILogger? logger = null) : base ("xcsync")
 	{
@@ -42,7 +42,7 @@ class XcSyncCommand : RootCommand {
 
 		SharedOptions.DotnetPath.AddValidator (result => {
 			xcSync.DotnetPath = result.GetValueForOption (SharedOptions.DotnetPath) ?? string.Empty;
-			Logger?.Information (Strings.Base.DotnetPath (xcSync.DotnetPath));
+			Logger.Information (Strings.Base.DotnetPath (xcSync.DotnetPath));
 		});
 
 		AddCommand (new GenerateCommand (fileSystem, Logger));

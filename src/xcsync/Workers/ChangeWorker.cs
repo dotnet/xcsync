@@ -19,7 +19,7 @@ class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir
 		message.ClrMonitor.StopMonitoring ();
 		message.XcodeMonitor.StopMonitoring ();
 		if (message.Direction == SyncDirection.ToXcode)
-			XcodeCommand<GenerateCommand>.RecreateDirectory (FileSystem, ProjectPath, TargetDir);
+			XcodeCommand<GenerateCommand>.RecreateDirectory (FileSystem, ProjectPath, TargetDir, Logger);
 		Logger.Debug (Strings.Watch.Syncing);
 		await new SyncContext (FileSystem, new TypeService (Logger), message.Direction, ProjectPath, TargetDir, Framework, Logger).SyncAsync (cancellationToken);
 		Logger.Debug (Strings.Watch.ResumingMonitoring);
