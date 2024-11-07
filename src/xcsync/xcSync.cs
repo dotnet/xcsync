@@ -28,7 +28,7 @@ static class xcSync {
 	public static ILogger? Logger { get; internal set; }
 	public static IFileSystem FileSystem { get; } = new FileSystem ();
 
-	public static async Task Main (string [] args)
+	public static async Task<int> Main (string [] args)
 	{
 		ConfigureLogging ();
 
@@ -40,7 +40,7 @@ static class xcSync {
 			.UseDefaults ()
 			.Build ();
 
-		await parser.InvokeAsync (args).ConfigureAwait (false);
+		return await parser.InvokeAsync (args).ConfigureAwait (false);
 	}
 
 	static void RegisterMSBuild ()

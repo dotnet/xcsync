@@ -53,6 +53,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 		Assert.True (File.Exists (csproj));
 
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (csproj, "net8.0-ios");
 		var fileSystem = new FileSystem ();
 		var logger = new XunitLogger (TestOutput);
 		var command = new GenerateCommand (fileSystem, logger);
@@ -60,21 +61,22 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		// ensure the default target directory is created relative to the project directory, not the pwd
 		Assert.Equal (0, exitCode);
-		Assert.True (Directory.Exists (Path.Combine (tmpDir, "obj", "xcode")));
+		Assert.True (Directory.Exists (Path.Combine (tmpDir, intermediateOutputPath, "xcsync")));
 	}
 
 	[Theory]
 	[InlineData ("macos", "", "", "")]
 	[InlineData ("macos", "net8.0-macos", "", "")]
-	[InlineData ("macos", "net8.0-macos", "obj/xcode", "")]
-	[InlineData ("macos", "net9.0-macos", "obj/xcode", "Target framework is not supported by current .NET project.")]
+	[InlineData ("macos", "net8.0-macos", "{IntermediateOutputPath}/xcsync", "")]
+	[InlineData ("macos", "net9.0-macos", "obj/xcsync", "Target framework is not supported by current .NET project.")]
 	[InlineData ("maui", "", "", "Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.")]
-	[InlineData ("maui", "net8.0-ios", "obj/xcode", "")]
-	[InlineData ("maui", "net8.0-maccatalyst", "obj/xcode", "")]
-	[InlineData ("maui", "net8.0-macos", "obj/xcode", "Target framework is not supported by current .NET project.")]
-	[InlineData ("maui", "net8.0-ios", "{Directory}/xcode", "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
+	[InlineData ("maui", "net8.0-ios", "{IntermediateOutputPath}/xcsync", "")]
+	[InlineData ("maui", "net8.0-maccatalyst", "{IntermediateOutputPath}/xcsync", "")]
+	[InlineData ("maui", "net8.0-macos", "obj/xcsync", "Target framework is not supported by current .NET project.")]
+	[InlineData ("maui", "net8.0-ios", "{Directory}/xcode{DoesNotExist}", "Target path '{TargetPath}' does not exist, or is not a valid Xcode project folder.")]
 	public async void BaseCommandValidation_SingleProject (string projectType, string tfm, string targetPath, string expectedError)
 	{
+		var createXcodeProject = !targetPath.Contains ("{DoesNotExist}");
 		var projectName = Guid.NewGuid ().ToString ();
 		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
 
@@ -85,7 +87,12 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.True (Directory.Exists (tmpDir));
 		var fullProjectPath = Path.Combine (tmpDir, $"{projectName}.csproj");
 
+		var projectTfm = Scripts.GetTargetFrameworksFromProject (fullProjectPath).FirstOrDefault () ?? string.Empty;
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (fullProjectPath, string.IsNullOrEmpty (tfm) ? projectTfm : tfm);
+
 		targetPath = targetPath
+			.Replace ("{DoesNotExist}", string.Empty)
+			.Replace ("{IntermediateOutputPath}", intermediateOutputPath)
 			.Replace ("{Directory}", Path.GetDirectoryName (fullProjectPath));
 
 		expectedError = expectedError
@@ -94,6 +101,10 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			.Replace ("{TargetFramework}", tfm)
 			.Replace ("{TargetPath}", targetPath);
 
+		if (createXcodeProject) {
+			var xcodePath = fileSystem.Path.Combine (tmpDir, string.IsNullOrEmpty (targetPath) ? intermediateOutputPath : targetPath, fileSystem.Path.GetFileName (targetPath) == "xcsync" ? string.Empty : "xcsync");
+			EnsureXcodeProject (fileSystem, projectName, xcodePath);
+		}
 		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
 
 		var args = new string [] {
@@ -159,10 +170,10 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Theory]
-	[InlineData ("{Directory}/xcode", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
-	[InlineData ("{Directory}/xcode", true, "")]
-	[InlineData ("{Directory}/some/rando/folder/xcode", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
-	[InlineData ("{Directory}/some/rando/folder/xcode", true, "")]
+	[InlineData ("{Directory}/xcsync", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
+	[InlineData ("{Directory}/xcync", true, "")]
+	[InlineData ("{Directory}/some/rando/folder/xcsync", false, "Target path '{TargetPath}' does not exist, will create directory if [--force, -f] is set.")]
+	[InlineData ("{Directory}/some/rando/folder/xcsync", true, "")]
 	public async void TestXcodeCommandValidation (string targetPath, bool force, string expectedError)
 	{
 		var fileSystem = new FileSystem ();
@@ -252,7 +263,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var args = new string [] {
 			"--project", fullProjectPath,
 			"--target-framework-moniker", "net8.0-ios",
-			"--target", "obj/xcode"
+			"--target", "obj/xcsync"
 		 };
 
 		var console = new CapturingConsole ();
@@ -279,11 +290,17 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.True (Directory.Exists (tmpDir));
 		var fullProjectPath = fileSystem.Path.Combine (tmpDir, $"{projectName}.csproj");
 
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (fullProjectPath, "net8.0-ios");
+
+		var xcodePath = fileSystem.Path.Combine (tmpDir, intermediateOutputPath, "xcsync");
+
+		EnsureXcodeProject (fileSystem, projectName, xcodePath);
+
 		var baseCommand = new BaseCommand<string> (fileSystem, logger, "test", "test description");
 		var args = new string [] {
 			"--project", fullProjectPath,
 			"--target-framework-moniker", "net8.0-ios",
-			"--target", "obj/xcode"
+			"--target", $"{intermediateOutputPath}/xcsync"
 		 };
 
 		var console = new CapturingConsole ();
@@ -291,8 +308,26 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
-		Assert.Equal ("", errorMessage);
 		Assert.Equal (0, exitCode);
+		Assert.Equal ("", errorMessage);
+	}
+
+	static void EnsureXcodeProject (FileSystem fileSystem, string projectName, string xcodePath)
+	{
+		var pbxprojContent = @"
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+	};
+}
+";
+		fileSystem.Directory.CreateDirectory (xcodePath);
+		fileSystem.Directory.CreateDirectory (Path.Combine (xcodePath, $"{projectName}.xcodeproj"));
+		fileSystem.File.WriteAllTextAsync (Path.Combine (xcodePath, $"{projectName}.xcodeproj", "project.pbxproj"), pbxprojContent).Wait ();
 	}
 
 	const string net_8_0_iosProject = @"

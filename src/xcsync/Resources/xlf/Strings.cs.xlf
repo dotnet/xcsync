@@ -77,6 +77,11 @@
         <target state="translated">V souboru projektu bylo nalezeno více cílových architektur. Pomocí možnosti [--target-framework, -tfm] zadejte cílovou architekturu, která se má použít.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Errors.PbxprojNotFound">
+        <source>Could not find a project.pbxproj file in path '{0}'</source>
+        <target state="new">Could not find a project.pbxproj file in path '{0}'</target>
+        <note>{0} is the path to the file or directory</note>
+      </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
         <source>Target platform not found</source>
         <target state="translated">Nebyla nalezena cílová platforma.</target>
@@ -131,6 +136,11 @@
         <source>The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</source>
         <target state="translated">Cílová cesta {0} už existuje a není prázdná. Pokud chcete přepsat existující projekt, použijte možnost [--force, -f].</target>
         <note>{0} is the path to the directory</note>
+      </trans-unit>
+      <trans-unit id="Errors.Validation.TargetIsNotValidXcodeProjectFolder">
+        <source>Target path '{0}' does not exist, or is not a valid Xcode project folder.</source>
+        <target state="new">Target path '{0}' does not exist, or is not a valid Xcode project folder.</target>
+        <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
         <source>Generated Xcode header and implementation files</source>

@@ -168,6 +168,10 @@
 		<value>Invalid option '{0}' provided: {1}</value>
 		<comment>{0} is name of the command line options, {1} is the value of the option provided by the user</comment>
 	</data>
+	<data name="Errors.PbxprojNotFound" xml:space="preserve">
+		<value>Could not find a project.pbxproj file in path '{0}'</value>
+		<comment>{0} is the path to the file or directory</comment>
+	</data>
 	<data name="Errors.CsprojNotFound" xml:space="preserve">
 		<value>Could not find a .csproj file in path '{0}'</value>
 		<comment>{0} is the path to the file or directory</comment>
@@ -188,6 +192,10 @@
 	</data>
 	<data name="Errors.Validation.TargetDoesNotExist" xml:space="preserve">
 		<value>Target path '{0}' does not exist, will create directory if [--force, -f] is set.</value>
+		<comment>{0} is the path to the file or directory</comment>
+	</data>
+	<data name="Errors.Validation.TargetIsNotValidXcodeProjectFolder" xml:space="preserve">
+		<value>Target path '{0}' does not exist, or is not a valid Xcode project folder.</value>
 		<comment>{0} is the path to the file or directory</comment>
 	</data>
 	<data name="Errors.Validation.PathDoesNotContainCsproj" xml:space="preserve">

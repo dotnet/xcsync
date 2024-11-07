@@ -41,13 +41,15 @@ class XcodeCommand<T> : BaseCommand<T> {
 		base.AddValidators ();
 	}
 
-	protected override (string, string) TryValidateTargetPath (string projectPath, string targetPath)
+	protected override (string, string) TryValidateTargetPath (string projectPath, string tfm, string targetPath)
 	{
 		string error = string.Empty;
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (projectPath, tfm);
 
-		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
-			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
+		targetPath = targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath);
+
+		if (!fileSystem.Path.IsPathRooted (targetPath)) {
+			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath));
 		}
 
 		if (!Force) {
@@ -56,7 +58,7 @@ class XcodeCommand<T> : BaseCommand<T> {
 				error = Strings.Errors.Validation.TargetNotEmpty (targetPath);
 			}
 
-			if (!fileSystem.Directory.Exists (targetPath) && string.Compare (targetPath, DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) != 0) {
+			if (!fileSystem.Directory.Exists (targetPath) && !targetPath.EndsWith (fileSystem.Path.Combine (intermediateOutputPath, DefaultXcodeOutputFolder), StringComparison.OrdinalIgnoreCase)) {
 				LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
 				error = Strings.Errors.Validation.TargetDoesNotExist (targetPath);
 			}

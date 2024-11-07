@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using System.Runtime.Versioning;
 using Marille;
 using Microsoft.CodeAnalysis;
 using Serilog;
@@ -54,6 +53,10 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		if (force && FileSystem.Directory.Exists (projectFilesPath)) {
 			// remove existing xcode project
 			FileSystem.Directory.Delete (projectFilesPath, true);
+		}
+
+		if (!FileSystem.Directory.Exists (TargetDir)) {
+			FileSystem.Directory.CreateDirectory (TargetDir);
 		}
 
 		HashSet<string> frameworks = ["Foundation", "Cocoa"];
@@ -472,7 +475,13 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework.ToString ());
 
-		Scripts.ConvertPbxProjToJson (FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj", "project.pbxproj"));
+		var xcodeproj = FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj");
+		var pbxProjPath = FileSystem.Path.Combine (xcodeproj, "project.pbxproj");
+		if (!FileSystem.File.Exists (pbxProjPath)) {
+			Logger.Fatal (Strings.Errors.PbxprojNotFound (xcodeproj));
+			return;
+		}
+		Scripts.ConvertPbxProjToJson (pbxProjPath);
 
 		await xcodeWorkspace.LoadAsync (token).ConfigureAwait (false);
 
