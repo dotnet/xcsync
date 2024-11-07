@@ -77,6 +77,11 @@
         <target state="translated">プロジェクト ファイルに複数のターゲット フレームワークが見つかりました。[--target-framework, -tfm] オプションで使用するターゲット フレームワークを指定します。</target>
         <note />
       </trans-unit>
+      <trans-unit id="Errors.PbxprojNotFound">
+        <source>Could not find a project.pbxproj file in path '{0}'</source>
+        <target state="new">Could not find a project.pbxproj file in path '{0}'</target>
+        <note>{0} is the path to the file or directory</note>
+      </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
         <source>Target platform not found</source>
         <target state="translated">ターゲット プラットフォームが見つかりません</target>
@@ -131,6 +136,11 @@
         <source>The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</source>
         <target state="translated">ターゲット パス '{0}' は既に存在し、空ではありません。既存のプロジェクトを上書きするには、[--force, -f] を使用します。</target>
         <note>{0} is the path to the directory</note>
+      </trans-unit>
+      <trans-unit id="Errors.Validation.TargetIsNotValidXcodeProjectFolder">
+        <source>Target path '{0}' does not exist, or is not a valid Xcode project folder.</source>
+        <target state="new">Target path '{0}' does not exist, or is not a valid Xcode project folder.</target>
+        <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
         <source>Generated Xcode header and implementation files</source>

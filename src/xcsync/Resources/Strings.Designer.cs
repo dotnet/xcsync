@@ -31,6 +31,7 @@ static class Strings {
 			internal static string PathNameEmpty => Resources.Strings.Errors_Validation_PathNameIsEmpty;
 			internal static string PathDoesNotExist (string path) => string.Format (Resources.Strings.Errors_Validation_PathDoesNotExist, path);
 			internal static string TargetDoesNotExist (string path) => string.Format (Resources.Strings.Errors_Validation_TargetDoesNotExist, path);
+			internal static string TargetIsNotValidXcodeProjectFolder (string path) => string.Format (Resources.Strings.Errors_Validation_TargetIsNotValidXcodeProjectFolder, path);
 			internal static string TargetNotEmpty (string path) => string.Format (Resources.Strings.Errors_Validation_TargetIsNotEmpty, path);
 			internal static string PathDoesNotContainCsproj (string path) => string.Format (Resources.Strings.Errors_Validation_PathDoesNotContainCsproj, path);
 			internal static string MissingTfmInPath (string path) => string.Format (Resources.Strings.Errors_Validation_MissingValidTargetFrameworkInPath, path);
@@ -41,6 +42,7 @@ static class Strings {
 
 		internal static string InvalidOption (string option, string error) => string.Format (Resources.Strings.Errors_InvalidOption, option, error);
 		internal static string MultipleProjectFilesFound (string path, string projectFilesFound) => string.Format (Resources.Strings.Errors_MultipleProjectFilesFound, path, projectFilesFound);
+		internal static string PbxprojNotFound (string path) => string.Format (Resources.Strings.Errors_PbxprojNotFound, path);
 		internal static string CsprojNotFound (string path) => string.Format (Resources.Strings.Errors_CsprojNotFound, path);
 		internal static string MultipleTfmsFound => Resources.Strings.Errors_MultipleTfmsFound;
 		internal static string TargetPlatformNotFound => Resources.Strings.Errors_TargetPlatformNotFound;

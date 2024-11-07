@@ -354,7 +354,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		Assert.True (Directory.Exists (tmpDir));
 
-		var xcodeDir = Path.Combine (tmpDir, "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "xcsync");
 		Directory.CreateDirectory (xcodeDir); // create directory so --Force is not needed
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
@@ -388,7 +388,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		Assert.True (Directory.Exists (Path.Combine (tmpDir)));
 
-		var xcodeDir = Path.Combine (tmpDir, "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "xcsync");
 		Directory.CreateDirectory (xcodeDir);
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 		string projectPath = Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj");
