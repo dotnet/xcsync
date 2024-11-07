@@ -205,7 +205,7 @@ class BaseCommand<T> : Command {
 
 		targetPath = targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath);
 
-		if (string.IsNullOrEmpty(targetPath)) {
+		if (string.IsNullOrEmpty (targetPath)) {
 			targetPath = fileSystem.Path.Combine (intermediateOutputPath, DefaultXcodeOutputFolder);
 		}
 

@@ -88,8 +88,8 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var fullProjectPath = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		var projectTfm = Scripts.GetTargetFrameworksFromProject (fullProjectPath).FirstOrDefault () ?? string.Empty;
-		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (fullProjectPath, string.IsNullOrEmpty(tfm) ? projectTfm : tfm);
-		
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (fullProjectPath, string.IsNullOrEmpty (tfm) ? projectTfm : tfm);
+
 		targetPath = targetPath
 			.Replace ("{DoesNotExist}", string.Empty)
 			.Replace ("{IntermediateOutputPath}", intermediateOutputPath)
@@ -312,7 +312,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.Equal ("", errorMessage);
 	}
 
-	private static void EnsureXcodeProject (FileSystem fileSystem, string projectName, string xcodePath)
+	static void EnsureXcodeProject (FileSystem fileSystem, string projectName, string xcodePath)
 	{
 		var pbxprojContent = @"
 // !$*UTF8*$!
@@ -327,7 +327,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 ";
 		fileSystem.Directory.CreateDirectory (xcodePath);
 		fileSystem.Directory.CreateDirectory (Path.Combine (xcodePath, $"{projectName}.xcodeproj"));
-		fileSystem.File.WriteAllTextAsync (Path.Combine (xcodePath, $"{projectName}.xcodeproj", "project.pbxproj"), pbxprojContent ).Wait ();
+		fileSystem.File.WriteAllTextAsync (Path.Combine (xcodePath, $"{projectName}.xcodeproj", "project.pbxproj"), pbxprojContent).Wait ();
 	}
 
 	const string net_8_0_iosProject = @"
