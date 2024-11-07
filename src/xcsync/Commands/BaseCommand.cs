@@ -205,8 +205,12 @@ class BaseCommand<T> : Command {
 
 		targetPath = targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath);
 
+		if (string.IsNullOrEmpty(targetPath)) {
+			targetPath = fileSystem.Path.Combine (intermediateOutputPath, DefaultXcodeOutputFolder);
+		}
+
 		if (!fileSystem.Path.IsPathRooted (targetPath)) {
-			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath));
+			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath);
 		}
 
 		var xcodeProj = fileSystem.Path.Combine (targetPath, $"{fileSystem.Path.GetFileNameWithoutExtension (projectPath)}.xcodeproj");

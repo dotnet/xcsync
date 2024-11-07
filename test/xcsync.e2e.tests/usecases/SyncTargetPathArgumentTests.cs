@@ -168,15 +168,15 @@ public partial class SyncTargetPathArgumentTests :
 	public void Dispose ()
 	{
 		// Cleanup
-		// SafeDirectoryDelete (Path.Combine (fixture.RootPath, fixture.IntermediateOutputPath));
-		// var rootedTarget = targetPath;
-		// if (!Path.IsPathRooted (targetPath)) {
-		// 	var targetRoot = Path.GetDirectoryName (targetPath)?.Split (Path.DirectorySeparatorChar) [0];
-		// 	if (targetRoot != null) {
-		// 		rootedTarget = Path.Combine (fixture.RootPath, targetRoot);
-		// 	}
-		// }
-		// SafeDirectoryDelete (rootedTarget);
+		SafeDirectoryDelete (Path.Combine (fixture.RootPath, fixture.IntermediateOutputPath));
+		var rootedTarget = targetPath;
+		if (!Path.IsPathRooted (targetPath)) {
+			var targetRoot = Path.GetDirectoryName (targetPath)?.Split (Path.DirectorySeparatorChar) [0];
+			if (targetRoot != null) {
+				rootedTarget = Path.Combine (fixture.RootPath, targetRoot);
+			}
+		}
+		SafeDirectoryDelete (rootedTarget);
 
 		GC.SuppressFinalize (this);
 	}
