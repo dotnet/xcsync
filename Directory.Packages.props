@@ -4,14 +4,14 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-	  <!-- <PackageVersion Include="" Version="" /> -->
+    <!-- <PackageVersion Include="" Version="" /> -->
     <PackageVersion Include="Marille" Version="$(MarillePackageVersion)" />
-    <PackageVersion Include="Microsoft.Build" Version="$(MicrosoftBuildPackageVersion)"/>
+    <PackageVersion Include="Microsoft.Build" Version="$(MicrosoftBuildPackageVersion)" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="$(MicrosoftBuildLocatorPackageVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisPackageVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="$(MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />    
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
     <PackageVersion Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="$(SerilogEnrichersThreadPackageVersion)" />
     <PackageVersion Include="Serilog.Expressions" Version="$(SerilogExpressionsPackageVersion)" />
@@ -22,18 +22,18 @@
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="$(TestableIOSystemIOAbstractionsWrappersPackageVersion)" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Analyzers" Version="$(TestableIOSystemIOAbstractionsAnalyzersPackageVersion)" />
     <PackageVersion Include="NuGet.Frameworks" Version="$(NuGetFrameworksPackageVersion)" />
-	  <!-- ClangSharp -->
+    <!-- ClangSharp -->
     <PackageVersion Include="clangsharp" Version="$(ClangSharpPackageVersion)" />
     <PackageVersion Include="libClang.runtime.osx-arm64" Version="$(libClangRuntimeOsxArm64PackageVersion)" />
     <PackageVersion Include="libClangSharp.runtime.osx-arm64" Version="$(libClangSharpRuntimeOsxArm64PackageVersion)" />
     <PackageVersion Include="libClang.runtime.osx-x64" Version="$(libClangRuntimeOsxX64PackageVersion)" />
     <PackageVersion Include="libClangSharp.runtime.osx-x64" Version="$(libClangSharpRuntimeOsxX64PackageVersion)" />
-	  <!-- Test Packages -->	
-	  <PackageVersion Include="Moq" Version="$(MoqPackageVersion)" />
+    <!-- Test Packages -->
+    <PackageVersion Include="Moq" Version="$(MoqPackageVersion)" />
     <PackageVersion Include="Serilog.Sinks.Xunit" Version="$(SerilogSinksXunitPackageVersion)" />
     <PackageVersion Include="System.Linq.Async" Version="$(SystemLinqAsyncPackageVersion)" />
     <PackageVersion Include="coverlet.collector" Version="$(CoverletCollectorPackageVersion)" />
-	  <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="$(TestableIOSystemIOAbstractionsTestingHelpers)" />
+    <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="$(TestableIOSystemIOAbstractionsTestingHelpers)" />
     <PackageVersion Include="Microsoft.DotNet.XUnitExtensions" Version="$(MicrosoftDotNetXUnitExtensionsPackageVersion)" />
   </ItemGroup>
 </Project>

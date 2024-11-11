@@ -6,7 +6,7 @@
   <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" /> 
 
   <PropertyGroup> 
-    <XcsyncRootDirectory>$(MSBuildThisFileDirectory)/..</XcsyncRootDirectory>
+    <XcsyncRootDirectory>$(MSBuildThisFileDirectory)/../</XcsyncRootDirectory>
   </PropertyGroup>
 
 </Project>
