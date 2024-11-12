@@ -50,17 +50,17 @@ class FileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<FileMessa
 			// Gets the bytes from text
 			byte [] data = encoding.GetBytes (message.Content);
 			outStream.Write (data, 0, data.Length);
-			Logger.Information ("Wrote {Bytes} bytes to {Path}", data.Length, message.Path);
+			Logger.Information (Strings.Workers.WroteFile (data.Length, message.Path));
 
 		} catch (Exception ex) {
-			Logger.Fatal (ex, $"Exception in ConsumeAsync: {ex.Message}");
+			Logger.Fatal (ex, Strings.Workers.ProcessingException);
 			throw;
 		}
 	}
 
 	public override Task ConsumeAsync (FileMessage message, Exception exception, CancellationToken token = default)
 	{
-		Log.Error (exception, "Error processing file message {Id}", message.Id);
+		Log.Error (exception, Strings.Workers.ProcessingError);
 		return Task.CompletedTask;
 	}
 }
@@ -76,9 +76,9 @@ class CopyFileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<CopyF
 			} else {
 				fileSystem.File.Copy (message.sourcePath, message.destinationPath, true);
 			}
-			Logger.Information ("Copied {Source} to {Destination}", message.sourcePath, message.destinationPath);
+			Logger.Information (Strings.Workers.CopiedFile (message.sourcePath, message.destinationPath));
 		} catch (Exception ex) {
-			Logger.Fatal (ex, $"Exception in ConsumeAsync: {ex.Message}");
+			Logger.Fatal (ex, Strings.Workers.ProcessingException);
 			throw;
 		}
 		return Task.CompletedTask;
@@ -86,7 +86,7 @@ class CopyFileWorker (ILogger Logger, IFileSystem fileSystem) : BaseWorker<CopyF
 
 	public override Task ConsumeAsync (CopyFileMessage message, Exception exception, CancellationToken token = default)
 	{
-		Logger.Error (exception, "Error processing file message {Id}", message.Id);
+		Logger.Error (exception, Strings.Workers.ProcessingError);
 		return Task.CompletedTask;
 	}
 }

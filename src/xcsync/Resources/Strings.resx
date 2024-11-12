@@ -160,7 +160,7 @@
 		<value>used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</value>
 	</data>
 	<data name="Commands.Watch.Description" xml:space="preserve">
-		<value>syncs changes between the .NET project and Xcode project automatically</value>
+		<value>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</value>
 	</data>
 
 	<!-- Errors -->
@@ -324,7 +324,9 @@
 		<value>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</value>
 		<comment>{0} is the message Id, {1} is the exception message</comment>
 	</data>
-
+	<data name="Watch.StopWatchProcess" xml:space="preserve">
+		<value>User has requested to stop the sync process. Changes will no longer be processed.</value>
+	</data>
 
     <!-- Type Service Messages -->
     <data name="TypeService.DuplicateType" xml:space="preserve">
@@ -374,6 +376,28 @@
         <value>{0}: Failed to cache new compilation within type system, changes are not preserved.</value>
         <comment>{0} is the name of the Assembly</comment>
     </data>
+
+    <!-- .NET Project Messages -->
+	<data name="ClrProject.NotSupportedException" xml:space="preserve">
+        <value>Compilation not supported for current project  '{0}'</value>
+        <comment>{0} is the path to the .NET project</comment>
+	</data>
+	<data name="ClrProject.InvalidOperationException" xml:space="preserve">
+        <value>Compilation errors detected in project '{0}': {1}}</value>
+        <comment>{0} is the path to the .NET project, {1} is the list of error messages</comment>
+	</data>
+	<data name="ClrProject.CompilationError" xml:space="preserve">
+        <value>Compilation error in project '{0}' : {1}</value>
+        <comment>{0} is the path to the .NET project, {1} is the error message</comment>
+	</data>
+	<data name="ClrProject.InvalidOperationError" xml:space="preserve">
+        <value>Invalid operation while processing project '{0}' : {1}</value>
+        <comment>{0} is the path to the .NET project, {1} is the error message</comment>
+	</data>
+	<data name="ClrProject.UnexpectedError" xml:space="preserve">
+        <value>Unexpected error occurred while processing project '{0}' : {1}</value>
+        <comment>{0} is the path to the .NET project, {1} is the error message</comment>
+	</data>
 
     <!-- Xcode Workspace Messages -->
 	<data name="XcodeWorkspace.XcodeProjectNotFound" xml:space="preserve">
@@ -448,6 +472,9 @@
         <value>Error processing '{0}' : {1}\n{2}</value>
         <comment>{0} is the file path, {1} is the exception, {2} is the stack trace</comment>
     </data>
+v    <data name="XcodeWorkspace.UsingDefaultSdkRoot" xml:space="preserve">
+        <value>SDKROOT not found in any release configuration, defaulting to 'macosx'</value>
+    </data>
 
     <!-- Sync Context Messages -->
     <data name="SyncContext.SyncComplete" xml:space="preserve">
@@ -456,4 +483,43 @@
     <data name="SyncContext.GeneratingFiles" xml:space="preserve">
 		<value>Generating Xcode project files...</value>
 	</data>
+    <data name="SyncContext.ProcessingType" xml:space="preserve">
+		<value>Processing type {0}</value>
+        <comment>{0} is the name of the type</comment>
+	</data>
+
+	<!-- ObjC Syntax Processing -->
+    <data name="ObjCSyntax.ObjCImplementationDeclFound" xml:space="preserve">
+		<value>Found ObjCImplementationDecl: {0}</value>
+        <comment>{0} is the name of the syntax declaration</comment>
+	</data>
+    <data name="ObjCSyntax.Visiting" xml:space="preserve">
+		<value>[{0}] Visiting {{1}}</value>
+        <comment>{0} is the name of the visitor class, {1} is the declaration kind name</comment>
+	</data>
+    <data name="ObjCSyntax.PropertyNotImplementedException" xml:space="preserve">
+		<value>Unsupported property type {}0</value>
+        <comment>{0} is the name of the property type</comment>
+	</data>
+    <data name="ObjCSyntax.ParsingProperty" xml:space="preserve">
+		<value>[{0}] Parsing property type '{0}'</value>
+        <comment>{0} is the name of the visitor class, {1} is the declaration kind name</comment>
+	</data>
+
+	<!-- Workers -->
+    <data name="FileWorker.WroteFile" xml:space="preserve">
+		<value>Wrote {0} bytes to {1}</value>
+        <comment>{0} is the number of bytes written, {1} is the path to the file</comment>
+	</data>
+    <data name="Worker.ProcessingException" xml:space="preserve">
+		<value>Exception processing message.</value>
+	</data>
+    <data name="Worker.ProcessingError" xml:space="preserve">
+		<value>Error processing message.</value>
+	</data>
+    <data name="CopyFileWorker.CopiedFile" xml:space="preserve">
+		<value>Copied {0} to {1}</value>
+        <comment>{0} is the source path, {1} is the destination path</comment>
+	</data>
+
 </root>

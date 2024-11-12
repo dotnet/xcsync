@@ -16,7 +16,7 @@ class ObjCImplementationDeclVisitor (ILogger Logger) : AstVisitor {
 	protected override Task VisitDeclAsync (Decl decl)
 	{
 		if (decl is ObjCImplementationDecl objCImplementationDecl) {
-			Logger.Information ("Found ObjCImplementationDecl: {decl}", objCImplementationDecl.Name);
+			Logger.Debug (Strings.ObjCSyntax.ObjCImplementationDeclFound (objCImplementationDecl.Name));
 			ObjCTypes.Add (objCImplementationDecl);
 		}
 		return Task.CompletedTask;

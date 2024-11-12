@@ -42,6 +42,31 @@
         <target state="translated">{0}에서 Xcode 사용</target>
         <note>{0} is the path to Xcode</note>
       </trans-unit>
+      <trans-unit id="ClrProject.CompilationError">
+        <source>Compilation error in project '{0}' : {1}</source>
+        <target state="new">Compilation error in project '{0}' : {1}</target>
+        <note>{0} is the path to the .NET project, {1} is the error message</note>
+      </trans-unit>
+      <trans-unit id="ClrProject.InvalidOperationError">
+        <source>Invalid operation while processing project '{0}' : {1}</source>
+        <target state="new">Invalid operation while processing project '{0}' : {1}</target>
+        <note>{0} is the path to the .NET project, {1} is the error message</note>
+      </trans-unit>
+      <trans-unit id="ClrProject.InvalidOperationException">
+        <source>Compilation errors detected in project '{0}': {1}}</source>
+        <target state="new">Compilation errors detected in project '{0}': {1}}</target>
+        <note>{0} is the path to the .NET project, {1} is the list of error messages</note>
+      </trans-unit>
+      <trans-unit id="ClrProject.NotSupportedException">
+        <source>Compilation not supported for current project  '{0}'</source>
+        <target state="new">Compilation not supported for current project  '{0}'</target>
+        <note>{0} is the path to the .NET project</note>
+      </trans-unit>
+      <trans-unit id="ClrProject.UnexpectedError">
+        <source>Unexpected error occurred while processing project '{0}' : {1}</source>
+        <target state="new">Unexpected error occurred while processing project '{0}' : {1}</target>
+        <note>{0} is the path to the .NET project, {1} is the error message</note>
+      </trans-unit>
       <trans-unit id="Commands.Generate.Description">
         <source>generate a Xcode project at the path specified by --target from the project identified by --project</source>
         <target state="translated">--project로 식별된 프로젝트에서 --target으로 지정된 경로에 Xcode 프로젝트를 생성합니다.</target>
@@ -53,9 +78,14 @@
         <note />
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
-        <source>syncs changes between the .NET project and Xcode project automatically</source>
-        <target state="translated">.NET 프로젝트와 Xcode 프로젝트 간의 변경 내용을 자동으로 동기화합니다.</target>
+        <source>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
+        <target state="needs-review-translation">.NET 프로젝트와 Xcode 프로젝트 간의 변경 내용을 자동으로 동기화합니다.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="CopyFileWorker.CopiedFile">
+        <source>Copied {0} to {1}</source>
+        <target state="new">Copied {0} to {1}</target>
+        <note>{0} is the source path, {1} is the destination path</note>
       </trans-unit>
       <trans-unit id="Errors.CsprojNotFound">
         <source>Could not find a .csproj file in path '{0}'</source>
@@ -142,6 +172,11 @@
         <target state="new">Target path '{0}' does not exist, or is not a valid Xcode project folder.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
+      <trans-unit id="FileWorker.WroteFile">
+        <source>Wrote {0} bytes to {1}</source>
+        <target state="new">Wrote {0} bytes to {1}</target>
+        <note>{0} is the number of bytes written, {1} is the path to the file</note>
+      </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
         <source>Generated Xcode header and implementation files</source>
         <target state="translated">생성된 Xcode 헤더와 구현 파일</target>
@@ -161,6 +196,26 @@
         <source>'{0}' is open in Xcode</source>
         <target state="translated">'{0}'이(가) Xcode에서 열려 있습니다.</target>
         <note>{0} is the path to the opened project</note>
+      </trans-unit>
+      <trans-unit id="ObjCSyntax.ObjCImplementationDeclFound">
+        <source>Found ObjCImplementationDecl: {0}</source>
+        <target state="new">Found ObjCImplementationDecl: {0}</target>
+        <note>{0} is the name of the syntax declaration</note>
+      </trans-unit>
+      <trans-unit id="ObjCSyntax.ParsingProperty">
+        <source>[{0}] Parsing property type '{0}'</source>
+        <target state="new">[{0}] Parsing property type '{0}'</target>
+        <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
+      </trans-unit>
+      <trans-unit id="ObjCSyntax.PropertyNotImplementedException">
+        <source>Unsupported property type {}0</source>
+        <target state="new">Unsupported property type {}0</target>
+        <note>{0} is the name of the property type</note>
+      </trans-unit>
+      <trans-unit id="ObjCSyntax.Visiting">
+        <source>[{0}] Visiting {{1}}</source>
+        <target state="new">[{0}] Visiting {{1}}</target>
+        <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
         <source>Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</source>
@@ -213,6 +268,11 @@
         <source>Generating Xcode project files...</source>
         <target state="translated">Xcode 프로젝트 파일을 생성하는 중...</target>
         <note />
+      </trans-unit>
+      <trans-unit id="SyncContext.ProcessingType">
+        <source>Processing type {0}</source>
+        <target state="new">Processing type {0}</target>
+        <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
         <source>Synchronization complete.</source>
@@ -324,6 +384,11 @@
         <target state="translated">{0}의 프로젝트 파일 변경 모니터링을 중지했습니다.</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
+      <trans-unit id="Watch.StopWatchProcess">
+        <source>User has requested to stop the sync process. Changes will no longer be processed.</source>
+        <target state="new">User has requested to stop the sync process. Changes will no longer be processed.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Watch.Syncing">
         <source>Syncing change context</source>
         <target state="translated">변경 컨텍스트 동기화 중</target>
@@ -333,6 +398,16 @@
         <source>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</source>
         <target state="translated">변경 메시지 {0}을(를) 처리하는 동안 오류가 발생했습니다. {1}. https://aka.ms/xcsync-issue 페이지에서 버그 보고서를 제출하세요.</target>
         <note>{0} is the message Id, {1} is the exception message</note>
+      </trans-unit>
+      <trans-unit id="Worker.ProcessingError">
+        <source>Error processing message.</source>
+        <target state="new">Error processing message.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Worker.ProcessingException">
+        <source>Exception processing message.</source>
+        <target state="new">Exception processing message.</target>
+        <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorDiagnosticIssue">
         <source>ERROR: {0}</source>
@@ -408,6 +483,11 @@
         <source>Unexpected type found: {0}</source>
         <target state="translated">예기치 않은 형식을 찾았습니다. {0}</target>
         <note>{0} is the non-ObjC type found</note>
+      </trans-unit>
+      <trans-unit id="XcodeWorkspace.UsingDefaultSdkRoot">
+        <source>SDKROOT not found in any release configuration, defaulting to 'macosx'</source>
+        <target state="new">SDKROOT not found in any release configuration, defaulting to 'macosx'</target>
+        <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.WarningDiagnosticIssue">
         <source>WARNING: {0}</source>
