@@ -11,7 +11,7 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool Open = false, bool force = false)
+class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string FileChannel = "Files";
@@ -457,7 +457,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		XcodeWorkspaceGenerator.Generate (FileSystem, projectName, Environment.UserName, TargetDir, xcodeProject);
 		Logger?.Information (Strings.Generate.GeneratedProject (TargetDir));
 
-		if (Open) {
+		if (open) {
 			string workspacePath = FileSystem.Path.GetFullPath (FileSystem.Path.Combine (TargetDir, projectName + ".xcodeproj", "project.xcworkspace"));
 			Logger?.Information (Strings.Generate.OpenProject (Scripts.RunAppleScript (Scripts.OpenXcodeProject (workspacePath))));
 		}

@@ -17,7 +17,7 @@ class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir
 		message.ClrMonitor.StopMonitoring ();
 		message.XcodeMonitor.StopMonitoring ();
 		Logger.Debug (Strings.Watch.Syncing);
-		await new SyncContext (FileSystem, new TypeService (Logger), message.Direction, ProjectPath, TargetDir, Framework, Logger, Open: false, force: message.Direction == SyncDirection.ToXcode).SyncAsync (cancellationToken);
+		await new SyncContext (FileSystem, new TypeService (Logger), message.Direction, ProjectPath, TargetDir, Framework, Logger, open: false, force: message.Direction == SyncDirection.ToXcode).SyncAsync (cancellationToken);
 		Logger.Debug (Strings.Watch.ResumingMonitoring);
 		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
 		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
