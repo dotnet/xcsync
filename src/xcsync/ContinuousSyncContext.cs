@@ -8,7 +8,7 @@ using xcsync.Projects;
 
 namespace xcsync;
 
-class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger)
+class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string ChangeChannel = "Changes";
@@ -20,7 +20,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		await ConfigureMarilleHub ();
 
 		// Generate initial Xcode project
-		await new SyncContext (FileSystem, new TypeService (Logger), SyncDirection.ToXcode, ProjectPath, TargetDir, Framework.ToString (), Logger)
+		await new SyncContext (FileSystem, new TypeService (Logger), SyncDirection.ToXcode, ProjectPath, TargetDir, Framework.ToString (), Logger, open, force)
 			.SyncAsync (token).ConfigureAwait (false);
 
 		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem, FileSystem.FileSystemWatcher.New (), Logger);
