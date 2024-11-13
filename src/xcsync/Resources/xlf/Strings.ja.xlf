@@ -389,6 +389,16 @@
         <target state="new">Received ESC, exiting.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Watch.ReceivedCtrlC">
+        <source>Received CTRL-C, exiting.</source>
+        <target state="new">Received CTRL-C, exiting.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Watch.ReceivedEsc">
+        <source>Received ESC, exiting.</source>
+        <target state="new">Received ESC, exiting.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Watch.ResumingMonitoring">
         <source>Context synced. Resuming monitoring</source>
         <target state="new">Context synced. Resuming monitoring</target>
