@@ -145,7 +145,7 @@
   </Target>
   
   <Target Name="GetLatestFrameworks_OSX" BeforeTargets="BeforeBuild" Inputs="@(DownloadFile)" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')" Condition="$([MSBuild]::IsOSPlatform(OSX))">
-    <Exec Command="curl --create-dirs -f -s 'https://raw.githubusercontent.com/xamarin/%(DownloadFile.Repo)/%(DownloadFile.Hash)/%(DownloadFile.Identity)' --output '$(LatestFrameworksDownloadOutputPath)/%(DownloadFile.Repo)/%(DownloadFile.Identity)'" />
+      <Exec Command="curl --create-dirs -f -s 'https://raw.githubusercontent.com/xamarin/%(DownloadFile.Repo)/%(DownloadFile.Hash)/%(DownloadFile.Identity)' --output '$(LatestFrameworksDownloadOutputPath)/%(DownloadFile.Repo)/%(DownloadFile.Identity)'" />
   </Target>
 
   <Target Name="GetLatestFrameworks_Windows" BeforeTargets="BeforeBuild" Inputs="@(DownloadFile)" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')" Condition="$([MSBuild]::IsOSPlatform(Windows))">

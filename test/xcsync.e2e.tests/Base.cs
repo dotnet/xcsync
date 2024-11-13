@@ -34,7 +34,7 @@ public class Base (ITestOutputHelper testOutput) {
 		DotNetExe = output.ToString ().Trim ();
 	}
 
-	class OutputCapture : TextWriter {
+	protected class OutputCapture : TextWriter {
 		readonly StringBuilder output = new ();
 
 		public override void WriteLine (string? value)
@@ -84,7 +84,7 @@ public class Base (ITestOutputHelper testOutput) {
 		return exec.ExitCode;
 	}
 
-	class LoggingOutputWriter (ITestOutputHelper helper) : TextWriter {
+	protected class LoggingOutputWriter (ITestOutputHelper helper) : TextWriter {
 		public override void WriteLine (string? value)
 		{
 			if (value is not null)

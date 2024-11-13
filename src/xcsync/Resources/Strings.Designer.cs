@@ -72,7 +72,11 @@ static class Strings {
 	}
 
 	internal static class Watch {
-		internal static string HeaderInformation => Resources.Strings.Watch_HeaderInformation;
+		internal static string HeaderInformation(string project, string target, string tfm) => string.Format (Resources.Strings.Watch_HeaderInformation, project, target, tfm);
+		internal static string ReceivedCtrlC => Resources.Strings.Watch_ReceivedCtrlC;
+		internal static string ReceivedEsc => Resources.Strings.Watch_ReceivedEsc;
+		internal static string StopSynchronization => Resources.Strings.Watch_StopSynchronization;
+		internal static string ExitWatchInstructions(bool isInteractive) => isInteractive ? Resources.Strings.Watch_InteractiveInstructions : Resources.Strings.Watch_InputRedirectedInstructions;
 		internal static string StartMonitoringProject (string projectRootPath) => string.Format (Resources.Strings.Watch_StartMonitoringProject, projectRootPath);
 		internal static string StopMonitoringProject (string projectRootPath) => string.Format (Resources.Strings.Watch_StopMonitoringProject, projectRootPath);
 		internal static string FileChangeFilter (string filter) => string.Format (Resources.Strings.Watch_FileChangeFilter, filter);
