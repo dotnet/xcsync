@@ -29,7 +29,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 			e.Cancel = false;
 		};
 
-		LogInformation (Strings.Watch.HeaderInformation(ProjectPath, TargetPath, Tfm));
+		LogInformation (Strings.Watch.HeaderInformation (ProjectPath, TargetPath, Tfm));
 
 		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!);
 
@@ -44,7 +44,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 			}
 		}, cts.Token);
 
-		LogInformation (Strings.Watch.ExitWatchInstructions (!Console.IsInputRedirected) );
+		LogInformation (Strings.Watch.ExitWatchInstructions (!Console.IsInputRedirected));
 		var consoleReader = new ConsoleReader (cts.Token);
 		consoleReader.Start ();
 
