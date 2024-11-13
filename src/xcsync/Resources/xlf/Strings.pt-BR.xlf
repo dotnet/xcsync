@@ -218,13 +218,13 @@
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.PropertyNotImplementedException">
-        <source>Unsupported property type {}0</source>
-        <target state="new">Unsupported property type {}0</target>
+        <source>Unsupported property type {0}</source>
+        <target state="new">Unsupported property type {0}</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
-        <source>[{0}] Visiting {{1}}</source>
-        <target state="new">[{0}] Visiting {{1}}</target>
+        <source>[{0}] Visiting {{{1}}}</source>
+        <target state="new">[{0}] Visiting {{{1}}}</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
