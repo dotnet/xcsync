@@ -10,7 +10,7 @@ namespace xcsync.Commands;
 
 class GenerateCommand : XcodeCommand<GenerateCommand> {
 
-	public GenerateCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "generate", Strings.Commands.SyncDescription)
+	public GenerateCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "generate", Strings.Commands.GenerateDescription)
 	{
 		this.SetHandler (Execute);
 	}

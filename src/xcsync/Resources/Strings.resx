@@ -509,11 +509,11 @@ v    <data name="XcodeWorkspace.UsingDefaultSdkRoot" xml:space="preserve">
         <comment>{0} is the name of the syntax declaration</comment>
 	</data>
     <data name="ObjCSyntax.Visiting" xml:space="preserve">
-		<value>[{0}] Visiting {{1}}</value>
+		<value>[{0}] Visiting {{{1}}}</value>
         <comment>{0} is the name of the visitor class, {1} is the declaration kind name</comment>
 	</data>
     <data name="ObjCSyntax.PropertyNotImplementedException" xml:space="preserve">
-		<value>Unsupported property type {}0</value>
+		<value>Unsupported property type {0}</value>
         <comment>{0} is the name of the property type</comment>
 	</data>
     <data name="ObjCSyntax.ParsingProperty" xml:space="preserve">
@@ -535,6 +535,16 @@ v    <data name="XcodeWorkspace.UsingDefaultSdkRoot" xml:space="preserve">
     <data name="CopyFileWorker.CopiedFile" xml:space="preserve">
 		<value>Copied {0} to {1}</value>
         <comment>{0} is the source path, {1} is the destination path</comment>
+	</data>
+
+	<!-- General -->
+    <data name="General.FoundMsBuild" xml:space="preserve">
+		<value>Found MSBuild instance {0} at {1}</value>
+        <comment>{0} is a version number, {1} is the path</comment>
+	</data>
+    <data name="General.RegisteredMsBuild" xml:space="preserve">
+		<value>Registered MSBuild instance {0} at {1}</value>
+        <comment>{0} is a version number, {1} is the path</comment>
 	</data>
 
 </root>
