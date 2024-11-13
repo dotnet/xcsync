@@ -284,9 +284,24 @@
 
 	<!-- Watch Messages -->
 	<data name="Watch.HeaderInformation" xml:space="preserve">
-		<value>Syncing changes between project '{0}' and '{1}'.</value>
-		<comment>{0} is the path to the project file, {1} is the path to the target project</comment>
+		<value>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</value>
+		<comment>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</comment>
 	</data>
+	<data name="Watch.ReceivedCtrlC" xml:space="preserve">
+		<value>Received CTRL-C, exiting.</value>
+	</data>
+	<data name="Watch.ReceivedEsc" xml:space="preserve">
+		<value>Received ESC, exiting.</value>
+	</data>
+	<data name="Watch.StopSynchronization" xml:space="preserve">
+		<value>Stopping synchronization and completing remaining jobs.</value>
+	</data>
+	<data name="Watch.InputRedirectedInstructions" xml:space="preserve">
+		<value>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</value>
+	</data>
+	<data name="Watch.InteractiveInstructions" xml:space="preserve">
+		<value>Press Ctrl+C or ESC to stop.</value>
+	</data>	
 	<data name="Watch.StartMonitoringProject" xml:space="preserve">
 		<value>Monitoring project file changes in {0} started.</value>
 		<comment>{0} is the path to the project file</comment>

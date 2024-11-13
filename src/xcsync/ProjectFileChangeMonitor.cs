@@ -63,7 +63,11 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 		watcher.Renamed += OnRenamedHandler;
 		watcher.Error += OnErrorHandler;
 
-		watcher.EnableRaisingEvents = true;
+		try {
+			watcher.EnableRaisingEvents = true;
+		} catch (Exception ex) {
+			logger.Debug ($"{ex.Message}");
+		}
 
 		_extensionFilter = project.ProjectFilesFilter;
 
@@ -75,7 +79,7 @@ class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileS
 	/// </summary>
 	public void StopMonitoring ()
 	{
-		logger.Debug (Strings.Watch.StartMonitoringProject (project!.RootPath));
+		logger.Debug (Strings.Watch.StopMonitoringProject (project!.RootPath));
 
 		watcher.EnableRaisingEvents = false;
 
