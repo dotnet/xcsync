@@ -466,8 +466,6 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 
 	async Task SyncFromXcodeAsync (CancellationToken token)
 	{
-		Logger.Information (Strings.Sync.HeaderInformation, TargetDir, ProjectPath);
-
 		var projectName = FileSystem.Path.GetFileNameWithoutExtension (ProjectPath);
 
 		var dotNetProject = new ClrProject (FileSystem, Logger, TypeService, projectName, ProjectPath, Framework.ToString ());
@@ -525,7 +523,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
 
 		foreach (var type in typesToWrite) {
-			Logger.Information ("Processing type {Type}", type?.ClrType);
+			Logger.Information (Strings.SyncContext.ProcessingType (type?.ClrType ?? string.Empty));
 
 			// This gets the SyntaxTree from the *.designer.cs portion of the type
 			var typeSymbol = type?.TypeSymbol!;

@@ -98,7 +98,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			if (!string.IsNullOrEmpty (sdk)) break;
 		}
 		if (string.IsNullOrEmpty (sdk)) {
-			Logger.Warning ("SDKROOT not found in any release configuration, defaulting to 'macosx'");
+			Logger.Warning (Strings.XcodeWorkspace.UsingDefaultSdkRoot);
 			sdk = "macosx";
 		}
 		SdkRoot = sdk switch {
