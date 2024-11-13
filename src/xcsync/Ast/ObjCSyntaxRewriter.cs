@@ -78,7 +78,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 
 		protected override Task VisitDeclAsync (Decl decl)
 		{
-			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Visiting {{Kind}}", decl.DeclKindName);
+			logger.Debug (Strings.ObjCSyntax.Visiting (nameof (ObjCSyntaxRewriter), decl.DeclKindName));
 			switch (decl.Kind) {
 			case CX_DeclKind_ObjCInterface:
 				var objcImpl = decl as ObjCInterfaceDecl;
@@ -139,13 +139,13 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 
 			var propertyName = objcProperty.Name;
 
-			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Parsing property type '{objcProperty.Type.AsString}'");
+			logger.Debug (Strings.ObjCSyntax.ParsingProperty (nameof (ObjCSyntaxRewriter), objcProperty.Type.AsString));
 			// TODO: This is a *very* primitive way to get the property type and will need improvement
 			// TODO: Need a solution to handle the case where the property type is not found  or is null in the type mapping
 			var propertyType = objcProperty.Type switch { { Kind: CXType_ObjCObjectPointer } => typeService
 															  .QueryTypes (null, objcProperty.Type.AsString.Split (' ') [0])
 															  .First ()?.ClrType ?? string.Empty,
-				_ => throw new NotImplementedException ($"Unsupported property type {objcProperty.Type.KindSpelling}")
+				_ => throw new NotImplementedException (Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling))
 			};
 
 			// Create the property
@@ -213,19 +213,19 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 
 		protected override Task VisitAttrAsync (Attr attr)
 		{
-			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Visiting {{Kind}}", attr.KindSpelling);
+			logger.Debug (Strings.ObjCSyntax.Visiting (nameof (ObjCSyntaxRewriter), attr.KindSpelling));
 			return Task.CompletedTask;
 		}
 
 		protected override Task VisitRefAsync (Ref @ref)
 		{
-			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Visiting {{Kind}}", @ref.Spelling);
+			logger.Debug (Strings.ObjCSyntax.Visiting (nameof (ObjCSyntaxRewriter), @ref.Spelling));
 			return Task.CompletedTask;
 		}
 
 		protected override Task VisitStmtAsync (Stmt stmt)
 		{
-			logger.Debug ($"[{nameof (ObjCSyntaxRewriter)}] Visiting {{Kind}}", stmt.Spelling);
+			logger.Debug (Strings.ObjCSyntax.Visiting (nameof (ObjCSyntaxRewriter), stmt.Spelling));
 			return Task.CompletedTask;
 		}
 	}

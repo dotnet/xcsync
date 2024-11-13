@@ -29,19 +29,15 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		xcodeChanges.StartMonitoring (XcodeProject, token);
 
 		clrChanges.OnFileChanged = async path => {
-			Logger.Debug ($"CLR Project file {path} changed");
-
 			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.ToXcode, clrChanges, xcodeChanges));
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
-			Logger.Debug ($"Xcode Project file {path} changed");
 			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.FromXcode, clrChanges, xcodeChanges));
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
 		{
-			Logger.Debug ($"CLR Project file {oldPath} renamed to {newPath}");
 			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.ToXcode, clrChanges, xcodeChanges));
 		}
 
@@ -49,27 +45,25 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
-			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
 			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.FromXcode, clrChanges, xcodeChanges));
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
 
 		clrChanges.OnError = ex => {
-			Logger.Error (ex, $"Error:{ex.Message} in CLR Project file change monitor");
+			// TODO: Send Error to Marrille Error Channel
 		};
 
 		xcodeChanges.OnError = ex => {
-			Logger.Error (ex, $"Error:{ex.Message} in Xcode Project file change monitor");
+			// TODO: Send Error to Marrille Error Channel
 		};
 
 		do {
-			// TODO:  Use a FIFO queue to process the jobs
-			// Keep executing sync jobs until the user presses the esc sequence [CTRL-Q]
-			Logger.Debug ("Checking for changes in the projects...");
+			// Keep executing sync jobs until the process is canceled
+			await Task.Delay (10); // Just so we don't hog the thread.
 		} while (token.IsCancellationRequested == false);
 
-		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
+		Logger.Information (Strings.Watch.StopWatchProcess);
 	}
 
 	protected async override Task ConfigureMarilleHub ()

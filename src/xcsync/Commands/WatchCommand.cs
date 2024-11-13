@@ -11,8 +11,7 @@ namespace xcsync.Commands;
 class WatchCommand : XcodeCommand<WatchCommand> {
 	bool keepRunning = true;
 
-	public WatchCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "watch",
-			"generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project")
+	public WatchCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "watch", Strings.Commands.WatchDescription)
 	{
 		this.SetHandler (Execute, project, target, tfm, force, open);
 	}

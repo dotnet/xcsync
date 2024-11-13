@@ -83,10 +83,10 @@ static class Strings {
 		internal static string Syncing => Resources.Strings.Watch_Syncing;
 		internal static string ResumingMonitoring => Resources.Strings.Watch_ResumingMonitoring;
 		internal static string WorkerException (string messageId, string exceptionMessage) => string.Format (Resources.Strings.Watch_WorkerException, messageId, exceptionMessage);
+		internal static string StopWatchProcess => Resources.Strings.Watch_StopWatchProcess;
 	}
 
 	internal static class TypeService {
-
 		internal static string DuplicateType (string type) => string.Format (Resources.Strings.TypeService_DuplicateType, type);
 		internal static string MappingMismatch (string oldClrType, string oldObjCType, string newClrType, string newObjCType) => string.Format (Resources.Strings.TypeService_MappingMismatch, oldClrType, oldObjCType, newClrType, newObjCType);
 		internal static string MappingNotFound (string clrType, string objCType) => string.Format (Resources.Strings.TypeService_MappingNotFound, clrType, objCType);
@@ -101,6 +101,13 @@ static class Strings {
 		internal static string AssemblyUpdateError (string assemblyName) => string.Format (Resources.Strings.TypeService_AssemblyUpdateError, assemblyName);
 	}
 
+	internal static class ClrProject {
+		internal static string NotSupportedException (string path) => string.Format (Resources.Strings.ClrProject_NotSupportedException, path);
+		internal static string InvalidOperationException (string path, string message) => string.Format (Resources.Strings.ClrProject_InvalidOperationException, path, message);
+		internal static string CompilationError (string path, string message) => string.Format (Resources.Strings.ClrProject_CompilationError, path, message);
+		internal static string InvalidOperationError (string path, string message) => string.Format (Resources.Strings.ClrProject_InvalidOperationError, path, message);
+		internal static string UnexpectedError (string path, string message) => string.Format (Resources.Strings.ClrProject_UnexpectedError, path, message);
+	}
 	internal static class XcodeWorkspace {
 		internal static string XcodeProjectNotFound (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectNotFound, path);
 		internal static string FailToLoadXcodeProject (string path) => string.Format (Resources.Strings.XcodeWorkspace_FailToLoadXcodeProject, path);
@@ -120,10 +127,28 @@ static class Strings {
 		internal static string SkipProcessing (string path) => string.Format (Resources.Strings.XcodeWorkspace_SkipProcessing, path);
 		internal static string ProcessingFile (string path) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingFile, path);
 		internal static string ErrorProcessing (string path, string error, string stackTrace) => string.Format (Resources.Strings.XcodeWorkspace_ErrorProcessing, path, error, stackTrace);
+		internal static string UsingDefaultSdkRoot => Resources.Strings.XcodeWorkspace_UsingDefaultSdkRoot;
 	}
 
 	internal static class SyncContext {
 		internal static string SyncComplete => Resources.Strings.SyncContext_SyncComplete;
 		internal static string GeneratingFiles => Resources.Strings.SyncContext_GeneratingFiles;
+		internal static string ProcessingType(string typeName) => string.Format(Resources.Strings.SyncContext_ProcessingType, typeName);
 	}
-}
+
+	internal static class ObjCSyntax
+ 	{
+		internal static string ObjCImplementationDeclFound(string decl) => string.Format(Resources.Strings.ObjCSyntax_ObjCImplementationDeclFound, decl);
+		internal static string Visiting(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_Visiting, visitor, decl);
+		internal static string PropertyNotImplementedException(string decl) => string.Format(Resources.Strings.ObjCSyntax_PropertyNotImplementedException, decl);
+		internal static string ParsingProperty(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_ParsingProperty, visitor, decl);
+ 	}
+
+	internal static class Workers 
+	{
+		internal static string WroteFile(int bytes, string path) => string.Format(Resources.Strings.FileWorker_WroteFile, bytes, path);
+		internal static string CopiedFile(string source, string destination) => string.Format(Resources.Strings.CopyFileWorker_CopiedFile, source, destination);
+		internal static string ProcessingException => Resources.Strings.Worker_ProcessingException;
+		internal static string ProcessingError => Resources.Strings.Worker_ProcessingError;
+	}
+ }

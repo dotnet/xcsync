@@ -10,8 +10,7 @@ namespace xcsync.Commands;
 
 class GenerateCommand : XcodeCommand<GenerateCommand> {
 
-	public GenerateCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "generate",
-			"generate a Xcode project at the path specified by --target from the project identified by --project")
+	public GenerateCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "generate", Strings.Commands.SyncDescription)
 	{
 		this.SetHandler (Execute);
 	}
