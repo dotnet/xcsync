@@ -42,7 +42,7 @@ class XcSyncCommand : RootCommand {
 
 		SharedOptions.DotnetPath.AddValidator (result => {
 			xcSync.DotnetPath = result.GetValueForOption (SharedOptions.DotnetPath) ?? string.Empty;
-			Logger?.Information (Strings.Base.DotnetPath (xcSync.DotnetPath));
+			Logger?.Debug (Strings.Base.DotnetPath (xcSync.DotnetPath));
 		});
 
 		AddCommand (new GenerateCommand (fileSystem, Logger));
