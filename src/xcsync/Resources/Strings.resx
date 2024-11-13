@@ -522,4 +522,14 @@ v    <data name="XcodeWorkspace.UsingDefaultSdkRoot" xml:space="preserve">
         <comment>{0} is the source path, {1} is the destination path</comment>
 	</data>
 
+	<!-- General -->
+    <data name="General.FoundMsBuild" xml:space="preserve">
+		<value>Found MSBuild instance {0} at {1}</value>
+        <comment>{0} is a version number, {1} is the path</comment>
+	</data>
+    <data name="General.RegisteredMsBuild" xml:space="preserve">
+		<value>Registered MSBuild instance {0} at {1}</value>
+        <comment>{0} is a version number, {1} is the path</comment>
+	</data>
+
 </root>

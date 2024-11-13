@@ -177,6 +177,16 @@
         <target state="new">Wrote {0} bytes to {1}</target>
         <note>{0} is the number of bytes written, {1} is the path to the file</note>
       </trans-unit>
+      <trans-unit id="General.FoundMsBuild">
+        <source>Found MSBuild instance {0} at {1}</source>
+        <target state="new">Found MSBuild instance {0} at {1}</target>
+        <note>{0} is a version number, {1} is the path</note>
+      </trans-unit>
+      <trans-unit id="General.RegisteredMsBuild">
+        <source>Registered MSBuild instance {0} at {1}</source>
+        <target state="new">Registered MSBuild instance {0} at {1}</target>
+        <note>{0} is a version number, {1} is the path</note>
+      </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
         <source>Generated Xcode header and implementation files</source>
         <target state="translated">Cabeçalho e arquivos de implementação do Xcode gerados</target>

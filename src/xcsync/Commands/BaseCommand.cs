@@ -80,7 +80,7 @@ class BaseCommand<T> : Command {
 			}
 
 			xcSync.XcodePath = Scripts.SelectXcode ();
-			Logger?.Information (Strings.Base.XcodePath (xcSync.XcodePath));
+			Logger?.Debug (Strings.Base.XcodePath (xcSync.XcodePath));
 
 			var validation = ValidateCommand (result);
 
