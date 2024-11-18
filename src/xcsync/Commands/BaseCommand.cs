@@ -143,7 +143,7 @@ class BaseCommand<T> : Command {
 			}
 
 			LogDebug (Strings.Base.FoundProjectFile (csprojFiles [0], projectPath));
-			updatedPath = fileSystem.Path.Combine( fileSystem.Path.GetDirectoryName(projectPath) ?? string.Empty, csprojFiles [0] );
+			updatedPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? string.Empty, csprojFiles [0]);
 		}
 
 		if (!fileSystem.File.Exists (updatedPath)) {
