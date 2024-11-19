@@ -44,27 +44,27 @@
       </trans-unit>
       <trans-unit id="ClrProject.CompilationError">
         <source>Compilation error in project '{0}' : {1}</source>
-        <target state="new">Compilation error in project '{0}' : {1}</target>
+        <target state="translated">'{0}' 프로젝트의 컴파일 오류: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationError">
         <source>Invalid operation while processing project '{0}' : {1}</source>
-        <target state="new">Invalid operation while processing project '{0}' : {1}</target>
+        <target state="translated">'{0}' 프로젝트를 처리하는 동안 잘못된 작업: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationException">
         <source>Compilation errors detected in project '{0}': {1}}</source>
-        <target state="new">Compilation errors detected in project '{0}': {1}}</target>
+        <target state="translated">'{0}' 프로젝트에서 컴파일 오류가 검색되었습니다. {1}}</target>
         <note>{0} is the path to the .NET project, {1} is the list of error messages</note>
       </trans-unit>
       <trans-unit id="ClrProject.NotSupportedException">
         <source>Compilation not supported for current project  '{0}'</source>
-        <target state="new">Compilation not supported for current project  '{0}'</target>
+        <target state="translated">현재 프로젝트 '{0}'에 대해 컴파일이 지원되지 않습니다.</target>
         <note>{0} is the path to the .NET project</note>
       </trans-unit>
       <trans-unit id="ClrProject.UnexpectedError">
         <source>Unexpected error occurred while processing project '{0}' : {1}</source>
-        <target state="new">Unexpected error occurred while processing project '{0}' : {1}</target>
+        <target state="translated">'{0}' 프로젝트를 처리하는 동안 예기치 않은 오류가 발생했습니다. {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
@@ -79,12 +79,12 @@
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
         <source>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
-        <target state="new">generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</target>
+        <target state="translated">Xcode 프로젝트를 생성한 다음 Xcode 프로젝트와 .NET 프로젝트 간의 변경 내용을 지속적으로 동기화합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="CopyFileWorker.CopiedFile">
         <source>Copied {0} to {1}</source>
-        <target state="new">Copied {0} to {1}</target>
+        <target state="translated">{0}을(를) {1}에 복사했습니다.</target>
         <note>{0} is the source path, {1} is the destination path</note>
       </trans-unit>
       <trans-unit id="Errors.CsprojNotFound">
@@ -109,7 +109,7 @@
       </trans-unit>
       <trans-unit id="Errors.PbxprojNotFound">
         <source>Could not find a project.pbxproj file in path '{0}'</source>
-        <target state="new">Could not find a project.pbxproj file in path '{0}'</target>
+        <target state="translated">'{0}' 경로에서 project.pbxproj 파일을 찾을 수 없습니다.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
@@ -169,22 +169,22 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetIsNotValidXcodeProjectFolder">
         <source>Target path '{0}' does not exist, or is not a valid Xcode project folder.</source>
-        <target state="new">Target path '{0}' does not exist, or is not a valid Xcode project folder.</target>
+        <target state="translated">대상 경로 '{0}'이(가) 없거나 올바른 Xcode 프로젝트 폴더가 아닙니다.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="FileWorker.WroteFile">
         <source>Wrote {0} bytes to {1}</source>
-        <target state="new">Wrote {0} bytes to {1}</target>
+        <target state="translated">{0} 바이트를 {1}에 작성했습니다.</target>
         <note>{0} is the number of bytes written, {1} is the path to the file</note>
       </trans-unit>
       <trans-unit id="General.FoundMsBuild">
         <source>Found MSBuild instance {0} at {1}</source>
-        <target state="new">Found MSBuild instance {0} at {1}</target>
+        <target state="translated">{1}에서 MSBuild 인스턴스 {0}을(를) 찾았습니다.</target>
         <note>{0} is a version number, {1} is the path</note>
       </trans-unit>
       <trans-unit id="General.RegisteredMsBuild">
         <source>Registered MSBuild instance {0} at {1}</source>
-        <target state="new">Registered MSBuild instance {0} at {1}</target>
+        <target state="translated">{1}에 등록된 MSBuild 인스턴스 {0}</target>
         <note>{0} is a version number, {1} is the path</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
@@ -209,22 +209,22 @@
       </trans-unit>
       <trans-unit id="ObjCSyntax.ObjCImplementationDeclFound">
         <source>Found ObjCImplementationDecl: {0}</source>
-        <target state="new">Found ObjCImplementationDecl: {0}</target>
+        <target state="translated">ObjCImplementationDecl을 찾았습니다. {0}</target>
         <note>{0} is the name of the syntax declaration</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.ParsingProperty">
         <source>[{0}] Parsing property type '{0}'</source>
-        <target state="new">[{0}] Parsing property type '{0}'</target>
+        <target state="translated">[{0}] 속성 형식 '{0}'을(를) 구문 분석하는 중</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.PropertyNotImplementedException">
         <source>Unsupported property type {0}</source>
-        <target state="new">Unsupported property type {0}</target>
+        <target state="translated">지원되지 않는 속성 형식 {0}</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
         <source>[{0}] Visiting {{{1}}}</source>
-        <target state="new">[{0}] Visiting {{{1}}}</target>
+        <target state="translated">[{0}] 방문 중 {{{1}}}</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
@@ -281,7 +281,7 @@
       </trans-unit>
       <trans-unit id="SyncContext.ProcessingType">
         <source>Processing type {0}</source>
-        <target state="new">Processing type {0}</target>
+        <target state="translated">처리 유형 {0}</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
@@ -371,17 +371,17 @@
       </trans-unit>
       <trans-unit id="Watch.HeaderInformation">
         <source>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</source>
-        <target state="new">Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</target>
+        <target state="translated">'{2}' 플랫폼에 대해 '{0}'에서 '{1}'(으)로 파일을 지속적으로 동기화합니다.</target>
         <note>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</note>
       </trans-unit>
       <trans-unit id="Watch.InputRedirectedInstructions">
         <source>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</source>
-        <target state="new">&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</target>
+        <target state="translated">&gt;&gt;&gt; 입력이 리디렉션되고 SIGINT를 기다리고 있습니다 &lt;&lt;&lt;</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.InteractiveInstructions">
         <source>Press Ctrl+C or ESC to stop.</source>
-        <target state="new">Press Ctrl+C or ESC to stop.</target>
+        <target state="translated">중지하려면 Ctrl+C 또는 ESC를 누릅니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.PausingMonitoring">
@@ -391,12 +391,12 @@
       </trans-unit>
       <trans-unit id="Watch.ReceivedCtrlC">
         <source>Received CTRL-C, exiting.</source>
-        <target state="new">Received CTRL-C, exiting.</target>
+        <target state="translated">Ctrl-C를 받았습니다. 종료됩니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ReceivedEsc">
         <source>Received ESC, exiting.</source>
-        <target state="new">Received ESC, exiting.</target>
+        <target state="translated">ESC를 받았으므로 종료됩니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ResumingMonitoring">
@@ -416,12 +416,12 @@
       </trans-unit>
       <trans-unit id="Watch.StopSynchronization">
         <source>Stopping synchronization and completing remaining jobs.</source>
-        <target state="new">Stopping synchronization and completing remaining jobs.</target>
+        <target state="translated">동기화를 중지하고 나머지 작업을 완료합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.StopWatchProcess">
         <source>User has requested to stop the sync process. Changes will no longer be processed.</source>
-        <target state="new">User has requested to stop the sync process. Changes will no longer be processed.</target>
+        <target state="translated">사용자가 동기화 프로세스를 중지하도록 요청했습니다. 변경 내용이 더 이상 처리되지 않습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.Syncing">
@@ -436,12 +436,12 @@
       </trans-unit>
       <trans-unit id="Worker.ProcessingError">
         <source>Error processing message.</source>
-        <target state="new">Error processing message.</target>
+        <target state="translated">메시지를 처리하는 동안 오류가 발생했습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Worker.ProcessingException">
         <source>Exception processing message.</source>
-        <target state="new">Exception processing message.</target>
+        <target state="translated">메시지를 처리하는 동안 예외가 발생했습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorDiagnosticIssue">
@@ -521,7 +521,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.UsingDefaultSdkRoot">
         <source>SDKROOT not found in any release configuration, defaulting to 'macosx'</source>
-        <target state="new">SDKROOT not found in any release configuration, defaulting to 'macosx'</target>
+        <target state="translated">릴리스 구성에서 SDKROOT를 찾을 수 없습니다. 기본값은 'macosx'입니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.WarningDiagnosticIssue">
