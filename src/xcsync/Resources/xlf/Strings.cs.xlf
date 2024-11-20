@@ -44,27 +44,27 @@
       </trans-unit>
       <trans-unit id="ClrProject.CompilationError">
         <source>Compilation error in project '{0}' : {1}</source>
-        <target state="new">Compilation error in project '{0}' : {1}</target>
+        <target state="translated">Chyba kompilace v projektu {0}: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationError">
         <source>Invalid operation while processing project '{0}' : {1}</source>
-        <target state="new">Invalid operation while processing project '{0}' : {1}</target>
+        <target state="translated">Neplatná operace při zpracování projektu {0}: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationException">
         <source>Compilation errors detected in project '{0}': {1}}</source>
-        <target state="new">Compilation errors detected in project '{0}': {1}}</target>
+        <target state="translated">V projektu {0} byly zjištěny chyby kompilace: {1}}</target>
         <note>{0} is the path to the .NET project, {1} is the list of error messages</note>
       </trans-unit>
       <trans-unit id="ClrProject.NotSupportedException">
         <source>Compilation not supported for current project  '{0}'</source>
-        <target state="new">Compilation not supported for current project  '{0}'</target>
+        <target state="translated">Kompilace se pro aktuální projekt {0} nepodporuje.</target>
         <note>{0} is the path to the .NET project</note>
       </trans-unit>
       <trans-unit id="ClrProject.UnexpectedError">
         <source>Unexpected error occurred while processing project '{0}' : {1}</source>
-        <target state="new">Unexpected error occurred while processing project '{0}' : {1}</target>
+        <target state="translated">Při zpracování projektu {0} došlo k neočekávané chybě: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
@@ -79,12 +79,12 @@
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
         <source>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
-        <target state="new">generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</target>
+        <target state="translated">generuje projekt Xcode a pak průběžně synchronizuje změny mezi projektem Xcode a projektem .NET.</target>
         <note />
       </trans-unit>
       <trans-unit id="CopyFileWorker.CopiedFile">
         <source>Copied {0} to {1}</source>
-        <target state="new">Copied {0} to {1}</target>
+        <target state="translated">Zkopírováno: {0} do {1}</target>
         <note>{0} is the source path, {1} is the destination path</note>
       </trans-unit>
       <trans-unit id="Errors.CsprojNotFound">
@@ -109,7 +109,7 @@
       </trans-unit>
       <trans-unit id="Errors.PbxprojNotFound">
         <source>Could not find a project.pbxproj file in path '{0}'</source>
-        <target state="new">Could not find a project.pbxproj file in path '{0}'</target>
+        <target state="translated">V cestě {0} se nepovedlo najít soubor project.pbxproj.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
@@ -169,22 +169,22 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetIsNotValidXcodeProjectFolder">
         <source>Target path '{0}' does not exist, or is not a valid Xcode project folder.</source>
-        <target state="new">Target path '{0}' does not exist, or is not a valid Xcode project folder.</target>
+        <target state="translated">Cílová cesta {0} neexistuje nebo se nejedná o platnou složku projektu Xcode.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="FileWorker.WroteFile">
         <source>Wrote {0} bytes to {1}</source>
-        <target state="new">Wrote {0} bytes to {1}</target>
+        <target state="translated">Počet bajtů zapsaných do {1}: {0}</target>
         <note>{0} is the number of bytes written, {1} is the path to the file</note>
       </trans-unit>
       <trans-unit id="General.FoundMsBuild">
         <source>Found MSBuild instance {0} at {1}</source>
-        <target state="new">Found MSBuild instance {0} at {1}</target>
+        <target state="translated">Nalezena instance MSBuild {0} v {1}</target>
         <note>{0} is a version number, {1} is the path</note>
       </trans-unit>
       <trans-unit id="General.RegisteredMsBuild">
         <source>Registered MSBuild instance {0} at {1}</source>
-        <target state="new">Registered MSBuild instance {0} at {1}</target>
+        <target state="translated">Zaregistrována instance MSBuild {0} v {1}</target>
         <note>{0} is a version number, {1} is the path</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
@@ -209,22 +209,22 @@
       </trans-unit>
       <trans-unit id="ObjCSyntax.ObjCImplementationDeclFound">
         <source>Found ObjCImplementationDecl: {0}</source>
-        <target state="new">Found ObjCImplementationDecl: {0}</target>
+        <target state="translated">Nalezené ObjCImplementationDecl: {0}</target>
         <note>{0} is the name of the syntax declaration</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.ParsingProperty">
         <source>[{0}] Parsing property type '{0}'</source>
-        <target state="new">[{0}] Parsing property type '{0}'</target>
+        <target state="translated">[{0}] Analýza typu vlastnosti {0}</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.PropertyNotImplementedException">
         <source>Unsupported property type {0}</source>
-        <target state="new">Unsupported property type {0}</target>
+        <target state="translated">Nepodporovaný typ vlastnosti {0}</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
         <source>[{0}] Visiting {{{1}}}</source>
-        <target state="new">[{0}] Visiting {{{1}}}</target>
+        <target state="translated">[{0}] Návštěva {{{1}}}</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
@@ -281,7 +281,7 @@
       </trans-unit>
       <trans-unit id="SyncContext.ProcessingType">
         <source>Processing type {0}</source>
-        <target state="new">Processing type {0}</target>
+        <target state="translated">Typ zpracování {0}</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
@@ -371,17 +371,17 @@
       </trans-unit>
       <trans-unit id="Watch.HeaderInformation">
         <source>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</source>
-        <target state="new">Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</target>
+        <target state="translated">Průběžná synchronizace souborů mezi {0} a {1} pro platformu {2}</target>
         <note>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</note>
       </trans-unit>
       <trans-unit id="Watch.InputRedirectedInstructions">
         <source>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</source>
-        <target state="new">&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</target>
+        <target state="translated">&gt;&gt;&gt; Vstup je přesměrován, čeká se na SIGINT &lt;&lt;&lt;</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.InteractiveInstructions">
         <source>Press Ctrl+C or ESC to stop.</source>
-        <target state="new">Press Ctrl+C or ESC to stop.</target>
+        <target state="translated">Zastavte stisknutím kombinace kláves Ctrl+C nebo ESC.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.PausingMonitoring">
@@ -391,12 +391,12 @@
       </trans-unit>
       <trans-unit id="Watch.ReceivedCtrlC">
         <source>Received CTRL-C, exiting.</source>
-        <target state="new">Received CTRL-C, exiting.</target>
+        <target state="translated">Přijato stisknutí kombinace kláves CTRL-C, ukončování.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ReceivedEsc">
         <source>Received ESC, exiting.</source>
-        <target state="new">Received ESC, exiting.</target>
+        <target state="translated">Byla přijato stisknutí klávesy ESC, ukončování.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ResumingMonitoring">
@@ -416,12 +416,12 @@
       </trans-unit>
       <trans-unit id="Watch.StopSynchronization">
         <source>Stopping synchronization and completing remaining jobs.</source>
-        <target state="new">Stopping synchronization and completing remaining jobs.</target>
+        <target state="translated">Zastavuje se synchronizace a dokončují se zbývající úlohy.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.StopWatchProcess">
         <source>User has requested to stop the sync process. Changes will no longer be processed.</source>
-        <target state="new">User has requested to stop the sync process. Changes will no longer be processed.</target>
+        <target state="translated">Uživatel požádal o zastavení procesu synchronizace. Změny se už nebudou zpracovávat.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.Syncing">
@@ -436,12 +436,12 @@
       </trans-unit>
       <trans-unit id="Worker.ProcessingError">
         <source>Error processing message.</source>
-        <target state="new">Error processing message.</target>
+        <target state="translated">Při zpracování zprávy došlo k chybě.</target>
         <note />
       </trans-unit>
       <trans-unit id="Worker.ProcessingException">
         <source>Exception processing message.</source>
-        <target state="new">Exception processing message.</target>
+        <target state="translated">Při zpracování zprávy došlo k výjimce.</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorDiagnosticIssue">
@@ -521,7 +521,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.UsingDefaultSdkRoot">
         <source>SDKROOT not found in any release configuration, defaulting to 'macosx'</source>
-        <target state="new">SDKROOT not found in any release configuration, defaulting to 'macosx'</target>
+        <target state="translated">V žádné konfiguraci vydané verze se nenašla hodnota SDKROOT, výchozí hodnota je macosx.</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.WarningDiagnosticIssue">

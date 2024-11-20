@@ -44,27 +44,27 @@
       </trans-unit>
       <trans-unit id="ClrProject.CompilationError">
         <source>Compilation error in project '{0}' : {1}</source>
-        <target state="new">Compilation error in project '{0}' : {1}</target>
+        <target state="translated">Error de compilación en el proyecto "{0}": {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationError">
         <source>Invalid operation while processing project '{0}' : {1}</source>
-        <target state="new">Invalid operation while processing project '{0}' : {1}</target>
+        <target state="translated">Operación no válida al procesar el proyecto "{0}": {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationException">
         <source>Compilation errors detected in project '{0}': {1}}</source>
-        <target state="new">Compilation errors detected in project '{0}': {1}}</target>
+        <target state="translated">Errores de compilación detectados en el proyecto "{0}": {1}}</target>
         <note>{0} is the path to the .NET project, {1} is the list of error messages</note>
       </trans-unit>
       <trans-unit id="ClrProject.NotSupportedException">
         <source>Compilation not supported for current project  '{0}'</source>
-        <target state="new">Compilation not supported for current project  '{0}'</target>
+        <target state="translated">Compilación no admitida para el proyecto actual "{0}"</target>
         <note>{0} is the path to the .NET project</note>
       </trans-unit>
       <trans-unit id="ClrProject.UnexpectedError">
         <source>Unexpected error occurred while processing project '{0}' : {1}</source>
-        <target state="new">Unexpected error occurred while processing project '{0}' : {1}</target>
+        <target state="translated">Error inesperado al procesar el proyecto "{0}" : {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
@@ -79,12 +79,12 @@
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
         <source>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
-        <target state="new">generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</target>
+        <target state="translated">genera un proyecto de Xcode y, a continuación, sincroniza continuamente los cambios entre el proyecto de Xcode y el proyecto de .NET.</target>
         <note />
       </trans-unit>
       <trans-unit id="CopyFileWorker.CopiedFile">
         <source>Copied {0} to {1}</source>
-        <target state="new">Copied {0} to {1}</target>
+        <target state="translated">Se copió "{0}" en "{1}".</target>
         <note>{0} is the source path, {1} is the destination path</note>
       </trans-unit>
       <trans-unit id="Errors.CsprojNotFound">
@@ -109,7 +109,7 @@
       </trans-unit>
       <trans-unit id="Errors.PbxprojNotFound">
         <source>Could not find a project.pbxproj file in path '{0}'</source>
-        <target state="new">Could not find a project.pbxproj file in path '{0}'</target>
+        <target state="translated">No se encontró un archivo project.pbxproj en la ruta de acceso "{0}"</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
@@ -169,22 +169,22 @@
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetIsNotValidXcodeProjectFolder">
         <source>Target path '{0}' does not exist, or is not a valid Xcode project folder.</source>
-        <target state="new">Target path '{0}' does not exist, or is not a valid Xcode project folder.</target>
+        <target state="translated">La ruta de acceso de destino "{0}" no existe o no es una carpeta de proyecto de Xcode válida.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="FileWorker.WroteFile">
         <source>Wrote {0} bytes to {1}</source>
-        <target state="new">Wrote {0} bytes to {1}</target>
+        <target state="translated">Bytes escritos {0} en {1}</target>
         <note>{0} is the number of bytes written, {1} is the path to the file</note>
       </trans-unit>
       <trans-unit id="General.FoundMsBuild">
         <source>Found MSBuild instance {0} at {1}</source>
-        <target state="new">Found MSBuild instance {0} at {1}</target>
+        <target state="translated">Instancia de MSBuild {0} encontrada en {1}</target>
         <note>{0} is a version number, {1} is the path</note>
       </trans-unit>
       <trans-unit id="General.RegisteredMsBuild">
         <source>Registered MSBuild instance {0} at {1}</source>
-        <target state="new">Registered MSBuild instance {0} at {1}</target>
+        <target state="translated">Instancia de MSBuild {0} registrada en {1}</target>
         <note>{0} is a version number, {1} is the path</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
@@ -209,22 +209,22 @@
       </trans-unit>
       <trans-unit id="ObjCSyntax.ObjCImplementationDeclFound">
         <source>Found ObjCImplementationDecl: {0}</source>
-        <target state="new">Found ObjCImplementationDecl: {0}</target>
+        <target state="translated">Se encontró ObjCImplementationDecl: {0}</target>
         <note>{0} is the name of the syntax declaration</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.ParsingProperty">
         <source>[{0}] Parsing property type '{0}'</source>
-        <target state="new">[{0}] Parsing property type '{0}'</target>
+        <target state="translated">[{0}] Analizando tipo de propiedad "{0}"</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.PropertyNotImplementedException">
         <source>Unsupported property type {0}</source>
-        <target state="new">Unsupported property type {0}</target>
+        <target state="translated">Tipo de propiedad no compatible {0}.</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
         <source>[{0}] Visiting {{{1}}}</source>
-        <target state="new">[{0}] Visiting {{{1}}}</target>
+        <target state="translated">[{0}] Visitando {{{1}}}</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
@@ -281,7 +281,7 @@
       </trans-unit>
       <trans-unit id="SyncContext.ProcessingType">
         <source>Processing type {0}</source>
-        <target state="new">Processing type {0}</target>
+        <target state="translated">Procesando tipo {0}</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
@@ -371,17 +371,17 @@
       </trans-unit>
       <trans-unit id="Watch.HeaderInformation">
         <source>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</source>
-        <target state="new">Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</target>
+        <target state="translated">Sincronizando archivos continuamente entre "{0}" y "{1}" para la plataforma "{2}".</target>
         <note>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</note>
       </trans-unit>
       <trans-unit id="Watch.InputRedirectedInstructions">
         <source>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</source>
-        <target state="new">&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</target>
+        <target state="translated">&gt;&gt;&gt; La entrada se ha redirigido, esperando SIGINT &lt;&lt;&lt;</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.InteractiveInstructions">
         <source>Press Ctrl+C or ESC to stop.</source>
-        <target state="new">Press Ctrl+C or ESC to stop.</target>
+        <target state="translated">Presione Ctrl+C o ESC para detener.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.PausingMonitoring">
@@ -391,12 +391,12 @@
       </trans-unit>
       <trans-unit id="Watch.ReceivedCtrlC">
         <source>Received CTRL-C, exiting.</source>
-        <target state="new">Received CTRL-C, exiting.</target>
+        <target state="translated">Se recibió CTRL-C, saliendo.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ReceivedEsc">
         <source>Received ESC, exiting.</source>
-        <target state="new">Received ESC, exiting.</target>
+        <target state="translated">Se recibió el ESC, saliendo.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ResumingMonitoring">
@@ -416,12 +416,12 @@
       </trans-unit>
       <trans-unit id="Watch.StopSynchronization">
         <source>Stopping synchronization and completing remaining jobs.</source>
-        <target state="new">Stopping synchronization and completing remaining jobs.</target>
+        <target state="translated">Deteniendo la sincronización y completando los trabajos restantes.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.StopWatchProcess">
         <source>User has requested to stop the sync process. Changes will no longer be processed.</source>
-        <target state="new">User has requested to stop the sync process. Changes will no longer be processed.</target>
+        <target state="translated">El usuario ha solicitado detener el proceso de sincronización. Los cambios ya no se procesarán.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.Syncing">
@@ -436,12 +436,12 @@
       </trans-unit>
       <trans-unit id="Worker.ProcessingError">
         <source>Error processing message.</source>
-        <target state="new">Error processing message.</target>
+        <target state="translated">Se produjo un error al procesar el mensaje.</target>
         <note />
       </trans-unit>
       <trans-unit id="Worker.ProcessingException">
         <source>Exception processing message.</source>
-        <target state="new">Exception processing message.</target>
+        <target state="translated">Mensaje de procesamiento de excepciones.</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorDiagnosticIssue">
@@ -521,7 +521,7 @@
       </trans-unit>
       <trans-unit id="XcodeWorkspace.UsingDefaultSdkRoot">
         <source>SDKROOT not found in any release configuration, defaulting to 'macosx'</source>
-        <target state="new">SDKROOT not found in any release configuration, defaulting to 'macosx'</target>
+        <target state="translated">SDKROOT no se encuentra en ninguna configuración de versión, con el valor predeterminado "macosx".</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.WarningDiagnosticIssue">
