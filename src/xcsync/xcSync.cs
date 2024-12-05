@@ -46,15 +46,8 @@ static class xcSync {
 	static void RegisterMSBuild ()
 	{
 		if (!MSBuildLocator.IsRegistered) {
-			var msbuildInstances = MSBuildLocator.QueryVisualStudioInstances ()
-				.OrderByDescending (instance => instance.Version);
-
-			foreach (var instance in msbuildInstances)
-				Logger?.Debug ("Found MSBuild instance {0} at {1}", instance.Version, instance.MSBuildPath);
-			var msbuildInstance = msbuildInstances.First ();
-
-			// Register a specific instance of MSBuild
-			MSBuildLocator.RegisterInstance (msbuildInstance);
+			// API resolves the path to MSBuild via the .NET Core SDK
+			var msbuildInstance = MSBuildLocator.RegisterDefaults ();
 			Logger?.Debug ("Registered MSBuild instance {0} at {1}", msbuildInstance.Version, msbuildInstance.MSBuildPath);
 		}
 	}
