@@ -49,7 +49,7 @@ class XcodeObject {
 }
 
 class PBXBuildPhase : XcodeObject {
-	
+
 	[JsonPropertyName ("buildActionMask")]
 	public string BuildActionMask { get; set; } = int.MaxValue.ToString ();
 
