@@ -76,6 +76,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.Formats.Asn1" />
     <PackageReference Include="Microsoft.Extensions.Logging" />    
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Enrichers.Thread" />
