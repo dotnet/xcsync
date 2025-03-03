@@ -18,7 +18,7 @@
     <MicrosoftBuildLocatorPackageVersion>1.7.8</MicrosoftBuildLocatorPackageVersion>
     <MicrosoftCodeAnalysisPackageVersion>4.12.0</MicrosoftCodeAnalysisPackageVersion>
     <MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion>4.12.0</MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion>
-    <MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion>4.12.0</MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion>
+    <MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion>4.13.0</MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>8.0.0</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftNETSdkPackageVersion>9.0.100-rc.2.24420.21</MicrosoftNETSdkPackageVersion>    
     <SerilogPackageVersion>4.0.0</SerilogPackageVersion>
