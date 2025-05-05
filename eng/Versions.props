@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <!-- Bump packages using link below -->
-	<!-- For non-MSFT packages, use `New or non-Microsoft package` even when updating..-->
+    <!-- For non-MSFT packages, use `New or non-Microsoft package` even when updating..-->
     <!-- https://github.com/dotnet/arcade/blob/main/Documentation/MirroringPackages.md -->
     <MarillePackageVersion>0.5.3</MarillePackageVersion>
     <MicrosoftBuildPackageVersion>17.10.4</MicrosoftBuildPackageVersion>
@@ -40,11 +40,20 @@
     <libClangRuntimeOsxX64PackageVersion>18.1.3</libClangRuntimeOsxX64PackageVersion>
     <libClangSharpRuntimeOsxX64PackageVersion>18.1.3.1</libClangSharpRuntimeOsxX64PackageVersion>
     <!-- Test Packages -->
-    <MoqPackageVersion>4.20.70</MoqPackageVersion>
     <SerilogSinksXunitPackageVersion>3.0.5</SerilogSinksXunitPackageVersion>
     <SystemLinqAsyncPackageVersion>6.0.1</SystemLinqAsyncPackageVersion>
     <CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
     <TestableIOSystemIOAbstractionsTestingHelpers>21.0.2</TestableIOSystemIOAbstractionsTestingHelpers>
     <MicrosoftDotNetXUnitExtensionsPackageVersion>8.0.0-beta.24376.1</MicrosoftDotNetXUnitExtensionsPackageVersion>
   </PropertyGroup>
+
+  <PropertyGroup Label="LockedPackageVersions">
+    <!--
+    Moq should not be updated to a newer version than 4.18.4.
+    For details, please see
+    https://www.bleepingcomputer.com/news/security/popular-open-source-project-moq-criticized-for-quietly-collecting-data/
+    -->
+    <MoqPackageVersion>4.18.4</MoqPackageVersion>
+  </PropertyGroup>
+
 </Project>
