@@ -81,6 +81,12 @@ gitGraph LR:
 	checkout main
 	commit
 	commit
+	checkout prerelease
+	commit tag: "v1.0.97+8d93f167d-preview"
+	checkout main
+	commit
+	merge prerelease
+	commit 
 	commit
 	checkout prerelease
 	merge main tag: "v1.0.100+c39c66439a-preview"
