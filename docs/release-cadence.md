@@ -71,7 +71,9 @@ gitGraph LR:
 	checkout main
 	commit
 	branch prerelease order: 1
+	commit
 	branch release order: 2
+	commit
 	checkout main
 	commit
 	checkout prerelease
