@@ -12,12 +12,12 @@ namespace xcsync.Commands;
 class WatchCommand : XcodeCommand<WatchCommand> {
 
 	public WatchCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "watch", Strings.Commands.WatchDescription)
-	{		
+	{
 		SetAction (ExecuteAsync);
 	}
 
 	public async Task ExecuteAsync (ParseResult result, CancellationToken cancellationToken)
-	{		
+	{
 		var open = result.GetValue (this.open);
 		var force = result.GetValue (this.force);
 

@@ -36,9 +36,9 @@ class BaseCommand<T> : Command {
 	protected string TargetPlatform => TryGetTargetPlatform (Tfm, out string targetPlatform) ? targetPlatform : string.Empty;
 	protected readonly IFileSystem fileSystem;
 
-	protected Option<string> project = new ( "project", ["--project", "-p"] ) {
+	protected Option<string> project = new ("project", ["--project", "-p"]) {
 		Description = Strings.Options.ProjectDescription,
-		DefaultValueFactory = (p) => "." 
+		DefaultValueFactory = (p) => "."
 	};
 
 	protected Option<string> tfm = new ("TargetFrameworkMoniker", ["--target-framework-moniker", "-tfm"]) {
@@ -75,7 +75,7 @@ class BaseCommand<T> : Command {
 		Validators.Add ((result) => {
 
 			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				result.AddError(Strings.Errors.Validation.InvalidOS);
+				result.AddError (Strings.Errors.Validation.InvalidOS);
 				return;
 			}
 

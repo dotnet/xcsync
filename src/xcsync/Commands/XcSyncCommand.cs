@@ -17,8 +17,8 @@ class XcSyncCommand : RootCommand {
 		Logger = logger ?? xcSync.Logger!
 			.ForContext ("SourceContext", typeof (XcSyncCommand).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
 
-		Options.Add( SharedOptions.Verbose);
-		Options.Add( SharedOptions.DotnetPath);
+		Options.Add (SharedOptions.Verbose);
+		Options.Add (SharedOptions.DotnetPath);
 
 		SharedOptions.Verbose.Validators.Add (result => {
 			try {
@@ -35,7 +35,7 @@ class XcSyncCommand : RootCommand {
 					_ => LogEventLevel.Information,
 				};
 			} catch (InvalidOperationException) {
-				result.AddError(Strings.Errors.Validation.InvalidVerbosity);
+				result.AddError (Strings.Errors.Validation.InvalidVerbosity);
 			}
 		});
 
