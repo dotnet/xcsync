@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 
 using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using Microsoft.Build.Locator;
@@ -36,10 +34,7 @@ static class xcSync {
 
 		RegisterMSBuild ();
 
-		var parser = new CommandLineBuilder (new XcSyncCommand (FileSystem))
-			.UseDefaults ()
-			.Build ();
-
+		var parser = new CommandLineConfiguration (new XcSyncCommand (FileSystem));
 		return await parser.InvokeAsync (args).ConfigureAwait (false);
 	}
 

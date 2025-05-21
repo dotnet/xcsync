@@ -11,10 +11,10 @@ namespace xcsync.Commands;
 class SyncCommand : BaseCommand<SyncCommand> {
 	public SyncCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "sync", Strings.Commands.SyncDescription)
 	{
-		this.SetHandler (Execute);
+		SetAction (ExecuteAsync);
 	}
 
-	public async Task Execute ()
+	public async Task ExecuteAsync (ParseResult result, CancellationToken cancellationToken)
 	{
 		Logger?.Information (Strings.Sync.HeaderInformation, TargetPath, ProjectPath);
 

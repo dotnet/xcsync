@@ -12,10 +12,10 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 
 	public GenerateCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "generate", Strings.Commands.GenerateDescription)
 	{
-		this.SetHandler (Execute);
+		SetAction (ExecuteAsync);
 	}
 
-	public async Task Execute ()
+	public async Task ExecuteAsync (ParseResult result, CancellationToken cancellationToken)
 	{
 		Logger?.Information (Strings.Generate.HeaderInformation, ProjectPath, TargetPath);
 

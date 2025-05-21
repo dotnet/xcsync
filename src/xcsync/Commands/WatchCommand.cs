@@ -4,7 +4,6 @@
 using System.Collections.Concurrent;
 using System.CommandLine;
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
 using Serilog;
 using xcsync.Projects;
 
@@ -13,12 +12,15 @@ namespace xcsync.Commands;
 class WatchCommand : XcodeCommand<WatchCommand> {
 
 	public WatchCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "watch", Strings.Commands.WatchDescription)
-	{
-		this.SetHandler (Execute, project, target, tfm, force, open);
+	{		
+		SetAction (ExecuteAsync);
 	}
 
-	public async Task Execute (string project, string target, string tfm, bool force, bool open)
-	{
+	public async Task ExecuteAsync (ParseResult result, CancellationToken cancellationToken)
+	{		
+		var open = result.GetValue (this.open);
+		var force = result.GetValue (this.force);
+
 		using var cts = new CancellationTokenSource ();
 
 		// Occurs when Ctrl+C or Ctrl+Break is pressed.

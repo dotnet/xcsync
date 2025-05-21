@@ -7,18 +7,18 @@ namespace xcsync.Commands;
 
 static class SharedOptions {
 	public static readonly Option<Verbosity> Verbose =
-		new (["--verbosity", "-v"],
-			getDefaultValue: () => Verbosity.Normal) {
-			IsRequired = false,
+		new ("Verbosity", ["--verbosity", "-v"]) {
+			Description = Strings.Options.VerbosityDescription,
+			DefaultValueFactory = (p) => Verbosity.Normal,
+			Required = false,
 			Arity = ArgumentArity.ZeroOrOne,
-			Description = Strings.Options.VerbosityDescription
 		};
 
 	public static readonly Option<string> DotnetPath =
-		new (["--dotnet-path", "-d"],
-			getDefaultValue: () => string.Empty) {
-			IsRequired = false,
+		new ("DotNetPath", ["--dotnet-path", "-d"]) {
+			Description = Strings.Options.DotnetPathDescription,
+			DefaultValueFactory = (p) => string.Empty,
+			Required = false,
 			Arity = ArgumentArity.ZeroOrOne,
-			Description = Strings.Options.DotnetPathDescription
 		};
 }

@@ -3,7 +3,6 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
-using System.Runtime.InteropServices;
 using Serilog;
 using Serilog.Events;
 
@@ -18,13 +17,13 @@ class XcSyncCommand : RootCommand {
 		Logger = logger ?? xcSync.Logger!
 			.ForContext ("SourceContext", typeof (XcSyncCommand).Name.Replace ("Command", string.Empty).ToLowerInvariant ());
 
-		AddGlobalOption (SharedOptions.Verbose);
-		AddGlobalOption (SharedOptions.DotnetPath);
+		Options.Add( SharedOptions.Verbose);
+		Options.Add( SharedOptions.DotnetPath);
 
-		SharedOptions.Verbose.AddValidator (result => {
+		SharedOptions.Verbose.Validators.Add (result => {
 			try {
-				var value = result.GetValueForOption (SharedOptions.Verbose);
-				if (!result.IsImplicit && result.Tokens.Count == 0) {
+				var value = result.GetValue (SharedOptions.Verbose);
+				if (!result.Implicit && result.Tokens.Count == 0) {
 					value = Verbosity.Normal;
 				}
 				xcSync.LogLevelSwitch.MinimumLevel = value switch {
@@ -36,17 +35,17 @@ class XcSyncCommand : RootCommand {
 					_ => LogEventLevel.Information,
 				};
 			} catch (InvalidOperationException) {
-				result.ErrorMessage = Strings.Errors.Validation.InvalidVerbosity;
+				result.AddError(Strings.Errors.Validation.InvalidVerbosity);
 			}
 		});
 
-		SharedOptions.DotnetPath.AddValidator (result => {
-			xcSync.DotnetPath = result.GetValueForOption (SharedOptions.DotnetPath) ?? string.Empty;
+		SharedOptions.DotnetPath.Validators.Add (result => {
+			xcSync.DotnetPath = result.GetValue (SharedOptions.DotnetPath) ?? string.Empty;
 			Logger?.Debug (Strings.Base.DotnetPath (xcSync.DotnetPath));
 		});
 
-		AddCommand (new GenerateCommand (fileSystem, Logger));
-		AddCommand (new SyncCommand (fileSystem, Logger));
-		AddCommand (new WatchCommand (fileSystem, Logger));
+		Subcommands.Add (new GenerateCommand (fileSystem, Logger));
+		Subcommands.Add (new SyncCommand (fileSystem, Logger));
+		Subcommands.Add (new WatchCommand (fileSystem, Logger));
 	}
 }
