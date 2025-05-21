@@ -3,13 +3,13 @@
   "isRoot": true,
   "tools": {
     "microsoft.visualstudio.texttemplating.commandline": {
-      "version": "17.13.40011",
+      "version": "17.14.40225",
       "commands": [
         "t4"
       ]
     },
     "dotnet-coverage": {
-      "version": "17.11.5",
+      "version": "17.14.2",
       "commands": [
         "dotnet-coverage"
       ]
