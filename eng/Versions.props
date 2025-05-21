@@ -14,8 +14,8 @@
     <!-- For non-MSFT packages, use `New or non-Microsoft package` even when updating..-->
     <!-- https://github.com/dotnet/arcade/blob/main/Documentation/MirroringPackages.md -->
     <MarillePackageVersion>0.5.3</MarillePackageVersion>
-    <MicrosoftBuildPackageVersion>17.10.4</MicrosoftBuildPackageVersion>
-    <MicrosoftBuildLocatorPackageVersion>1.7.8</MicrosoftBuildLocatorPackageVersion>
+    <MicrosoftBuildPackageVersion>17.11.4</MicrosoftBuildPackageVersion>
+    <MicrosoftBuildLocatorPackageVersion>1.9.1</MicrosoftBuildLocatorPackageVersion>
     <MicrosoftCodeAnalysisPackageVersion>4.13.0</MicrosoftCodeAnalysisPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>8.0.0</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftNETSdkPackageVersion>9.0.100-rc.2.24420.21</MicrosoftNETSdkPackageVersion>    
