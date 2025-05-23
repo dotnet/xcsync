@@ -80,7 +80,7 @@ class BaseCommand<T> : Command {
 			}
 
 			xcSync.XcodePath = Scripts.SelectXcode ();
-			Logger?.Information (Strings.Base.XcodePath (xcSync.XcodePath));
+			Logger?.Debug (Strings.Base.XcodePath (xcSync.XcodePath));
 
 			var validation = ValidateCommand (result);
 
@@ -143,7 +143,7 @@ class BaseCommand<T> : Command {
 			}
 
 			LogDebug (Strings.Base.FoundProjectFile (csprojFiles [0], projectPath));
-			updatedPath = csprojFiles [0];
+			updatedPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? string.Empty, csprojFiles [0]);
 		}
 
 		if (!fileSystem.File.Exists (updatedPath)) {

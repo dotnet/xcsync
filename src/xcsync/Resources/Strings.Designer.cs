@@ -155,4 +155,10 @@ static class Strings {
 		internal static string ProcessingException => Resources.Strings.Worker_ProcessingException;
 		internal static string ProcessingError => Resources.Strings.Worker_ProcessingError;
 	}
+
+	internal static class General 
+	{
+		internal static string FoundMsBuild(string version, string path) => string.Format(Resources.Strings.General_FoundMsBuild, version, path);
+		internal static string RegisteredMsBuild(string version, string path) => string.Format(Resources.Strings.General_RegisteredMsBuild, version, path);
+	}
  }

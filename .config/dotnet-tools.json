@@ -3,25 +3,25 @@
   "isRoot": true,
   "tools": {
     "microsoft.visualstudio.texttemplating.commandline": {
-      "version": "17.12.39124-preview.2",
+      "version": "17.14.40225",
       "commands": [
         "t4"
       ]
     },
     "dotnet-coverage": {
-      "version": "17.11.5",
+      "version": "17.14.2",
       "commands": [
         "dotnet-coverage"
       ]
     },
     "dotnet-reportgenerator-globaltool": {
-      "version": "5.2.4",
+      "version": "5.4.3",
       "commands": [
         "reportgenerator"
       ]
     },
     "PowerShell": {
-      "version": "7.4.4",
+      "version": "7.4.10",
       "commands": [
         "pwsh"
       ]

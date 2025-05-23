@@ -76,6 +76,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.Formats.Asn1" />
     <PackageReference Include="Microsoft.Extensions.Logging" />    
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Enrichers.Thread" />
@@ -144,7 +146,7 @@
     <RemoveDir Directories="$(T4GeneratedFilesOutputPath)" />
   </Target>
   
-  <Target Name="GetLatestFrameworks_OSX" BeforeTargets="BeforeBuild" Inputs="@(DownloadFile)" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')" Condition="$([MSBuild]::IsOSPlatform(OSX))">
+  <Target Name="GetLatestFrameworks_OSX" BeforeTargets="BeforeBuild" Inputs="@(DownloadFile)" Outputs="@(DownloadFile->'$(LatestFrameworksDownloadOutputPath)/%(Repo)/%(Identity)')" Condition="$([MSBuild]::IsOSPlatform(OSX)) Or $([MSBuild]::IsOSPlatform(Linux))">
       <Exec Command="curl --create-dirs -f -s 'https://raw.githubusercontent.com/xamarin/%(DownloadFile.Repo)/%(DownloadFile.Hash)/%(DownloadFile.Identity)' --output '$(LatestFrameworksDownloadOutputPath)/%(DownloadFile.Repo)/%(DownloadFile.Identity)'" />
   </Target>
 

@@ -31,7 +31,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 
 		LogInformation (Strings.Watch.HeaderInformation (ProjectPath, TargetPath, Tfm));
 
-		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!);
+		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!, open, force);
 
 		// Start an asynchronous task
 		var xcsyncTask = Task.Run (async () => {

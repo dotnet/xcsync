@@ -64,6 +64,34 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		Assert.True (Directory.Exists (Path.Combine (tmpDir, intermediateOutputPath, "xcsync")));
 	}
 
+	[Fact]
+	public async Task BaseCommand_WhenProjectPathDirectory_FindsCsprojInDirectory ()
+	{
+		var projectName = Guid.NewGuid ().ToString ();
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+		var fileSystem = new FileSystem ();
+
+		await DotnetNew (TestOutput, "ios", tmpDir);
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+		Assert.True (File.Exists (csproj));
+		var xcodePath = Path.Combine (tmpDir, "obj", "xcsync");
+		Directory.CreateDirectory (xcodePath);
+
+		EnsureXcodeProject (fileSystem, projectName, xcodePath);
+
+		var logger = new XunitLogger (TestOutput);
+		var command = new BaseCommand<string> (fileSystem, logger, "test", "test description");
+		var args = new string [] {
+			"--project", tmpDir,
+			"--target-framework-moniker", "net8.0-ios",
+			"--target", "obj/xcsync"
+		 };
+
+		int exitCode = command.Invoke (args);
+
+		Assert.Equal (0, exitCode);
+	}
+
 	[Theory]
 	[InlineData ("macos", "", "", "")]
 	[InlineData ("macos", "net8.0-macos", "", "")]

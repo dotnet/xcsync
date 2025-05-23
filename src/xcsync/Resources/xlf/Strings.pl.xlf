@@ -4,529 +4,539 @@
     <body>
       <trans-unit id="Base.CreateDefaultTarget">
         <source>Target path '{0}' does not exist, but is the default location, creating.</source>
-        <target state="new">Target path '{0}' does not exist, but is the default location, creating.</target>
+        <target state="translated">Ścieżka docelowa „{0}” nie istnieje, ale jest lokalizacją domyślną, trwa tworzenie.</target>
         <note>{0} is the path to target project</note>
       </trans-unit>
       <trans-unit id="Base.DotnetPath">
         <source>Using the `dotnet` located at {0}.</source>
-        <target state="new">Using the `dotnet` located at {0}.</target>
+        <target state="translated">Przy użyciu elementu „dotnet” znajdującego się w lokalizacji {0}.</target>
         <note>{0} is the path to dotnet</note>
       </trans-unit>
       <trans-unit id="Base.EstablishDefaultTarget">
         <source>Target path is the default location or empty, prefixing with '{0}'</source>
-        <target state="new">Target path is the default location or empty, prefixing with '{0}'</target>
+        <target state="translated">Ścieżka docelowa jest domyślną lokalizacją lub jest pusta. Prefiks ma wartość „{0}”</target>
         <note>{0} is the path to project</note>
       </trans-unit>
       <trans-unit id="Base.FoundProjectFile">
         <source>Found .csproj file '{0}' in path '{1}'</source>
-        <target state="new">Found .csproj file '{0}' in path '{1}'</target>
+        <target state="translated">Znaleziono plik csproj „{0}” w ścieżce „{1}”</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Base.ProjectTfms">
         <source>Project target frameworks: '{0}'</source>
-        <target state="new">Project target frameworks: '{0}'</target>
+        <target state="translated">Platformy docelowe projektu: „{0}”</target>
         <note>{0} is list of TFMs the selected project supports</note>
       </trans-unit>
       <trans-unit id="Base.SearchForProjectFiles">
         <source>'{0}' is not a .csproj file, searching for .csproj files in directory</source>
-        <target state="new">'{0}' is not a .csproj file, searching for .csproj files in directory</target>
+        <target state="translated">„{0}” nie jest plikiem csproj, wyszukiwanie plików csproj w katalogu</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Base.UseDefaultTfm">
         <source>No target framework moniker specified, using the first one found in the project.</source>
-        <target state="new">No target framework moniker specified, using the first one found in the project.</target>
+        <target state="translated">Nie określono monikera platformy docelowej, używając pierwszego znalezionego w projekcie.</target>
         <note />
       </trans-unit>
       <trans-unit id="Base.XcodePath">
         <source>Using Xcode from {0}.</source>
-        <target state="new">Using Xcode from {0}.</target>
+        <target state="translated">Korzystanie z programu Xcode z {0}.</target>
         <note>{0} is the path to Xcode</note>
       </trans-unit>
       <trans-unit id="ClrProject.CompilationError">
         <source>Compilation error in project '{0}' : {1}</source>
-        <target state="new">Compilation error in project '{0}' : {1}</target>
+        <target state="translated">Błąd kompilacji w projekcie „{0}”: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationError">
         <source>Invalid operation while processing project '{0}' : {1}</source>
-        <target state="new">Invalid operation while processing project '{0}' : {1}</target>
+        <target state="translated">Nieprawidłowa operacja podczas przetwarzania projektu „{0}”: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="ClrProject.InvalidOperationException">
         <source>Compilation errors detected in project '{0}': {1}}</source>
-        <target state="new">Compilation errors detected in project '{0}': {1}}</target>
+        <target state="translated">Wykryto błędy kompilacji w projekcie „{0}”: {1}}</target>
         <note>{0} is the path to the .NET project, {1} is the list of error messages</note>
       </trans-unit>
       <trans-unit id="ClrProject.NotSupportedException">
         <source>Compilation not supported for current project  '{0}'</source>
-        <target state="new">Compilation not supported for current project  '{0}'</target>
+        <target state="translated">Kompilacja nie jest obsługiwana dla bieżącego projektu „{0}”</target>
         <note>{0} is the path to the .NET project</note>
       </trans-unit>
       <trans-unit id="ClrProject.UnexpectedError">
         <source>Unexpected error occurred while processing project '{0}' : {1}</source>
-        <target state="new">Unexpected error occurred while processing project '{0}' : {1}</target>
+        <target state="translated">Wystąpił nieoczekiwany błąd podczas przetwarzania projektu „{0}”: {1}</target>
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
-        <source>generate an Xcode project at the path specified by --target from the project identified by --project</source>
-        <target state="new">generate an Xcode project at the path specified by --target from the project identified by --project</target>
+        <source>generate a Xcode project at the path specified by --target from the project identified by --project</source>
+        <target state="translated">wygeneruj projekt Xcode w ścieżce określonej przez parametr --target z projektu zidentyfikowanego przez parametr --project</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Sync.Description">
         <source>used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</source>
-        <target state="new">used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</target>
+        <target state="translated">używane po poleceniu generate w celu zsynchronizowania zmian z wygenerowanego projektu Xcode z powrotem do projektu platformy .NET</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
-        <source>generates an Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
-        <target state="new">generates an Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</target>
+        <source>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
+        <target state="translated">generuje projekt Xcode, a następnie stale synchronizuje zmiany między projektem Xcode i projektem platformy .NET</target>
         <note />
       </trans-unit>
       <trans-unit id="CopyFileWorker.CopiedFile">
         <source>Copied {0} to {1}</source>
-        <target state="new">Copied {0} to {1}</target>
+        <target state="translated">Skopiowano {0} do {1}</target>
         <note>{0} is the source path, {1} is the destination path</note>
       </trans-unit>
       <trans-unit id="Errors.CsprojNotFound">
         <source>Could not find a .csproj file in path '{0}'</source>
-        <target state="new">Could not find a .csproj file in path '{0}'</target>
+        <target state="translated">Nie można odnaleźć pliku csproj w ścieżce „{0}”</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.InvalidOption">
         <source>Invalid option '{0}' provided: {1}</source>
-        <target state="new">Invalid option '{0}' provided: {1}</target>
+        <target state="translated">Podano nieprawidłową opcję „{0}”: {1}</target>
         <note>{0} is name of the command line options, {1} is the value of the option provided by the user</note>
       </trans-unit>
       <trans-unit id="Errors.MultipleProjectFilesFound">
         <source>Multiple .csproj files found in '{0}', please specify which project file to use via the [--project, -p] option: {1}</source>
-        <target state="new">Multiple .csproj files found in '{0}', please specify which project file to use via the [--project, -p] option: {1}</target>
+        <target state="translated">Znaleziono wiele plików csproj w „{0}”. Określ plik projektu, który ma być używany za pośrednictwem opcji [--project, -p]: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.MultipleTfmsFound">
         <source>Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</source>
-        <target state="new">Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</target>
+        <target state="translated">W pliku projektu znaleziono wiele platform docelowych. Określ strukturę docelową, która ma być używana z opcją [--target-framework, -tfm].</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.PbxprojNotFound">
         <source>Could not find a project.pbxproj file in path '{0}'</source>
-        <target state="new">Could not find a project.pbxproj file in path '{0}'</target>
+        <target state="translated">Nie można odnaleźć pliku project.pbxproj w ścieżce „{0}”</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.TargetPlatformNotFound">
         <source>Target platform not found</source>
-        <target state="new">Target platform not found</target>
+        <target state="translated">Nie znaleziono platformy docelowej</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.TfmNotSupported">
         <source>Target framework is not supported by current .NET project.</source>
-        <target state="new">Target framework is not supported by current .NET project.</target>
+        <target state="translated">Platforma docelowa nie jest obsługiwana przez bieżący projekt platformy .NET.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidOS">
         <source>The xcsync tool can only be run on macOS.</source>
-        <target state="new">The xcsync tool can only be run on macOS.</target>
+        <target state="translated">Narzędzie xcsync można uruchomić tylko w systemie macOS.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidTargetFramework">
         <source>Invalid TFM: Target framework '{0}' does not target an Apple platform</source>
-        <target state="new">Invalid TFM: Target framework '{0}' does not target an Apple platform</target>
+        <target state="translated">Nieprawidłowy TFM: struktura docelowa „{0}” nie jest przeznaczona dla platformy firmy Apple</target>
         <note>{0} is name of the target frameworks, e.g net8-ios, net8-windows</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.InvalidVerbosity">
         <source>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</source>
-        <target state="new">Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</target>
+        <target state="translated">Nieprawidłowa szczegółowość. Dozwolone wartości to: Cichy, Minimalny, Normalny, Szczegółowy, Diagnostyczny.</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.MissingValidTargetFrameworkInPath">
         <source>Missing valid target framework in '{0}'.</source>
-        <target state="new">Missing valid target framework in '{0}'.</target>
+        <target state="translated">Brak prawidłowej struktury docelowej w „{0}”.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathDoesNotContainCsproj">
         <source>'{0}' is not a valid path to a .NET project or a directory.</source>
-        <target state="new">'{0}' is not a valid path to a .NET project or a directory.</target>
+        <target state="translated">„{0}” nie jest prawidłową ścieżką do projektu platformy .NET lub katalogu.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathDoesNotExist">
         <source>Path '{0}' does not exist</source>
-        <target state="new">Path '{0}' does not exist</target>
+        <target state="translated">Ścieżka „{0}” nie istnieje</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.PathNameIsEmpty">
         <source>Path name is empty</source>
-        <target state="new">Path name is empty</target>
+        <target state="translated">Nazwa ścieżki jest pusta</target>
         <note />
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetDoesNotExist">
         <source>Target path '{0}' does not exist, will create directory if [--force, -f] is set.</source>
-        <target state="new">Target path '{0}' does not exist, will create directory if [--force, -f] is set.</target>
+        <target state="translated">Ścieżka docelowa „{0}” nie istnieje. Katalog zostanie utworzony, jeśli ustawiono wartość [--force, -f].</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetIsNotEmpty">
         <source>The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</source>
-        <target state="new">The target path '{0}' already exists and is not empty. Use [--force, -f] to overwrite the existing project.</target>
+        <target state="translated">Ścieżka docelowa „{0}” już istnieje i nie jest pusta. Użyj [--force, -f], aby zastąpić istniejący projekt.</target>
         <note>{0} is the path to the directory</note>
       </trans-unit>
       <trans-unit id="Errors.Validation.TargetIsNotValidXcodeProjectFolder">
         <source>Target path '{0}' does not exist, or is not a valid Xcode project folder.</source>
-        <target state="new">Target path '{0}' does not exist, or is not a valid Xcode project folder.</target>
+        <target state="translated">Ścieżka docelowa „{0}” nie istnieje lub nie jest prawidłowym folderem projektu Xcode.</target>
         <note>{0} is the path to the file or directory</note>
       </trans-unit>
       <trans-unit id="FileWorker.WroteFile">
         <source>Wrote {0} bytes to {1}</source>
-        <target state="new">Wrote {0} bytes to {1}</target>
+        <target state="translated">Zapisano {0} bajtów do {1}</target>
         <note>{0} is the number of bytes written, {1} is the path to the file</note>
+      </trans-unit>
+      <trans-unit id="General.FoundMsBuild">
+        <source>Found MSBuild instance {0} at {1}</source>
+        <target state="translated">Znaleziono wystąpienie programu MSBuild {0} w witrynie {1}</target>
+        <note>{0} is a version number, {1} is the path</note>
+      </trans-unit>
+      <trans-unit id="General.RegisteredMsBuild">
+        <source>Registered MSBuild instance {0} at {1}</source>
+        <target state="translated">Zarejestrowane wystąpienie programu MSBuild {0} w witrynie {1}</target>
+        <note>{0} is a version number, {1} is the path</note>
       </trans-unit>
       <trans-unit id="Generate.GeneratedFiles">
         <source>Generated Xcode header and implementation files</source>
-        <target state="new">Generated Xcode header and implementation files</target>
+        <target state="translated">Wygenerowane pliki nagłówka i implementacji środowiska Xcode</target>
         <note />
       </trans-unit>
       <trans-unit id="Generate.GeneratedProject">
         <source>Generated Xcode project at '{0}'</source>
-        <target state="new">Generated Xcode project at '{0}'</target>
+        <target state="translated">Wygenerowano projekt Xcode w lokalizacji „{0}”</target>
         <note>{0} is the path to the generated Xcode project</note>
       </trans-unit>
       <trans-unit id="Generate.HeaderInformation">
         <source>Generating files from project '{0}' to target '{1}'</source>
-        <target state="new">Generating files from project '{0}' to target '{1}'</target>
+        <target state="translated">Generowanie plików z projektu „{0}” do elementu docelowego „{1}”</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
       <trans-unit id="Generate.OpenProject">
         <source>'{0}' is open in Xcode</source>
-        <target state="new">'{0}' is open in Xcode</target>
+        <target state="translated">Element „{0}” jest otwarty w środowisku Xcode</target>
         <note>{0} is the path to the opened project</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.ObjCImplementationDeclFound">
         <source>Found ObjCImplementationDecl: {0}</source>
-        <target state="new">Found ObjCImplementationDecl: {0}</target>
+        <target state="translated">Znaleziono obiekt ObjCImplementationDecl: {0}</target>
         <note>{0} is the name of the syntax declaration</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.ParsingProperty">
         <source>[{0}] Parsing property type '{0}'</source>
-        <target state="new">[{0}] Parsing property type '{0}'</target>
+        <target state="translated">[{0}] Analizowanie typu właściwości „{0}”</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.PropertyNotImplementedException">
-        <source>Unsupported property type {}0</source>
-        <target state="new">Unsupported property type {}0</target>
+        <source>Unsupported property type {0}</source>
+        <target state="translated">Nieobsługiwany typ właściwości {0}</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
-        <source>[{0}] Visiting {{1}}</source>
-        <target state="new">[{0}] Visiting {{1}}</target>
+        <source>[{0}] Visiting {{{1}}}</source>
+        <target state="translated">[{0}] Odwiedź {{{1}}}</target>
         <note>{0} is the name of the visitor class, {1} is the declaration kind name</note>
       </trans-unit>
       <trans-unit id="Options.DotnetPath.Description">
         <source>Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</source>
-        <target state="new">Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</target>
+        <target state="translated">Ustaw ścieżkę do zestawu SDK platformy .NET, jeśli nie zostanie podana, użyje ścieżki z procesu nadrzędnego, jeśli jest to ścieżka „dotnet”, w przeciwnym razie powróci do ścieżki „dotnet” w ścieżce PATH.</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Force.Description">
         <source>Force overwrite of an existing Xcode project</source>
-        <target state="new">Force overwrite of an existing Xcode project</target>
+        <target state="translated">Wymuś zastąpienie istniejącego projektu Xcode</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Open.Description">
         <source>Open the generated project in Xcode</source>
-        <target state="new">Open the generated project in Xcode</target>
+        <target state="translated">Otwieranie wygenerowanego projektu w środowisku Xcode</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Project.Description">
         <source>Path to the source .NET .csproj</source>
-        <target state="new">Path to the source .NET .csproj</target>
+        <target state="translated">Ścieżka do źródłowego pliku csproj platformy .NET</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Target.Description">
         <source>Path to the target Xcode project</source>
-        <target state="new">Path to the target Xcode project</target>
+        <target state="translated">Ścieżka do docelowego projektu Xcode</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Tfm.Description">
         <source>Specify the target framework moniker</source>
-        <target state="new">Specify the target framework moniker</target>
+        <target state="translated">Określ moniker platformy docelowej</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Verbosity.Description">
         <source>Set the verbosity level</source>
-        <target state="new">Set the verbosity level</target>
+        <target state="translated">Ustawianie poziomu szczegółowości</target>
         <note />
       </trans-unit>
       <trans-unit id="ProgramHeader">
         <source>xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
 		</source>
-        <target state="new">xcSync v{0}, (c) Microsoft Corporation. All rights reserved.
+        <target state="translated">xcSync v{0}, (c) Microsoft Corporation. Wszelkie prawa zastrzeżone.
 		</target>
         <note>{0} is a numerical based string containing the version number for the command line tool</note>
       </trans-unit>
       <trans-unit id="Sync.HeaderInformation">
         <source>Syncing files from project '{0}' to target '{1}'</source>
-        <target state="new">Syncing files from project '{0}' to target '{1}'</target>
+        <target state="translated">Synchronizowanie plików z projektu „{0}” do elementu docelowego „{1}”</target>
         <note>{0} is the path to the project file, {1} is the path to the target project</note>
       </trans-unit>
       <trans-unit id="SyncContext.GeneratingFiles">
         <source>Generating Xcode project files...</source>
-        <target state="new">Generating Xcode project files...</target>
+        <target state="translated">Trwa generowanie plików projektu Xcode...</target>
         <note />
       </trans-unit>
       <trans-unit id="SyncContext.ProcessingType">
         <source>Processing type {0}</source>
-        <target state="new">Processing type {0}</target>
+        <target state="translated">Typ przetwarzania {0}</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="SyncContext.SyncComplete">
         <source>Synchronization complete.</source>
-        <target state="new">Synchronization complete.</target>
+        <target state="translated">Synchronizacja ukończona.</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.AssemblyDiagnosticError">
         <source>{0}: {1}</source>
-        <target state="new">{0}: {1}</target>
+        <target state="translated">{0}: {1}</target>
         <note>{0} is the name of the Assembly, {1} is the Diganostic</note>
       </trans-unit>
       <trans-unit id="TypeService.AssemblyUpdateError">
         <source>{0}: Failed to cache new compilation within type system, changes are not preserved.</source>
-        <target state="new">{0}: Failed to cache new compilation within type system, changes are not preserved.</target>
+        <target state="translated">{0}: nie można buforować nowej kompilacji w systemie typów, zmiany nie są zachowywane.</target>
         <note>{0} is the name of the Assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.CompilationErrorsFound">
         <source>{0}: Compilation errors found</source>
-        <target state="new">{0}: Compilation errors found</target>
+        <target state="translated">{0}: znaleziono błędy kompilacji</target>
         <note>{0} is the name of the Assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.CompilationNotFound">
         <source>The compilation for {0} could not be located for synchronization.</source>
-        <target state="new">The compilation for {0} could not be located for synchronization.</target>
+        <target state="translated">Nie można zlokalizować kompilacji dla {0} na potrzeby synchronizacji.</target>
         <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.DuplicateCompilation">
         <source>The compilation for {0} has already been added, ignoring this instance.</source>
-        <target state="new">The compilation for {0} has already been added, ignoring this instance.</target>
+        <target state="translated">Kompilacja dla {0} została już dodana, ignorując to wystąpienie.</target>
         <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.DuplicateType">
         <source>Type '{0}' already exists in project.</source>
-        <target state="new">Type '{0}' already exists in project.</target>
+        <target state="translated">Typ „{0}” już istnieje w projekcie.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingMismatch">
         <source>Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.</source>
-        <target state="new">Mismatch when attempting to update mapping of '{0}' to '{1}' with '{2}' to '{3}'.</target>
+        <target state="translated">Niezgodność podczas próby zaktualizowania mapowania „{0}” na „{1}” z „{2}” na „{3}”.</target>
         <note>{0}, {1}, {2}, {3} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingNotFound">
         <source>Mapping from of '{0}' to '{1}' already exists.</source>
-        <target state="new">Mapping from of '{0}' to '{1}' already exists.</target>
+        <target state="translated">Mapowanie z „{0}” na „{1}” już istnieje.</target>
         <note>{0}, {1} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MappingUpdateFailed">
         <source>Failed to updated mapping of '{0}' to '{1}'.</source>
-        <target state="new">Failed to updated mapping of '{0}' to '{1}'.</target>
+        <target state="translated">Nie można zaktualizować mapowania elementu „{0}” do „{1}”.</target>
         <note>{0}, {1} are names of types</note>
       </trans-unit>
       <trans-unit id="TypeService.MissingAssemblyName">
         <source>The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</source>
-        <target state="new">The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</target>
+        <target state="translated">Kompilacja nie ma elementu AssemblyName, prawdopodobnie dlatego, że jest dynamiczna i nieobsługiwana.</target>
         <note />
       </trans-unit>
       <trans-unit id="TypeService.SyntaxRootNotFound">
         <source>The {0} type could not be synchronized due to missing symbol information.</source>
-        <target state="new">The {0} type could not be synchronized due to missing symbol information.</target>
+        <target state="translated">Nie można zsynchronizować typu {0} z powodu braku informacji o symbolach.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="TypeService.TypeNotFound">
         <source>The {0} type could not be located for synchronization.</source>
-        <target state="new">The {0} type could not be located for synchronization.</target>
+        <target state="translated">Nie można zlokalizować typu {0} na potrzeby synchronizacji.</target>
         <note>{0} is the name of the type</note>
       </trans-unit>
       <trans-unit id="Watch.ErrorMonitoringProjectFiles">
         <source>An error occurred while monitoring file changes in {0}.</source>
-        <target state="new">An error occurred while monitoring file changes in {0}.</target>
+        <target state="translated">Wystąpił błąd podczas monitorowania zmian plików w {0}.</target>
         <note>{0} is the path to the project folder</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeDetected">
         <source>Changes detected for {0} in {1} project.</source>
-        <target state="new">Changes detected for {0} in {1} project.</target>
+        <target state="translated">Wykryto zmiany {0} w projekcie {1}.</target>
         <note>{0} is the path to the file that changed, {1} is the name of the project</note>
       </trans-unit>
       <trans-unit id="Watch.FileChangeFilter">
         <source>Filtering file changes to files that match {0}.</source>
-        <target state="new">Filtering file changes to files that match {0}.</target>
+        <target state="translated">Filtrowanie zmian plików zgodnych z {0}.</target>
         <note>{0} is a regex string used to filter files.</note>
       </trans-unit>
       <trans-unit id="Watch.FileRenameDetected">
         <source>File renamed from {0} to {1} in {2} project.</source>
-        <target state="new">File renamed from {0} to {1} in {2} project.</target>
+        <target state="translated">Nazwa pliku została zmieniona z {0} na {1} w projekcie {2}.</target>
         <note>{0} and {1} are the old and new paths to the file that was renamed, {2} is the name of the project</note>
       </trans-unit>
       <trans-unit id="Watch.HeaderInformation">
         <source>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</source>
-        <target state="new">Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</target>
+        <target state="translated">Ciągła synchronizacja plików między platformą „{0}” i „{1}” dla platformy „{2}”.</target>
         <note>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</note>
       </trans-unit>
       <trans-unit id="Watch.InputRedirectedInstructions">
         <source>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</source>
-        <target state="new">&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</target>
+        <target state="translated">&gt;&gt;&gt; Dane wejściowe są przekierowywane, oczekiwanie na SIGINT &lt;&lt;&lt;</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.InteractiveInstructions">
         <source>Press Ctrl+C or ESC to stop.</source>
-        <target state="new">Press Ctrl+C or ESC to stop.</target>
+        <target state="translated">Naciśnij Ctrl+C lub ESC, aby zatrzymać.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.PausingMonitoring">
         <source>Pausing monitoring</source>
-        <target state="new">Pausing monitoring</target>
+        <target state="translated">Wstrzymanie monitorowania</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ReceivedCtrlC">
         <source>Received CTRL-C, exiting.</source>
-        <target state="new">Received CTRL-C, exiting.</target>
+        <target state="translated">Odebrano CTRL-C, wyjście.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ReceivedEsc">
         <source>Received ESC, exiting.</source>
-        <target state="new">Received ESC, exiting.</target>
+        <target state="translated">Odebrano ESC, wyjście.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.ResumingMonitoring">
         <source>Context synced. Resuming monitoring</source>
-        <target state="new">Context synced. Resuming monitoring</target>
+        <target state="translated">Zsynchronizowany kontekst. Wznawianie monitorowania</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.StartMonitoringProject">
         <source>Monitoring project file changes in {0} started.</source>
-        <target state="new">Monitoring project file changes in {0} started.</target>
+        <target state="translated">Rozpoczęto monitorowanie zmian plików projektu w {0}.</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
       <trans-unit id="Watch.StopMonitoringProject">
         <source>Monitoring project file changes in {0} stopped.</source>
-        <target state="new">Monitoring project file changes in {0} stopped.</target>
+        <target state="translated">Monitorowanie zmian plików projektu w {0} zatrzymane.</target>
         <note>{0} is the path to the project file</note>
       </trans-unit>
       <trans-unit id="Watch.StopSynchronization">
         <source>Stopping synchronization and completing remaining jobs.</source>
-        <target state="new">Stopping synchronization and completing remaining jobs.</target>
+        <target state="translated">Zatrzymywanie synchronizacji i kończenie pozostałych zadań.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.StopWatchProcess">
         <source>User has requested to stop the sync process. Changes will no longer be processed.</source>
-        <target state="new">User has requested to stop the sync process. Changes will no longer be processed.</target>
+        <target state="translated">Użytkownik zażądał zatrzymania procesu synchronizacji. Zmiany nie będą już przetwarzane.</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.Syncing">
         <source>Syncing change context</source>
-        <target state="new">Syncing change context</target>
+        <target state="translated">Synchronizowanie kontekstu zmiany</target>
         <note />
       </trans-unit>
       <trans-unit id="Watch.WorkerException">
         <source>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</source>
-        <target state="new">Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</target>
+        <target state="translated">Błąd podczas przetwarzania komunikatu o zmianie {0}: {1}. Zgłoś usterkę tutaj: https://aka.ms/xcsync-issue</target>
         <note>{0} is the message Id, {1} is the exception message</note>
       </trans-unit>
       <trans-unit id="Worker.ProcessingError">
         <source>Error processing message.</source>
-        <target state="new">Error processing message.</target>
+        <target state="translated">Błąd podczas przetwarzania komunikatu.</target>
         <note />
       </trans-unit>
       <trans-unit id="Worker.ProcessingException">
         <source>Exception processing message.</source>
-        <target state="new">Exception processing message.</target>
+        <target state="translated">Komunikat przetwarzania wyjątku.</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorDiagnosticIssue">
         <source>ERROR: {0}</source>
-        <target state="new">ERROR: {0}</target>
+        <target state="translated">BŁĄD: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorParsing">
         <source>Error: Parsing failed for '{0}' due to '{1}'.</source>
-        <target state="new">Error: Parsing failed for '{0}' due to '{1}'.</target>
+        <target state="translated">Błąd: analizowanie elementu „{0}” nie powiodło się z powodu „{1}”.</target>
         <note>{0} is the file path, {1} is the Translation Unit Error</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorProcessing">
         <source>Error processing '{0}' : {1}\n{2}</source>
-        <target state="new">Error processing '{0}' : {1}\n{2}</target>
+        <target state="translated">Błąd podczas przetwarzania pliku „{0}” : {1}\n{2}</target>
         <note>{0} is the file path, {1} is the exception, {2} is the stack trace</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ErrorUpdatingRoslynType">
         <source>{0} : Error '{1}' : {2}\n{3}</source>
-        <target state="new">{0} : Error '{1}' : {2}\n{3}</target>
+        <target state="translated">{0} : Błąd „{1}”: {2}\n{3}</target>
         <note>{0} is the Function, {1} is the Type, {2} is the exception message, {3} is the stack trace</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FailToLoadXcodeProject">
         <source>Failed to load the Xcode project file at {0}</source>
-        <target state="new">Failed to load the Xcode project file at {0}</target>
+        <target state="translated">Nie można załadować pliku projektu Xcode w lokalizacji {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FatalDiagnosticIssue">
         <source>FATAL: {0}</source>
-        <target state="new">FATAL: {0}</target>
+        <target state="translated">BŁĄD KRYTYCZNY: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileDiagnostics">
         <source>Diagnostics for '{0}':</source>
-        <target state="new">Diagnostics for '{0}':</target>
+        <target state="translated">Diagnostyka dla „{0}”:</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.FileParsingHasDiagnostics">
         <source>Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</source>
-        <target state="new">Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</target>
+        <target state="translated">Analizowanie „{0}” wygenerowanych komunikatów diagnostycznych używa rejestrowania szczegółowego do wyświetlania ich.</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.MultipleTypesFound">
         <source>Multiple types found for {0}</source>
-        <target state="new">Multiple types found for {0}</target>
+        <target state="translated">Znaleziono wiele typów dla {0}</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.NoTypesFound">
         <source>No types found for {0}</source>
-        <target state="new">No types found for {0}</target>
+        <target state="translated">Nie znaleziono typów dla {0}</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.NoteDiagnosticIssue">
         <source>NOTE: {0}</source>
-        <target state="new">NOTE: {0}</target>
+        <target state="translated">UWAGA: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingFile">
         <source>Processing '{0}'</source>
-        <target state="new">Processing '{0}'</target>
+        <target state="translated">Trwa przetwarzanie „{0}”</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.ProcessingObjCImplementation">
         <source>Processing ObjCImplementationDecl: {0}</source>
-        <target state="new">Processing ObjCImplementationDecl: {0}</target>
+        <target state="translated">Przetwarzanie obiektu ObjCImplementationDecl: {0}</target>
         <note>{0} is the ObjC Type</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.SkipProcessing">
         <source>Skipping '{0}' due to one or more errors listed above.</source>
-        <target state="new">Skipping '{0}' due to one or more errors listed above.</target>
+        <target state="translated">Pominięcie „{0}” z powodu co najmniej jednego błędu wymienionego powyżej.</target>
         <note>{0} is the file path</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.UnexpectedTypesFound">
         <source>Unexpected type found: {0}</source>
-        <target state="new">Unexpected type found: {0}</target>
+        <target state="translated">Znaleziono nieoczekiwany typ: {0}</target>
         <note>{0} is the non-ObjC type found</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.UsingDefaultSdkRoot">
         <source>SDKROOT not found in any release configuration, defaulting to 'macosx'</source>
-        <target state="new">SDKROOT not found in any release configuration, defaulting to 'macosx'</target>
+        <target state="translated">Nie znaleziono elementu SDKROOT w żadnej konfiguracji wydania, domyślnie jest to „macosx”</target>
         <note />
       </trans-unit>
       <trans-unit id="XcodeWorkspace.WarningDiagnosticIssue">
         <source>WARNING: {0}</source>
-        <target state="new">WARNING: {0}</target>
+        <target state="translated">OSTRZEŻENIE: {0}</target>
         <note>{0} is the diagnostic for which there are issues</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.XcodeProjectDoesNotContainObjects">
         <source>The Xcode project file at {0} does not contain any objects</source>
-        <target state="new">The Xcode project file at {0} does not contain any objects</target>
+        <target state="translated">Plik projektu Xcode w lokalizacji {0} nie zawiera żadnych obiektów</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
       <trans-unit id="XcodeWorkspace.XcodeProjectNotFound">
         <source>File not found: {0}</source>
-        <target state="new">File not found: {0}</target>
+        <target state="translated">Nie znaleziono pliku: {0}</target>
         <note>{0} is the path to the Xcode project</note>
       </trans-unit>
     </body>

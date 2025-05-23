@@ -9,8 +9,8 @@
     <PackageVersion Include="Microsoft.Build" Version="$(MicrosoftBuildPackageVersion)" />
     <PackageVersion Include="Microsoft.Build.Locator" Version="$(MicrosoftBuildLocatorPackageVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="$(MicrosoftCodeAnalysisPackageVersion)" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(MicrosoftCodeAnalysisCSharpWorkspacesPackageVersion)" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="$(MicrosoftCodeAnalysisWorkspacesMSBuildPackageVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(MicrosoftCodeAnalysisPackageVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="$(MicrosoftCodeAnalysisPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
     <PackageVersion Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="$(SerilogEnrichersThreadPackageVersion)" />
@@ -22,6 +22,8 @@
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="$(TestableIOSystemIOAbstractionsWrappersPackageVersion)" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Analyzers" Version="$(TestableIOSystemIOAbstractionsAnalyzersPackageVersion)" />
     <PackageVersion Include="NuGet.Frameworks" Version="$(NuGetFrameworksPackageVersion)" />
+    <PackageVersion Include="System.Text.Json" Version="$(SystemTextJsonPackageVersion)" />
+    <PackageVersion Include="System.Formats.Asn1" Version="$(SystemFormatsAsn1PackageVersion)" />
     <!-- ClangSharp -->
     <PackageVersion Include="clangsharp" Version="$(ClangSharpPackageVersion)" />
     <PackageVersion Include="libClang.runtime.osx-arm64" Version="$(libClangRuntimeOsxArm64PackageVersion)" />
