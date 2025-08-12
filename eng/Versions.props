@@ -16,7 +16,7 @@
     <MarillePackageVersion>0.5.3</MarillePackageVersion>
     <MicrosoftBuildPackageVersion>17.11.4</MicrosoftBuildPackageVersion>
     <MicrosoftBuildLocatorPackageVersion>1.9.1</MicrosoftBuildLocatorPackageVersion>
-    <MicrosoftCodeAnalysisPackageVersion>4.13.0</MicrosoftCodeAnalysisPackageVersion>
+    <MicrosoftCodeAnalysisPackageVersion>4.14.0</MicrosoftCodeAnalysisPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>8.0.0</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftNETSdkPackageVersion>9.0.100-rc.2.24420.21</MicrosoftNETSdkPackageVersion>    
     <SerilogPackageVersion>4.0.0</SerilogPackageVersion>
