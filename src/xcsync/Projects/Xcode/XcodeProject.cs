@@ -48,7 +48,7 @@ class XcodeObject {
 	}
 }
 
-class PBXResourcesBuildPhase : XcodeObject {
+class PBXBuildPhase : XcodeObject {
 
 	[JsonPropertyName ("buildActionMask")]
 	public string BuildActionMask { get; set; } = int.MaxValue.ToString ();
@@ -58,6 +58,19 @@ class PBXResourcesBuildPhase : XcodeObject {
 
 	[JsonPropertyName ("runOnlyForDeploymentPostprocessing")]
 	public string RunOnlyForDeploymentPostprocessing { get; set; } = "0";
+
+}
+
+class PBXResourcesBuildPhase : PBXBuildPhase {
+}
+
+class PBXSourcesBuildPhase : PBXBuildPhase {
+}
+
+class PBXFrameworksBuildPhase : PBXBuildPhase {
+}
+
+class PBXCopyFilesBuildPhase : PBXBuildPhase {
 }
 
 class XCBuildConfiguration : XcodeObject {
@@ -95,18 +108,6 @@ class PBXBuildFile : XcodeObject {
 
 	[JsonPropertyName ("fileRef")]
 	public string? FileRef { get; set; }
-}
-
-class PBXFrameworksBuildPhase : XcodeObject {
-
-	[JsonPropertyName ("buildActionMask")]
-	public string BuildActionMask { get; set; } = int.MaxValue.ToString ();
-
-	[JsonPropertyName ("files")]
-	public List<string>? Files { get; set; }
-
-	[JsonPropertyName ("runOnlyForDeploymentPostprocessing")]
-	public string RunOnlyForDeploymentPostprocessing { get; set; } = "0";
 }
 
 class PBXProject : XcodeObject {
@@ -155,17 +156,6 @@ class XCConfigurationList : XcodeObject {
 
 	[JsonPropertyName ("buildConfigurations")]
 	public List<string>? BuildConfigurations { get; set; }
-}
-
-class PBXSourcesBuildPhase : XcodeObject {
-	[JsonPropertyName ("buildActionMask")]
-	public string BuildActionMask { get; set; } = int.MaxValue.ToString ();
-
-	[JsonPropertyName ("files")]
-	public List<string>? Files { get; set; }
-
-	[JsonPropertyName ("runOnlyForDeploymentPostprocessing")]
-	public string RunOnlyForDeploymentPostprocessing { get; set; } = "0";
 }
 
 class PBXGroup : XcodeObject {
