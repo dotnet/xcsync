@@ -9,10 +9,6 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 to provide a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the
 instructions provided by the bot. You will only need to do this once across all repositories using our CLA.
 
-## Code of Conduct
-
-This project has adopted the [Microsoft Open Source Code of Conduct](CODE_OF_CONDUCT.md). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
 # Set up your machine to contribute
 
 These instructions will get you ready to contribute to this project. If you just want to use xcsync, see [using-latest-daily.md](using-latest-daily.md).
