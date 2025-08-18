@@ -49,8 +49,6 @@ There are many .NET related projects on GitHub.
 * [.NET home repo](https://github.com/Microsoft/dotnet) - links to 100s of .NET projects, from Microsoft and the community.
 * [.NET MAUI](https://docs.microsoft.com/dotnet/maui) - the best place to start learning about .NET MAUI.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](docs/CODE_OF_CONDUCT.md). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
 ## License
 
 The code in this repo is licensed under the [MIT](LICENSE.TXT) license.
