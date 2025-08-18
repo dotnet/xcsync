@@ -89,7 +89,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Fetch all history so that we can rebase the PR.
           token: ${{ secrets.GITHUB_TOKEN }}
