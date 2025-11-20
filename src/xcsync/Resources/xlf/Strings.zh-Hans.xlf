@@ -68,8 +68,8 @@
         <note>{0} is the path to the .NET project, {1} is the error message</note>
       </trans-unit>
       <trans-unit id="Commands.Generate.Description">
-        <source>generate a Xcode project at the path specified by --target from the project identified by --project</source>
-        <target state="translated">根据 --project 标识的项目，在 --target 指定的路径上生成一个 Xcode 项目</target>
+        <source>generate an Xcode project at the path specified by --target from the project identified by --project</source>
+        <target state="needs-review-translation">根据 --project 标识的项目，在 --target 指定的路径上生成一个 Xcode 项目</target>
         <note />
       </trans-unit>
       <trans-unit id="Commands.Sync.Description">
@@ -78,8 +78,8 @@
         <note />
       </trans-unit>
       <trans-unit id="Commands.Watch.Description">
-        <source>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
-        <target state="translated">生成 Xcode 项目，然后持续在 Xcode 项目和 .NET 项目之间同步所做更改</target>
+        <source>generates an Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</source>
+        <target state="needs-review-translation">生成 Xcode 项目，然后持续在 Xcode 项目和 .NET 项目之间同步所做更改</target>
         <note />
       </trans-unit>
       <trans-unit id="CopyFileWorker.CopiedFile">
