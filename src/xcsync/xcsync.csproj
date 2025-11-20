@@ -102,6 +102,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="$(XcsyncRootDirectory)\external\Xamarin.MacDev\Xamarin.MacDev\Xamarin.MacDev.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Resources/Strings.resx" GenerateSource="true">
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
