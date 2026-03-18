@@ -3,6 +3,7 @@
 
 using System.CommandLine;
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using Serilog;
 using Serilog.Events;
 
@@ -41,7 +42,7 @@ class XcSyncCommand : RootCommand {
 
 		SharedOptions.DotnetPath.AddValidator (result => {
 			xcSync.DotnetPath = result.GetValueForOption (SharedOptions.DotnetPath) ?? string.Empty;
-			Logger?.Debug ("Using the `dotnet` located at {0}", xcSync.DotnetPath);
+			Logger?.Debug (Strings.Base.DotnetPath (xcSync.DotnetPath));
 		});
 
 		AddCommand (new GenerateCommand (fileSystem, Logger));

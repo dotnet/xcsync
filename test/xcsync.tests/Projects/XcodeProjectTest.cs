@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Serilog;
 using Xamarin;
+using xcsync.Projects;
 using xcsync.Projects.Xcode;
 using Xunit.Abstractions;
-using System.IO.Abstractions;
-using Serilog;
-using xcsync.Projects;
 
 namespace xcsync.tests.Projects;
 
@@ -338,8 +338,8 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("maccatalyst", "", "net8.0-maccatalyst", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "SceneDelegate" })]
 	[InlineData ("ios", "", "net8.0-ios", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "LaunchScreen.storyboard", "SceneDelegate" })]
 	[InlineData ("tvos", "", "net8.0-tvos", new [] { "Assets.xcassets", "AppDelegate", "Info.plist", "Main.storyboard", "ViewController" })]
-	[InlineData ("maui", "", "net8.0-ios", new [] { "AppDelegate", "Info.plist" })]
-	[InlineData ("maui", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Info.plist" })]
+	[InlineData ("maui", "", "net8.0-ios", new [] { "AppDelegate", "Platforms/iOS/Info.plist" })]
+	[InlineData ("maui", "", "net8.0-maccatalyst", new [] { "AppDelegate", "Platforms/MacCatalyst/Info.plist" })]
 	public async Task IsXcodeProjectGenerated (string projectType, string templateOptions, string tfm, string [] projectFiles)
 	{
 		// todo: test for copying over assets.xcassets?
@@ -354,13 +354,13 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		Assert.True (Directory.Exists (tmpDir));
 
-		var xcodeDir = Path.Combine (tmpDir, "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "xcsync");
 		Directory.CreateDirectory (xcodeDir); // create directory so --Force is not needed
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 
 		// Run 'xcsync generate'
-		await new SyncContext (new FileSystem(), new TypeService(testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
 
 		projectFiles.SelectMany (projectFile => {
 			return (IEnumerable<string>) (Path.HasExtension (projectFile) ? ([projectFile]) : ([$"{projectFile}.m", $"{projectFile}.h"]));
@@ -374,7 +374,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 		});
 	}
 
-	[Fact (Skip="Only works interactively")]
+	[Fact (Skip = "Only works interactively")]
 	[Trait ("Category", "XcodeIntegration")]
 	[SkipOnCI ("Only works interactively")]
 	public async void IsXcodeProjectOpen ()
@@ -388,7 +388,7 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 		Assert.True (Directory.Exists (Path.Combine (tmpDir)));
 
-		var xcodeDir = Path.Combine (tmpDir, "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "xcsync");
 		Directory.CreateDirectory (xcodeDir);
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
 		string projectPath = Path.Combine (xcodeDir, $"{Path.GetFileName (projectName)}.xcodeproj");
@@ -399,11 +399,11 @@ public class XcodeProjectTest (ITestOutputHelper TestOutput) : Base {
 
 			// check if xcode has project open
 
-			string openResult = Scripts.Run (Scripts.CheckXcodeProject (projectPath));
+			string openResult = Scripts.RunAppleScript (Scripts.CheckXcodeProject (projectPath));
 
 			Assert.Equal ("true", openResult);
 		} finally {
-			Scripts.Run (Scripts.CloseXcodeProject (projectPath));
+			Scripts.RunAppleScript (Scripts.CloseXcodeProject (projectPath));
 		}
 	}
 }

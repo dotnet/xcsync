@@ -20,6 +20,7 @@ namespace xcsync;
 static class xcSync {
 
 	public static string DotnetPath { get; set; } = string.Empty;
+	public static string XcodePath { get; set; } = string.Empty;
 
 	public static ApplePlatforms ApplePlatforms { get; } = new ();
 
@@ -27,19 +28,19 @@ static class xcSync {
 	public static ILogger? Logger { get; internal set; }
 	public static IFileSystem FileSystem { get; } = new FileSystem ();
 
-	public static async Task Main (string [] args)
+	public static async Task<int> Main (string [] args)
 	{
 		ConfigureLogging ();
 
-		RegisterMSBuild ();
-
 		WriteHeader ();
+
+		RegisterMSBuild ();
 
 		var parser = new CommandLineBuilder (new XcSyncCommand (FileSystem))
 			.UseDefaults ()
 			.Build ();
 
-		await parser.InvokeAsync (args).ConfigureAwait (false);
+		return await parser.InvokeAsync (args).ConfigureAwait (false);
 	}
 
 	static void RegisterMSBuild ()

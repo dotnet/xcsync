@@ -402,4 +402,4 @@ FodyWeavers.xsd
 .dotnet
 *.log
 */TestResults/
-xcsync/xcsync.sln
+src/xcsync/xcsync.sln

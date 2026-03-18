@@ -1,0 +1,12 @@
+<Project>
+  <!--
+  Arcade needs to be imported below the root so that project created by tests in the .artifacts folder
+  do not include it.
+  -->
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" /> 
+
+  <PropertyGroup>
+   <TestArchitectures>x64;arm64</TestArchitectures>
+  </PropertyGroup>
+
+</Project>

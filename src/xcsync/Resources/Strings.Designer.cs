@@ -31,15 +31,18 @@ static class Strings {
 			internal static string PathNameEmpty => Resources.Strings.Errors_Validation_PathNameIsEmpty;
 			internal static string PathDoesNotExist (string path) => string.Format (Resources.Strings.Errors_Validation_PathDoesNotExist, path);
 			internal static string TargetDoesNotExist (string path) => string.Format (Resources.Strings.Errors_Validation_TargetDoesNotExist, path);
+			internal static string TargetIsNotValidXcodeProjectFolder (string path) => string.Format (Resources.Strings.Errors_Validation_TargetIsNotValidXcodeProjectFolder, path);
 			internal static string TargetNotEmpty (string path) => string.Format (Resources.Strings.Errors_Validation_TargetIsNotEmpty, path);
 			internal static string PathDoesNotContainCsproj (string path) => string.Format (Resources.Strings.Errors_Validation_PathDoesNotContainCsproj, path);
 			internal static string MissingTfmInPath (string path) => string.Format (Resources.Strings.Errors_Validation_MissingValidTargetFrameworkInPath, path);
 			internal static string InvalidTfm (string tfm) => string.Format (Resources.Strings.Errors_Validation_InvalidTargetFramework, tfm);
 			internal static string InvalidVerbosity => Resources.Strings.Errors_Validation_InvalidVerbosity;
+			internal static string InvalidOS => Resources.Strings.Errors_Validation_InvalidOS;
 		}
 
 		internal static string InvalidOption (string option, string error) => string.Format (Resources.Strings.Errors_InvalidOption, option, error);
 		internal static string MultipleProjectFilesFound (string path, string projectFilesFound) => string.Format (Resources.Strings.Errors_MultipleProjectFilesFound, path, projectFilesFound);
+		internal static string PbxprojNotFound (string path) => string.Format (Resources.Strings.Errors_PbxprojNotFound, path);
 		internal static string CsprojNotFound (string path) => string.Format (Resources.Strings.Errors_CsprojNotFound, path);
 		internal static string MultipleTfmsFound => Resources.Strings.Errors_MultipleTfmsFound;
 		internal static string TargetPlatformNotFound => Resources.Strings.Errors_TargetPlatformNotFound;
@@ -53,7 +56,10 @@ static class Strings {
 		internal static string UseDefaultTfm => Resources.Strings.Base_UseDefaultTfm;
 		internal static string EstablishDefaultTarget (string path) => string.Format (Resources.Strings.Base_EstablishDefaultTarget, path);
 		internal static string CreateDefaultTarget (string path) => string.Format (Resources.Strings.Base_CreateDefaultTarget, path);
+		internal static string DotnetPath (string path) => string.Format (Resources.Strings.Base_DotnetPath, path);
+		internal static string XcodePath (string path) => string.Format (Resources.Strings.Base_XcodePath, path);
 	}
+	
 	internal static class Generate {
 		internal static string HeaderInformation => Resources.Strings.Generate_HeaderInformation;
 		internal static string GeneratedFiles => Resources.Strings.Generate_GeneratedFiles;
@@ -66,17 +72,25 @@ static class Strings {
 	}
 
 	internal static class Watch {
-		internal static string HeaderInformation => Resources.Strings.Watch_HeaderInformation;
+		internal static string HeaderInformation(string project, string target, string tfm) => string.Format (Resources.Strings.Watch_HeaderInformation, project, target, tfm);
+		internal static string ReceivedCtrlC => Resources.Strings.Watch_ReceivedCtrlC;
+		internal static string ReceivedEsc => Resources.Strings.Watch_ReceivedEsc;
+		internal static string StopSynchronization => Resources.Strings.Watch_StopSynchronization;
+		internal static string ExitWatchInstructions(bool isInteractive) => isInteractive ? Resources.Strings.Watch_InteractiveInstructions : Resources.Strings.Watch_InputRedirectedInstructions;
 		internal static string StartMonitoringProject (string projectRootPath) => string.Format (Resources.Strings.Watch_StartMonitoringProject, projectRootPath);
 		internal static string StopMonitoringProject (string projectRootPath) => string.Format (Resources.Strings.Watch_StopMonitoringProject, projectRootPath);
 		internal static string FileChangeFilter (string filter) => string.Format (Resources.Strings.Watch_FileChangeFilter, filter);
 		internal static string FileRenamed (string oldPath, string newPath, string projectName) => string.Format (Resources.Strings.Watch_FileRenameDetected, oldPath, newPath, projectName);
 		internal static string FileChanged (string path, string projectName) => string.Format (Resources.Strings.Watch_FileChangeDetected, path, projectName);
 		internal static string ErrorWhileMonitoring (string path) => string.Format (Resources.Strings.Watch_ErrorMonitoringProjectFiles, path);
+		internal static string PausingMonitoring => Resources.Strings.Watch_PausingMonitoring;
+		internal static string Syncing => Resources.Strings.Watch_Syncing;
+		internal static string ResumingMonitoring => Resources.Strings.Watch_ResumingMonitoring;
+		internal static string WorkerException (string messageId, string exceptionMessage) => string.Format (Resources.Strings.Watch_WorkerException, messageId, exceptionMessage);
+		internal static string StopWatchProcess => Resources.Strings.Watch_StopWatchProcess;
 	}
 
 	internal static class TypeService {
-
 		internal static string DuplicateType (string type) => string.Format (Resources.Strings.TypeService_DuplicateType, type);
 		internal static string MappingMismatch (string oldClrType, string oldObjCType, string newClrType, string newObjCType) => string.Format (Resources.Strings.TypeService_MappingMismatch, oldClrType, oldObjCType, newClrType, newObjCType);
 		internal static string MappingNotFound (string clrType, string objCType) => string.Format (Resources.Strings.TypeService_MappingNotFound, clrType, objCType);
@@ -91,7 +105,15 @@ static class Strings {
 		internal static string AssemblyUpdateError (string assemblyName) => string.Format (Resources.Strings.TypeService_AssemblyUpdateError, assemblyName);
 	}
 
+	internal static class ClrProject {
+		internal static string NotSupportedException (string path) => string.Format (Resources.Strings.ClrProject_NotSupportedException, path);
+		internal static string InvalidOperationException (string path, string message) => string.Format (Resources.Strings.ClrProject_InvalidOperationException, path, message);
+		internal static string CompilationError (string path, string message) => string.Format (Resources.Strings.ClrProject_CompilationError, path, message);
+		internal static string InvalidOperationError (string path, string message) => string.Format (Resources.Strings.ClrProject_InvalidOperationError, path, message);
+		internal static string UnexpectedError (string path, string message) => string.Format (Resources.Strings.ClrProject_UnexpectedError, path, message);
+	}
 	internal static class XcodeWorkspace {
+		internal static string XcodeProjectNotFound (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectNotFound, path);
 		internal static string FailToLoadXcodeProject (string path) => string.Format (Resources.Strings.XcodeWorkspace_FailToLoadXcodeProject, path);
 		internal static string XcodeProjectDoesNotContainObjects (string path) => string.Format (Resources.Strings.XcodeWorkspace_XcodeProjectDoesNotContainObjects, path);
 		internal static string ProcessingObjCImplementation (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingObjCImplementation, objcType);
@@ -100,15 +122,43 @@ static class Strings {
 		internal static string UnexpectedTypesFound (string objcType) => string.Format (Resources.Strings.XcodeWorkspace_UnexpectedTypesFound, objcType);
 		internal static string ErrorUpdatingRoslynType (string roslynTypeName, string objCType, string exceptionMessage, string stackTrace) => string.Format (Resources.Strings.XcodeWorkspace_ErrorUpdatingRoslynType, roslynTypeName, objCType, exceptionMessage, stackTrace);
 		internal static string ErrorParsing (string path, string translationUnitError) => string.Format (Resources.Strings.XcodeWorkspace_ErrorParsing, path, translationUnitError);
+		internal static string FileParsingHasDiagnostics (string path) => string.Format (Resources.Strings.XcodeWorkspace_FileParsingHasDiagnostics, path);
 		internal static string FileDiagnostics (string path) => string.Format (Resources.Strings.XcodeWorkspace_FileDiagnostics, path);
-		internal static string DiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_DiagnosticIssue, diagnostic);
+		internal static string FatalDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_FatalDiagnosticIssue, diagnostic);
+		internal static string ErrorDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_ErrorDiagnosticIssue, diagnostic);
+		internal static string WarningDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_WarningDiagnosticIssue, diagnostic);
+		internal static string NoteDiagnosticIssue (string diagnostic) => string.Format (Resources.Strings.XcodeWorkspace_NoteDiagnosticIssue, diagnostic);
 		internal static string SkipProcessing (string path) => string.Format (Resources.Strings.XcodeWorkspace_SkipProcessing, path);
 		internal static string ProcessingFile (string path) => string.Format (Resources.Strings.XcodeWorkspace_ProcessingFile, path);
 		internal static string ErrorProcessing (string path, string error, string stackTrace) => string.Format (Resources.Strings.XcodeWorkspace_ErrorProcessing, path, error, stackTrace);
+		internal static string UsingDefaultSdkRoot => Resources.Strings.XcodeWorkspace_UsingDefaultSdkRoot;
 	}
 
 	internal static class SyncContext {
 		internal static string SyncComplete => Resources.Strings.SyncContext_SyncComplete;
 		internal static string GeneratingFiles => Resources.Strings.SyncContext_GeneratingFiles;
+		internal static string ProcessingType(string typeName) => string.Format(Resources.Strings.SyncContext_ProcessingType, typeName);
 	}
-}
+
+	internal static class ObjCSyntax
+ 	{
+		internal static string ObjCImplementationDeclFound(string decl) => string.Format(Resources.Strings.ObjCSyntax_ObjCImplementationDeclFound, decl);
+		internal static string Visiting(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_Visiting, visitor, decl);
+		internal static string PropertyNotImplementedException(string decl) => string.Format(Resources.Strings.ObjCSyntax_PropertyNotImplementedException, decl);
+		internal static string ParsingProperty(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_ParsingProperty, visitor, decl);
+ 	}
+
+	internal static class Workers 
+	{
+		internal static string WroteFile(int bytes, string path) => string.Format(Resources.Strings.FileWorker_WroteFile, bytes, path);
+		internal static string CopiedFile(string source, string destination) => string.Format(Resources.Strings.CopyFileWorker_CopiedFile, source, destination);
+		internal static string ProcessingException => Resources.Strings.Worker_ProcessingException;
+		internal static string ProcessingError => Resources.Strings.Worker_ProcessingError;
+	}
+
+	internal static class General 
+	{
+		internal static string FoundMsBuild(string version, string path) => string.Format(Resources.Strings.General_FoundMsBuild, version, path);
+		internal static string RegisteredMsBuild(string version, string path) => string.Format(Resources.Strings.General_RegisteredMsBuild, version, path);
+	}
+ }

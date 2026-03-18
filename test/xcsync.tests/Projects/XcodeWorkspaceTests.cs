@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.CommandLine.Parsing;
 using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Moq;
 using Serilog;
 using Xamarin;
@@ -43,7 +42,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty);
 		var newProject = projectType;
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 		Directory.CreateDirectory (xcodeDir);
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
@@ -87,7 +86,7 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 
 		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty);
 
-		var xcodeDir = Path.Combine (tmpDir, "obj", "xcode");
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
 		Directory.CreateDirectory (xcodeDir);
 
 		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
@@ -113,13 +112,19 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var loader = new ObjCTypesLoader (testLogger);
 
 		// Act
+		List<Task> tasks = [];
 		foreach (var syncItem in xcodeWorkspace.Items) {
+			TaskCompletionSource? completionSource = null;
 			Task task = syncItem switch {
-				SyncableType type => loader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), xcodeWorkspace, syncItem), CancellationToken.None),
+				SyncableType type => loader.ConsumeAsync (new LoadTypesFromObjCMessage (Guid.NewGuid ().ToString (), completionSource = new (), xcodeWorkspace, syncItem), CancellationToken.None),
 				_ => Task.CompletedTask
 			};
+			if (completionSource is not null)
+				tasks.Add (completionSource.Task);
+			tasks.Add (task);
 			await task;
 		}
+		Task.WaitAll ([.. tasks]);
 
 		// Assert
 		var typeSymbol = typeService.QueryTypes (null, "ViewController").First ()?.TypeSymbol!;
@@ -136,6 +141,78 @@ public partial class XcodeWorkspaceTests (ITestOutputHelper TestOutput) : Base {
 		var actualType = root?.ToString () ?? string.Empty;
 
 		Assert.Equal (expectedType, actualType);
+	}
+
+	[Theory]
+	[InlineData ("macos", "net8.0-macos")]
+	public async Task SyncAsync_ToXcode_ReturnsExpectedTypeChanges (string projectType, string tfm)
+	{
+
+		// Arrange
+		var fileSystem = new FileSystem ();
+
+		var projectName = Guid.NewGuid ().ToString ();
+
+		var tmpDir = Cache.CreateTemporaryDirectory (projectName);
+
+		await DotnetNew (TestOutput, projectType, tmpDir, string.Empty);
+
+		var xcodeDir = Path.Combine (tmpDir, "obj", "xcsync");
+		Directory.CreateDirectory (xcodeDir);
+
+		var csproj = Path.Combine (tmpDir, $"{projectName}.csproj");
+
+		// Run 'xcsync generate'
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.ToXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
+		// Run 'xcsync sync'
+		await new SyncContext (new FileSystem (), new TypeService (testLogger), SyncDirection.FromXcode, csproj, xcodeDir, tfm, testLogger).SyncAsync ();
+	}
+
+	[Theory]
+	[InlineData ("data/generated_pbxproj.in")]
+	[InlineData ("data/converted_pbxproj.in")]
+	public async void LoadAsync_FindsSDKRoot_WhenSDKRootIsInAnyReleaseConfiguration (string pbjProjFile)
+	{
+		// Arrange
+		var pbxProjFileData = await File.ReadAllTextAsync (pbjProjFile);
+		var fileSystem = new MockFileSystem ();
+		var projectName = Guid.NewGuid ().ToString ();
+		var xcodeDir = Path.Combine ("obj", "xcsync");
+
+		var projectPath = Path.Combine (xcodeDir, $"{projectName}.xcodeproj");
+
+		var typeService = new TypeService (testLogger);
+
+		fileSystem.Directory.CreateDirectory (projectPath);
+		await fileSystem.File.WriteAllTextAsync (Path.Combine (projectPath, "project.pbxproj"), pbxProjFileData);
+
+		var xcodeWorkspace = new XcodeWorkspace (fileSystem, testLogger, typeService, projectName, xcodeDir, "macos");
+
+		// Act
+		await xcodeWorkspace.LoadAsync ();
+
+		// Assert
+	}
+
+	[Fact]
+	public async void LoadAsync_WhenNoPbxProjFile_LogsErrorMessage ()
+	{
+		// Arrange
+		var fileSystem = new MockFileSystem ();
+		var logger = new Mock<ILogger> ();
+
+		var projectName = Guid.NewGuid ().ToString ();
+		var xcodeDir = Path.Combine ("obj", "xcsync");
+
+		var pbxProjFile = Path.Combine (xcodeDir, $"{projectName}.xcodeproj", "project.pbxproj");
+
+		var xcodeWorkspace = new XcodeWorkspace (fileSystem, logger.Object, Mock.Of<ITypeService> (), projectName, xcodeDir, "macos");
+
+		// Act
+		await xcodeWorkspace.LoadAsync ();
+
+		// Assert
+		logger.Verify (l => l.Error (It.Is<string> (msg => string.CompareOrdinal (msg, Strings.XcodeWorkspace.XcodeProjectNotFound (pbxProjFile)) == 0)));
 	}
 
 	string CreateValidIdentifier (string projectName)

@@ -5,13 +5,14 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Serilog;
 
 namespace xcsync.Commands;
 
 class BaseCommand<T> : Command {
-	protected const string DefaultXcodeOutputFolder = "obj/xcode";
+	protected const string DefaultXcodeOutputFolder = "xcsync";
 	protected static ILogger? Logger { get; private set; }
 
 	/// <summary>
@@ -48,7 +49,7 @@ class BaseCommand<T> : Command {
 	protected Option<string> target = new (
 		["--target", "-t"],
 		description: Strings.Options.TargetDescription,
-		getDefaultValue: () => $".{Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
+		getDefaultValue: () => $"$(IntermediateOutputPath){Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
 
 	public BaseCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (name, description)
 	{
@@ -73,6 +74,14 @@ class BaseCommand<T> : Command {
 	{
 		AddValidator ((result) => {
 
+			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
+				result.ErrorMessage = Strings.Errors.Validation.InvalidOS;
+				return;
+			}
+
+			xcSync.XcodePath = Scripts.SelectXcode ();
+			Logger?.Debug (Strings.Base.XcodePath (xcSync.XcodePath));
+
 			var validation = ValidateCommand (result);
 
 			ProjectPath = validation.ProjectPath;
@@ -94,10 +103,10 @@ class BaseCommand<T> : Command {
 		(error, string newProjectPath) = TryValidateProjectPath (projectPath);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, moniker, targetPath, error); }
 
-		(error, string newTfm) = TryValidateTfm (projectPath, moniker);
+		(error, string newTfm) = TryValidateTfm (newProjectPath, moniker);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, moniker, targetPath, error); }
 
-		(error, string newTargetPath) = TryValidateTargetPath (projectPath, targetPath);
+		(error, string newTargetPath) = TryValidateTargetPath (newProjectPath, newTfm, targetPath);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (newProjectPath, newTfm, targetPath, error); }
 
 		return new ValidationResult (newProjectPath, newTfm, newTargetPath, error);
@@ -134,7 +143,7 @@ class BaseCommand<T> : Command {
 			}
 
 			LogDebug (Strings.Base.FoundProjectFile (csprojFiles [0], projectPath));
-			updatedPath = csprojFiles [0];
+			updatedPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? string.Empty, csprojFiles [0]);
 		}
 
 		if (!fileSystem.File.Exists (updatedPath)) {
@@ -188,23 +197,28 @@ class BaseCommand<T> : Command {
 		return (error, tfm);
 	}
 
-	protected virtual (string, string) TryValidateTargetPath (string projectPath, string targetPath)
+	protected virtual (string, string) TryValidateTargetPath (string projectPath, string tfm, string targetPath)
 	{
 		string error = string.Empty;
 
-		if (targetPath.EndsWith (DefaultXcodeOutputFolder, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty (targetPath)) {
-			LogVerbose (Strings.Base.EstablishDefaultTarget (fileSystem.Path.GetDirectoryName (projectPath)!));
-			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath) ?? ".", DefaultXcodeOutputFolder);
+		var intermediateOutputPath = Scripts.GetIntermediateOutputPath (projectPath, tfm).Trim ();
 
-			if (!fileSystem.Directory.Exists (targetPath)) {
-				LogDebug (Strings.Base.CreateDefaultTarget (targetPath));
-				fileSystem.Directory.CreateDirectory (targetPath);
-			}
+		targetPath = targetPath.Replace ("$(IntermediateOutputPath)", intermediateOutputPath);
+
+		if (string.IsNullOrEmpty (targetPath)) {
+			targetPath = fileSystem.Path.Combine (intermediateOutputPath, DefaultXcodeOutputFolder);
 		}
 
-		if (!fileSystem.Directory.Exists (targetPath)) {
-			LogDebug (Strings.Errors.Validation.TargetDoesNotExist (targetPath));
-			error = Strings.Errors.Validation.TargetDoesNotExist (targetPath);
+		if (!fileSystem.Path.IsPathRooted (targetPath)) {
+			targetPath = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projectPath)!, targetPath);
+		}
+
+		var xcodeProj = fileSystem.Path.Combine (targetPath, $"{fileSystem.Path.GetFileNameWithoutExtension (projectPath)}.xcodeproj");
+		var pbxproj = fileSystem.Path.Combine (xcodeProj, "project.pbxproj");
+
+		if (!fileSystem.Directory.Exists (targetPath) || !fileSystem.Directory.Exists (xcodeProj) || !fileSystem.File.Exists (pbxproj)) {
+			LogDebug (Strings.Errors.Validation.TargetIsNotValidXcodeProjectFolder (targetPath));
+			error = Strings.Errors.Validation.TargetIsNotValidXcodeProjectFolder (targetPath);
 			return (error, targetPath);
 		}
 
@@ -216,7 +230,7 @@ class BaseCommand<T> : Command {
 
 		tfms = [];
 		try {
-			tfms = Scripts.GetTfms (fileSystem, csproj);
+			tfms = Scripts.GetTargetFrameworksFromProject (csproj);
 
 			return tfms.Count > 0;
 		} catch (Exception ex) {

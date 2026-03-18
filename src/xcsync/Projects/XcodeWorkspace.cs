@@ -23,7 +23,7 @@ using static ClangSharp.Interop.CXTranslationUnit_Flags;
 namespace xcsync.Projects;
 
 partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework) :
-	SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, ["*.xcodeproj", "*.xcworkspace", "*.m", "*.h", "*.storyboard"]) {
+	SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, new ExtensionFilter (".pbxproj", ".m", ".h", ".storyboard")) {
 
 	static CXIndex cxIndex = CXIndex.Create ();
 
@@ -53,22 +53,28 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 
 	public async Task LoadAsync (CancellationToken cancellationToken = default)
 	{
+		var pbxProjFile = FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj");
+		if (!FileSystem.File.Exists (pbxProjFile)) {
+			Logger.Error (Strings.XcodeWorkspace.XcodeProjectNotFound (pbxProjFile));
+			return;
+		}
+
 		// Load the project files
-		Project = await LoadProjectAsync (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj"), cancellationToken).ConfigureAwait (false);
+		Project = await LoadProjectAsync (pbxProjFile, cancellationToken).ConfigureAwait (false);
 
 		if (Project is null) {
-			Logger.Error (Strings.XcodeWorkspace.FailToLoadXcodeProject (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
+			Logger.Error (Strings.XcodeWorkspace.FailToLoadXcodeProject (pbxProjFile));
 			return;
 		}
 
 		if (Project.Objects is null) {
-			Logger.Error (Strings.XcodeWorkspace.XcodeProjectDoesNotContainObjects (FileSystem.Path.Combine (RootPath, $"{Name}.xcodeproj", "project.pbxproj")));
+			Logger.Error (Strings.XcodeWorkspace.XcodeProjectDoesNotContainObjects (pbxProjFile));
 			return;
 		}
 
 		var frameworkGroup = (from groups in Project.Objects.Values
 							  where groups.Isa == "PBXGroup" && groups is PBXGroup { Name: "Frameworks" }
-							  select groups as PBXGroup).First ().Children.AsQueryable ();
+							  select groups as PBXGroup).FirstOrDefault ()?.Children.AsQueryable () ?? Array.Empty<string> ().AsQueryable ();
 
 		var fileReferences = from fileRef in Project.Objects.Values
 							 where fileRef.Isa == "PBXFileReference"
@@ -78,26 +84,34 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 						 join fileRef in fileReferences on frameworkRef equals fileRef.Token
 						 select fileRef;
 
-		var configuration = (from configurations in Project.Objects.Values
+		var releaseConfigs = from configurations in Project.Objects.Values
 							 where configurations.Isa == "XCBuildConfiguration" && configurations is XCBuildConfiguration { Name: "Release" } // TODO: Support Debug configuration?
-							 select configurations as XCBuildConfiguration).First ();
+							 select configurations as XCBuildConfiguration;
 
-		var buildSettings = configuration?.BuildSettings?.AsQueryable ();
-		var value = buildSettings?
-					.First (
+		string sdk = string.Empty;
+		foreach (var configuration in releaseConfigs) {
+			var buildSettings = configuration.BuildSettings?.AsQueryable ();
+			sdk = buildSettings?
+					.FirstOrDefault (
 						(v) => v.Key == "SDKROOT"
-					).Value?.FirstOrDefault ();
-		SdkRoot = (value ?? string.Empty) switch {
+					).Value?.FirstOrDefault () ?? string.Empty;
+			if (!string.IsNullOrEmpty (sdk)) break;
+		}
+		if (string.IsNullOrEmpty (sdk)) {
+			Logger.Warning (Strings.XcodeWorkspace.UsingDefaultSdkRoot);
+			sdk = "macosx";
+		}
+		SdkRoot = sdk switch {
 			"macosx" => "MacOSX",
 			"iphoneos" => "iPhoneOS",
-			_ => string.Empty
+			_ => "MacOSX"
 		};
 
 		clangCommandLineArgs.AddRange ([
 			"-target",
-			$"arm64-apple-{value}",
+			$"arm64-apple-{sdk}",
 			"-isysroot",
-			FileSystem.Path.Combine (Scripts.SelectXcode (), "Contents", "Developer", "Platforms", $"{SdkRoot}.platform", "Developer", "SDKs", $"{SdkRoot}.sdk"),
+			FileSystem.Path.Combine (xcSync.XcodePath, "Contents", "Developer", "Platforms", $"{SdkRoot}.platform", "Developer", "SDKs", $"{SdkRoot}.sdk"),
 		]);
 
 		LoadSyncableItems (fileReferences, syncableItems);
@@ -106,14 +120,17 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 	void LoadSyncableItems (IEnumerable<PBXFileReference> fileReferences, ConcurrentBag<ISyncableItem> syncableItems)
 	{
 		(from fileReference in fileReferences
-		 where fileReference.Path!.EndsWith (".storyboard")
-		 select new SyncableContent (FileSystem.Path.Combine (RootPath, fileReference.Path!)))
+		 where fileReference.Path!.EndsWith (".storyboard") ||
+			   fileReference.Path!.EndsWith (".xib") ||
+			   fileReference.Path!.EndsWith (".plist") ||
+			   fileReference.Path!.EndsWith (".xcassets")
+		 select new SyncableContent (FileSystem.Path.Combine (RootPath, fileReference.Path!), fileReference.Path!))
 	   	.ToList ().ForEach (syncableItems.Add);
 
 		var filePaths = from moduleReference in fileReferences
 						join headerReference in fileReferences on FileSystem.Path.GetFileNameWithoutExtension (moduleReference.Path) equals FileSystem.Path.GetFileNameWithoutExtension (headerReference.Path)
 						where headerReference.Path is not null && moduleReference.Path is not null
-						where string.CompareOrdinal (FileSystem.Path.GetExtension (headerReference.Path)?.ToLower (), ".h") + string.CompareOrdinal (FileSystem.Path.GetExtension (moduleReference.Path)?.ToLower (), ".m") == 0
+						where headerReference.Path!.EndsWith (".h") && moduleReference.Path!.EndsWith (".m")
 						select FileSystem.Path.Combine (RootPath, moduleReference.Path!);
 
 		filePaths.Select ((path) => Tuple.Create (path, TypeService.QueryTypes (null, FileSystem.Path.GetFileNameWithoutExtension (path)).FirstOrDefault ()))
@@ -192,18 +209,21 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			Logger.Error (Strings.XcodeWorkspace.ErrorParsing (filePath, translationUnitError.ToString ()));
 			skipProcessing = true;
 		} else if (handle.NumDiagnostics != 0) {
-			Logger.Warning (Strings.XcodeWorkspace.FileDiagnostics (filePath));
 
+			Logger.Information (Strings.XcodeWorkspace.FileParsingHasDiagnostics (filePath));
+
+			Logger.Verbose (Strings.XcodeWorkspace.FileDiagnostics (filePath));
 			for (uint i = 0; i < handle.NumDiagnostics; ++i) {
 				using var diagnostic = handle.GetDiagnostic (i);
 
-				if (diagnostic.Severity is CXDiagnostic_Error or CXDiagnostic_Fatal) {
-					Logger.Error (Strings.XcodeWorkspace.DiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()));
-				} else {
-					Logger.Warning (Strings.XcodeWorkspace.DiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()));
-				}
-				// skipProcessing |= diagnostic.Severity == CXDiagnostic_Error;
-				// skipProcessing |= diagnostic.Severity == CXDiagnostic_Fatal;
+				string diagnosticMessage = diagnostic.Severity switch {
+					CXDiagnostic_Error => Strings.XcodeWorkspace.ErrorDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					CXDiagnostic_Fatal => Strings.XcodeWorkspace.FatalDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					CXDiagnostic_Note => Strings.XcodeWorkspace.NoteDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					CXDiagnostic_Warning => Strings.XcodeWorkspace.WarningDiagnosticIssue (diagnostic.Format (CXDiagnostic_DisplayOption).ToString ()),
+					_ => string.Empty
+				};
+				Logger.Verbose (diagnosticMessage);
 			}
 		}
 

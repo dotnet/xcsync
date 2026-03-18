@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using System.Text.RegularExpressions;
 using Serilog;
 
 namespace xcsync;
@@ -12,7 +11,7 @@ namespace xcsync;
 /// </summary>
 /// <param name="fileSystemWatcher">an instance of a <see cref="FileSystemWatcher"/></param>
 /// <param name="logger"></param>
-class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger logger) : IDisposable {
+class ProjectFileChangeMonitor (IFileSystem fileSystem, IFileSystemWatcher fileSystemWatcher, ILogger logger) : IDisposable {
 	readonly static Action<string> defaultOnFileChanged = _ => { };
 	readonly static Action<string, string> defaultOnFileRenamed = (_, _) => { };
 	readonly static Action<Exception> defaultOnError = _ => { };
@@ -40,7 +39,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 
 	bool disposedValue;
 
-	Regex? fileFilterRegex;
+	ExtensionFilter _extensionFilter = new (".");
 
 	/// <summary>
 	/// Starts monitoring the project file changes.
@@ -53,10 +52,9 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 
 		this.project = project;
 
-		watcher.Path = project.RootPath;
+		watcher.Path = fileSystem.Path.GetDirectoryName (project.RootPath)!;
 
 		watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-		watcher.Filter = "*.*";
 		watcher.IncludeSubdirectories = true;
 
 		watcher.Changed += OnChangedHandler;
@@ -65,13 +63,15 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 		watcher.Renamed += OnRenamedHandler;
 		watcher.Error += OnErrorHandler;
 
-		watcher.EnableRaisingEvents = true;
+		try {
+			watcher.EnableRaisingEvents = true;
+		} catch (Exception ex) {
+			logger.Debug ($"{ex.Message}");
+		}
 
-		var filters = string.Join ("|", this.project.ProjectFilesFilter.Select (f => f.Replace (".", @"\.").Replace ("*", ".*").Replace ("?", ".?")));
-		if (string.IsNullOrEmpty (filters))
-			filters = ".*";
-		fileFilterRegex = new Regex ($"^{filters}$", RegexOptions.IgnoreCase);
-		logger.Debug (Strings.Watch.FileChangeFilter (fileFilterRegex.ToString ()));
+		_extensionFilter = project.ProjectFilesFilter;
+
+		logger.Information (Strings.Watch.FileChangeFilter (_extensionFilter.GetExtensionsToMonitorAsString ()));
 	}
 
 	/// <summary>
@@ -79,7 +79,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 	/// </summary>
 	public void StopMonitoring ()
 	{
-		logger.Debug (Strings.Watch.StartMonitoringProject (project!.RootPath));
+		logger.Debug (Strings.Watch.StopMonitoringProject (project!.RootPath));
 
 		watcher.EnableRaisingEvents = false;
 
@@ -116,7 +116,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 			return;
 		}
 
-		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+		if (!_extensionFilter.ProcessRenameEvent (e.OldFullPath, e.FullPath))
 			return;
 
 		logger.Information (Strings.Watch.FileRenamed (e.OldFullPath, e.FullPath, project!.Name));
@@ -134,7 +134,7 @@ class ProjectFileChangeMonitor (IFileSystemWatcher fileSystemWatcher, ILogger lo
 			return;
 		}
 
-		if (!fileFilterRegex?.IsMatch (e.FullPath) ?? false)
+		if (!_extensionFilter.ProcessEvent (e.FullPath))
 			return;
 
 		logger.Information (Strings.Watch.FileChanged (e.FullPath, project!.Name));

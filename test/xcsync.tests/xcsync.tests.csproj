@@ -37,4 +37,8 @@
     <Content Include="Resources\MultipleValid.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="data/*.*" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
 </Project>

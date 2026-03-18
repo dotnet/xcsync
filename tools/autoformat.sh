@@ -4,7 +4,7 @@
 cd "$(git rev-parse --show-toplevel)"
 SRC_DIR=$(pwd)
 
-# Go one directory up, to avoid any global.json in maccore
+# Go one directory up, to avoid any global.json in repository
 cd ..
 
 # Start formatting!

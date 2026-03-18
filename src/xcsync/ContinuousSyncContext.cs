@@ -5,100 +5,92 @@ using System.IO.Abstractions;
 using Marille;
 using Serilog;
 using xcsync.Projects;
-using xcsync.Workers;
 
 namespace xcsync;
 
-class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger)
+class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string ChangeChannel = "Changes";
+	ClrProject ClrProject { get; } = new (fileSystem, logger, typeService, "CLR", fileSystem.Path.GetFullPath (projectPath), framework);
+	XcodeWorkspace XcodeProject { get; } = new (fileSystem, logger, typeService, "Xcode", targetDir, framework);
+
 	public async Task SyncAsync (CancellationToken token = default)
 	{
-		// Generate initial Xcode project
 		await ConfigureMarilleHub ();
-		await new SyncContext (FileSystem, TypeService, SyncDirection.ToXcode, ProjectPath, TargetDir, Framework, Logger).SyncAsync (token);
 
-		var clrProject = new ClrProject (FileSystem, Logger, TypeService, "CLR Project", ProjectPath, Framework);
-		var xcodeProject = new XcodeWorkspace (FileSystem, Logger, TypeService, "Xcode Project", TargetDir, Framework);
+		// Generate initial Xcode project
+		await new SyncContext (FileSystem, new TypeService (Logger), SyncDirection.ToXcode, ProjectPath, TargetDir, Framework.ToString (), Logger, open, force)
+			.SyncAsync (token).ConfigureAwait (false);
 
-		using var clrChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
-		clrChanges.StartMonitoring (clrProject, token);
-		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem.FileSystemWatcher.New (), Logger);
-		xcodeChanges.StartMonitoring (xcodeProject, token);
+		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem, FileSystem.FileSystemWatcher.New (), Logger);
+		xcodeChanges.StartMonitoring (XcodeProject, token);
+
+		using var clrChanges = new ProjectFileChangeMonitor (FileSystem, FileSystem.FileSystemWatcher.New (), Logger);
+		clrChanges.StartMonitoring (ClrProject, token);
 
 		clrChanges.OnFileChanged = async path => {
-			Logger.Debug ($"CLR Project file {path} changed");
-			await SyncChange (path, Hub);
+			if (token.IsCancellationRequested)
+				return;
+
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.ToXcode, clrChanges, xcodeChanges));
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
-			Logger.Debug ($"Xcode Project file {path} changed");
-			await SyncChange (path, Hub);
+			if (token.IsCancellationRequested)
+				return;
+
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.FromXcode, clrChanges, xcodeChanges));
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
 		{
-			Logger.Debug ($"CLR Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, Hub);
+			if (token.IsCancellationRequested)
+				return;
+
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.ToXcode, clrChanges, xcodeChanges));
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
 
 		async void XcodeFileRenamed (string oldPath, string newPath)
 		{
-			Logger.Debug ($"Xcode Project file {oldPath} renamed to {newPath}");
-			await SyncRename (oldPath, Hub);
+			if (token.IsCancellationRequested)
+				return;
+
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.FromXcode, clrChanges, xcodeChanges));
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
 
-		clrChanges.OnError = async ex => {
-			Logger.Error (ex, $"Error:{ex.Message} in CLR Project file change monitor");
-			await SyncError (ProjectPath, ex, Hub);
+		clrChanges.OnError = ex => {
+			// TODO: Send Error to Marrille Error Channel
+			if (token.IsCancellationRequested)
+				return;
 		};
 
-		xcodeChanges.OnError = async ex => {
-			Logger.Error (ex, $"Error:{ex.Message} in Xcode Project file change monitor");
-			await SyncError (TargetDir, ex, Hub);
+		xcodeChanges.OnError = ex => {
+			// TODO: Send Error to Marrille Error Channel
+			if (token.IsCancellationRequested)
+				return;
 		};
 
 		do {
-			// TODO:  Use a FIFO queue to process the jobs
-			// Keep executing sync jobs until the user presses the esc sequence [CTRL-Q]
-			Logger.Debug ("Checking for changes in the projects...");
+			// Keep executing sync jobs until the process is canceled
+			await Task.Delay (10); // Just so we don't hog the thread.
 		} while (token.IsCancellationRequested == false);
 
-		Logger.Information ("User has requested to stop the sync process. Changes will no longer be processed.");
+		Logger.Information (Strings.Watch.StopWatchProcess);
 	}
 
-	public async Task SyncChange (string path, IHub hub)
+	protected async override Task ConfigureMarilleHub ()
 	{
-		// Hub will publish the message to the channel, will be received by worker (who will enact consumeAsync)
-		var syncLoad = new SyncLoad (new object ());
-		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, syncLoad));
-	}
-
-	public async Task SyncError (string path, Exception ex, IHub hub)
-	{
-		var errorLoad = new ErrorLoad (ex);
-		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, errorLoad));
-	}
-
-	public async Task SyncRename (string path, IHub hub)
-	{
-		var renameLoad = new RenameLoad (new object ());
-		await hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, renameLoad));
-	}
-
-	protected async override Task ConfigureMarilleHub () {
 		await base.ConfigureMarilleHub ();
-		ChangeErrorWorker errorWorker = new ();
 		// Hub creates a topic channel w message type template
 		// Only 1 channel corresponding to project changes to model FIFO queue && preserve order
 		// Different changes will be processed differently based on unique payload
-		await Hub.CreateAsync<ChangeMessage> (ChangeChannel, configuration, errorWorker);
-		var worker = new ChangeWorker ();
+		var worker = new ChangeWorker (FileSystem, ProjectPath, TargetDir, Framework.ToString (), Logger, ClrProject, XcodeProject);
+		await Hub.CreateAsync (ChangeChannel, configuration, worker);
 		await Hub.RegisterAsync (ChangeChannel, worker);
 		// worker now knows to pick up any and all change-related events from the channel in hub
 	}

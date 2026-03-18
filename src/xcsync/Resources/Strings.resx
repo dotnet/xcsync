@@ -160,13 +160,17 @@
 		<value>used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</value>
 	</data>
 	<data name="Commands.Watch.Description" xml:space="preserve">
-		<value>syncs changes between the .NET project and Xcode project automatically</value>
+		<value>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</value>
 	</data>
 
 	<!-- Errors -->
 	<data name="Errors.InvalidOption" xml:space="preserve">
 		<value>Invalid option '{0}' provided: {1}</value>
 		<comment>{0} is name of the command line options, {1} is the value of the option provided by the user</comment>
+	</data>
+	<data name="Errors.PbxprojNotFound" xml:space="preserve">
+		<value>Could not find a project.pbxproj file in path '{0}'</value>
+		<comment>{0} is the path to the file or directory</comment>
 	</data>
 	<data name="Errors.CsprojNotFound" xml:space="preserve">
 		<value>Could not find a .csproj file in path '{0}'</value>
@@ -190,6 +194,10 @@
 		<value>Target path '{0}' does not exist, will create directory if [--force, -f] is set.</value>
 		<comment>{0} is the path to the file or directory</comment>
 	</data>
+	<data name="Errors.Validation.TargetIsNotValidXcodeProjectFolder" xml:space="preserve">
+		<value>Target path '{0}' does not exist, or is not a valid Xcode project folder.</value>
+		<comment>{0} is the path to the file or directory</comment>
+	</data>
 	<data name="Errors.Validation.PathDoesNotContainCsproj" xml:space="preserve">
 		<value>'{0}' is not a valid path to a .NET project or a directory.</value>
 		<comment>{0} is the path to the file or directory</comment>
@@ -205,6 +213,9 @@
     <data name="Errors.Validation.InvalidVerbosity" xml:space="preserve">
 		<value>Invalid Verbosity. Allowed values are: Quiet, Minimal, Normal, Detailed, Diagnostic.</value>
 	</data>
+    <data name="Errors.Validation.InvalidOS" xml:space="preserve">
+		<value>The xcsync tool can only be run on macOS.</value>
+	</data>	
 	<data name="Errors.MultipleTfmsFound" xml:space="preserve">
 		<value>Multiple target frameworks found in the project file. Specify which target framework to use with the [--target-framework, -tfm] option.</value>
 	</data>
@@ -239,6 +250,14 @@
 		<value>Target path '{0}' does not exist, but is the default location, creating.</value>
 		<comment>{0} is the path to target project</comment>
 	</data>
+	<data name="Base.DotnetPath" xml:space="preserve">
+		<value>Using the `dotnet` located at {0}.</value>
+		<comment>{0} is the path to dotnet</comment>
+	</data>
+	<data name="Base.XcodePath" xml:space="preserve">
+		<value>Using Xcode from {0}.</value>
+		<comment>{0} is the path to Xcode</comment>
+	</data>
 
 	<!-- Generate Messages -->
 	<data name="Generate.HeaderInformation" xml:space="preserve">
@@ -265,9 +284,24 @@
 
 	<!-- Watch Messages -->
 	<data name="Watch.HeaderInformation" xml:space="preserve">
-		<value>Syncing changes between project '{0}' and '{1}'.</value>
-		<comment>{0} is the path to the project file, {1} is the path to the target project</comment>
+		<value>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</value>
+		<comment>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</comment>
 	</data>
+	<data name="Watch.ReceivedCtrlC" xml:space="preserve">
+		<value>Received CTRL-C, exiting.</value>
+	</data>
+	<data name="Watch.ReceivedEsc" xml:space="preserve">
+		<value>Received ESC, exiting.</value>
+	</data>
+	<data name="Watch.StopSynchronization" xml:space="preserve">
+		<value>Stopping synchronization and completing remaining jobs.</value>
+	</data>
+	<data name="Watch.InputRedirectedInstructions" xml:space="preserve">
+		<value>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</value>
+	</data>
+	<data name="Watch.InteractiveInstructions" xml:space="preserve">
+		<value>Press Ctrl+C or ESC to stop.</value>
+	</data>	
 	<data name="Watch.StartMonitoringProject" xml:space="preserve">
 		<value>Monitoring project file changes in {0} started.</value>
 		<comment>{0} is the path to the project file</comment>
@@ -291,6 +325,22 @@
 	<data name="Watch.ErrorMonitoringProjectFiles" xml:space="preserve">
 		<value>An error occurred while monitoring file changes in {0}.</value>
 		<comment>{0} is the path to the project folder</comment>
+	</data>
+	<data name="Watch.PausingMonitoring" xml:space="preserve">
+		<value>Pausing monitoring</value>
+	</data>
+	<data name="Watch.Syncing" xml:space="preserve">
+		<value>Syncing change context</value>
+	</data>
+	<data name="Watch.ResumingMonitoring" xml:space="preserve">
+		<value>Context synced. Resuming monitoring</value>
+	</data>
+	<data name="Watch.WorkerException" xml:space="preserve">
+		<value>Error processing change message {0}: {1}. Please file a bug report here: https://aka.ms/xcsync-issue</value>
+		<comment>{0} is the message Id, {1} is the exception message</comment>
+	</data>
+	<data name="Watch.StopWatchProcess" xml:space="preserve">
+		<value>User has requested to stop the sync process. Changes will no longer be processed.</value>
 	</data>
 
     <!-- Type Service Messages -->
@@ -342,7 +392,33 @@
         <comment>{0} is the name of the Assembly</comment>
     </data>
 
+    <!-- .NET Project Messages -->
+	<data name="ClrProject.NotSupportedException" xml:space="preserve">
+        <value>Compilation not supported for current project  '{0}'</value>
+        <comment>{0} is the path to the .NET project</comment>
+	</data>
+	<data name="ClrProject.InvalidOperationException" xml:space="preserve">
+        <value>Compilation errors detected in project '{0}': {1}}</value>
+        <comment>{0} is the path to the .NET project, {1} is the list of error messages</comment>
+	</data>
+	<data name="ClrProject.CompilationError" xml:space="preserve">
+        <value>Compilation error in project '{0}' : {1}</value>
+        <comment>{0} is the path to the .NET project, {1} is the error message</comment>
+	</data>
+	<data name="ClrProject.InvalidOperationError" xml:space="preserve">
+        <value>Invalid operation while processing project '{0}' : {1}</value>
+        <comment>{0} is the path to the .NET project, {1} is the error message</comment>
+	</data>
+	<data name="ClrProject.UnexpectedError" xml:space="preserve">
+        <value>Unexpected error occurred while processing project '{0}' : {1}</value>
+        <comment>{0} is the path to the .NET project, {1} is the error message</comment>
+	</data>
+
     <!-- Xcode Workspace Messages -->
+	<data name="XcodeWorkspace.XcodeProjectNotFound" xml:space="preserve">
+        <value>File not found: {0}</value>
+        <comment>{0} is the path to the Xcode project</comment>
+	</data>
     <data name="XcodeWorkspace.FailToLoadXcodeProject" xml:space="preserve">
         <value>Failed to load the Xcode project file at {0}</value>
         <comment>{0} is the path to the Xcode project</comment>
@@ -375,12 +451,28 @@
         <value>Error: Parsing failed for '{0}' due to '{1}'.</value>
         <comment>{0} is the file path, {1} is the Translation Unit Error</comment>
     </data>
+    <data name="XcodeWorkspace.FileParsingHasDiagnostics" xml:space="preserve">
+        <value>Parsing '{0}' generated diagnostic messages use Detailed logging to view them.</value>
+        <comment>{0} is the file path</comment>
+    </data>
     <data name="XcodeWorkspace.FileDiagnostics" xml:space="preserve">
         <value>Diagnostics for '{0}':</value>
         <comment>{0} is the file path</comment>
     </data>
-    <data name="XcodeWorkspace.DiagnosticIssue" xml:space="preserve">
-        <value>{0}</value>
+    <data name="XcodeWorkspace.ErrorDiagnosticIssue" xml:space="preserve">
+        <value>ERROR: {0}</value>
+        <comment>{0} is the diagnostic for which there are issues</comment>
+    </data>
+    <data name="XcodeWorkspace.WarningDiagnosticIssue" xml:space="preserve">
+        <value>WARNING: {0}</value>
+        <comment>{0} is the diagnostic for which there are issues</comment>
+    </data>
+    <data name="XcodeWorkspace.NoteDiagnosticIssue" xml:space="preserve">
+        <value>NOTE: {0}</value>
+        <comment>{0} is the diagnostic for which there are issues</comment>
+    </data>
+    <data name="XcodeWorkspace.FatalDiagnosticIssue" xml:space="preserve">
+        <value>FATAL: {0}</value>
         <comment>{0} is the diagnostic for which there are issues</comment>
     </data>
     <data name="XcodeWorkspace.SkipProcessing" xml:space="preserve">
@@ -395,6 +487,9 @@
         <value>Error processing '{0}' : {1}\n{2}</value>
         <comment>{0} is the file path, {1} is the exception, {2} is the stack trace</comment>
     </data>
+v    <data name="XcodeWorkspace.UsingDefaultSdkRoot" xml:space="preserve">
+        <value>SDKROOT not found in any release configuration, defaulting to 'macosx'</value>
+    </data>
 
     <!-- Sync Context Messages -->
     <data name="SyncContext.SyncComplete" xml:space="preserve">
@@ -403,4 +498,53 @@
     <data name="SyncContext.GeneratingFiles" xml:space="preserve">
 		<value>Generating Xcode project files...</value>
 	</data>
+    <data name="SyncContext.ProcessingType" xml:space="preserve">
+		<value>Processing type {0}</value>
+        <comment>{0} is the name of the type</comment>
+	</data>
+
+	<!-- ObjC Syntax Processing -->
+    <data name="ObjCSyntax.ObjCImplementationDeclFound" xml:space="preserve">
+		<value>Found ObjCImplementationDecl: {0}</value>
+        <comment>{0} is the name of the syntax declaration</comment>
+	</data>
+    <data name="ObjCSyntax.Visiting" xml:space="preserve">
+		<value>[{0}] Visiting {{{1}}}</value>
+        <comment>{0} is the name of the visitor class, {1} is the declaration kind name</comment>
+	</data>
+    <data name="ObjCSyntax.PropertyNotImplementedException" xml:space="preserve">
+		<value>Unsupported property type {0}</value>
+        <comment>{0} is the name of the property type</comment>
+	</data>
+    <data name="ObjCSyntax.ParsingProperty" xml:space="preserve">
+		<value>[{0}] Parsing property type '{0}'</value>
+        <comment>{0} is the name of the visitor class, {1} is the declaration kind name</comment>
+	</data>
+
+	<!-- Workers -->
+    <data name="FileWorker.WroteFile" xml:space="preserve">
+		<value>Wrote {0} bytes to {1}</value>
+        <comment>{0} is the number of bytes written, {1} is the path to the file</comment>
+	</data>
+    <data name="Worker.ProcessingException" xml:space="preserve">
+		<value>Exception processing message.</value>
+	</data>
+    <data name="Worker.ProcessingError" xml:space="preserve">
+		<value>Error processing message.</value>
+	</data>
+    <data name="CopyFileWorker.CopiedFile" xml:space="preserve">
+		<value>Copied {0} to {1}</value>
+        <comment>{0} is the source path, {1} is the destination path</comment>
+	</data>
+
+	<!-- General -->
+    <data name="General.FoundMsBuild" xml:space="preserve">
+		<value>Found MSBuild instance {0} at {1}</value>
+        <comment>{0} is a version number, {1} is the path</comment>
+	</data>
+    <data name="General.RegisteredMsBuild" xml:space="preserve">
+		<value>Registered MSBuild instance {0} at {1}</value>
+        <comment>{0} is a version number, {1} is the path</comment>
+	</data>
+
 </root>

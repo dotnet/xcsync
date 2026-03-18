@@ -1,0 +1,16 @@
+version: 2
+# https://eng.ms/docs/products/dependabot/configuration/version_updates
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "Moq"
+        # Moq should not be updated to a newer version than 4.18.4. For details, please see
+        # https://www.bleepingcomputer.com/news/security/popular-open-source-project-moq-criticized-for-quietly-collecting-data/
+        versions: ["(4.18.4,)"]

@@ -28,22 +28,75 @@ static class Scripts {
 		return exec;
 	}
 
-#pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
-	public static string SelectXcode ()
+	public static string RunAppleScript (string script)
 	{
-		var exec = ExecuteCommand ("xcode-select", ["-p"], TimeSpan.FromMinutes (1));
-		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
+		var args = new [] { "-e", script };
+		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
+		return exec.StandardOutput?.ToString ()?.Trim ('\n')!;
 	}
-#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 
-	public static List<string> GetTfms (IFileSystem fileSystem, string projPath)
+	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = false)
 	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
+		// Get information about the source directory
+		var dir = fileSystem.DirectoryInfo.New (sourceDir);
+		// Check if the source directory exists
+		if (!dir.Exists)
+			throw new DirectoryNotFoundException ($"Source directory not found: {dir.FullName}");
+
+		// Cache directories before we start copying
+		var dirs = dir.GetDirectories ();
+
+		// Create the destination directory
+		Directory.CreateDirectory (destinationDir);
+
+		// Get the files in the source directory and copy to the destination directory
+		foreach (var file in dir.GetFiles ()) {
+			string targetFilePath = fileSystem.Path.Combine (destinationDir, file.Name);
+			file.CopyTo (targetFilePath, overwrite: overwrite);
+		}
+
+		// If recursive and copying subdirectories, recursively call this method
+		if (recursive) {
+			foreach (var subDir in dirs) {
+				string newDestinationDir = fileSystem.Path.Combine (destinationDir, subDir.Name);
+				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, recursive: recursive, overwrite: overwrite);
+			}
+		}
+	}
+
+#pragma warning disable IO0002 // Replace File class with IFileSystem.File for improved testability
+#pragma warning disable IO0006 // Replace Path class with IFileSystem.Path for improved testability
+
+	public static bool ConvertPbxProjToJson (string projectPath)
+	{
+		var exec = ExecuteCommand ("plutil", ["-convert", "json", projectPath], TimeSpan.FromMinutes (1));
+		return File.Exists (projectPath) && exec.ExitCode == 0;
+	}
+
+	public static string GetSupportedOSVersionForTfmFromProject (string projPath, string tfm)
+	{
+		var resultFile = Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		var result = File.ReadAllText (resultFile).Trim ('\n');
+
+		SafeFileDelete (resultFile);
+
+		return result;
+
+	}
+
+	public static List<string> GetTargetFrameworksFromProject (string projPath)
+	{
+		var resultFile = Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getProperty:TargetFrameworks,TargetFramework", $"-getResultOutputFile:{resultFile}" };
 
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
-		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
+		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
+
+		SafeFileDelete (resultFile);
 
 		List<string> tfms = [];
 
@@ -65,53 +118,55 @@ static class Scripts {
 		return tfms;
 	}
 
-	public static string GetSupportedOSVersion (IFileSystem fileSystem, string projPath, string tfm)
+	public static HashSet<string> GetAssetItemsFromProject (string projPath, string tfm)
 	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
-		var args = new [] { "msbuild", projPath, "-getProperty:SupportedOSPlatformVersion", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
-		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
-
-		return fileSystem.File.ReadAllText (resultFile).Trim ('\n');
-	}
-
-	public static HashSet<string> GetAssets (IFileSystem fileSystem, string projPath, string tfm)
-	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
+		var resultFile = Path.GetTempFileName ();
 		//maybe add support for ImageAsset? But right now doesn't seem v necessary? (Default is BundleResource)
-		var args = new [] { "msbuild", projPath, "-getItem:BundleResource", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
+		var args = new [] { "msbuild", projPath, "-getItem:BundleResource,ImageAsset", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
 		// dynamic cuz don't wanna create a whole class to rep the incoming json
-		dynamic data = JsonConvert.DeserializeObject (fileSystem.File.ReadAllText (resultFile))!;
-		var bundleResources = data.Items.BundleResource;
-		HashSet<string> assetPaths = new ();
+		dynamic data = JsonConvert.DeserializeObject (File.ReadAllText (resultFile))!;
 
-		// iterate through bundle resources , specific to tfm, and compute the appropriate asset paths
-		foreach (var item in bundleResources) {
-			var id = item.Identity.ToString ().Replace ('\\', '/');
-			if (id.Contains ("Assets.xcassets")) {
-				if (!fileSystem.Path.IsPathRooted (id))
-					// Combine with the project path if it's not a full path
-					id = fileSystem.Path.Combine (fileSystem.Path.GetDirectoryName (projPath), id);
+		SafeFileDelete (resultFile);
 
-				// Strip off anything after ".xcassets"
-				var index = id.IndexOf (".xcassets", StringComparison.Ordinal);
-				if (index > -1)
-					id = id.Substring (0, index + ".xcassets".Length);
+		HashSet<string> assetPaths = [];
 
-				assetPaths.Add (id);
+		GetAssetPaths (projPath, data.Items.BundleResource, assetPaths);
+		GetAssetPaths (projPath, data.Items.ImageAsset, assetPaths);
+
+		return assetPaths;
+
+		static void GetAssetPaths (string projPath, dynamic bundleResources, HashSet<string> assetPaths)
+		{
+			// iterate through bundle resources , specific to tfm, and compute the appropriate asset paths
+			foreach (var item in bundleResources) {
+				var id = item.Identity.ToString ().Replace ('\\', '/');
+				if (id.Contains ("Assets.xcassets")) {
+					if (!Path.IsPathRooted (id))
+						// Combine with the project path if it's not a full path
+						id = Path.Combine (Path.GetDirectoryName (projPath), id);
+
+					// Strip off anything after ".xcassets"
+					var index = id.IndexOf (".xcassets", StringComparison.Ordinal);
+					if (index > -1)
+						id = id.Substring (0, index + ".xcassets".Length);
+
+					assetPaths.Add (id);
+				}
 			}
 		}
-		return assetPaths;
 	}
 
-	public static List<string> GetFiles (IFileSystem fileSystem, string projPath, string tfm, string targetPlatform)
+	public static List<string> GetFileItemsFromProject (string projPath, string tfm, string targetPlatform)
 	{
-		var resultFile = fileSystem.Path.GetTempFileName ();
+		var resultFile = Path.GetTempFileName ();
 		var args = new [] { "msbuild", projPath, "-getItem:Compile,None", $"-property:TargetFramework={tfm}", $"-getResultOutputFile:{resultFile}" };
 		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
-		var jsonObject = JObject.Parse (fileSystem.File.ReadAllText (resultFile));
+		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
+
+		SafeFileDelete (resultFile);
 
 		// Combine the search for Compile and None tokens into one operation
 		var tokens = jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath");
@@ -119,44 +174,56 @@ static class Scripts {
 		return jsonObject.SelectTokens ("$..['Compile','None'][*].FullPath")
 		   .Select (token => token.ToString ())
 		   .Where (path => !path.Contains ("Platforms") || path.Contains ($"Platforms/{targetPlatform}", StringComparison.OrdinalIgnoreCase))
+		   .Distinct ()
 		   .ToList ();
 	}
 
-	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive)
+	public static bool IsMauiAppProject (string projPath)
 	{
-		// Get information about the source directory
-		var dir = fileSystem.DirectoryInfo.New (sourceDir);
-		// Check if the source directory exists
-		if (!dir.Exists)
-			throw new DirectoryNotFoundException ($"Source directory not found: {dir.FullName}");
+		var resultFile = Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, "-getProperty:UseMaui,OutputType", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
 
-		// Cache directories before we start copying
-		var dirs = dir.GetDirectories ();
+		var jsonObject = JObject.Parse (File.ReadAllText (resultFile));
 
-		// Create the destination directory
-		Directory.CreateDirectory (destinationDir);
+		SafeFileDelete (resultFile);
 
-		// Get the files in the source directory and copy to the destination directory
-		foreach (var file in dir.GetFiles ()) {
-			string targetFilePath = fileSystem.Path.Combine (destinationDir, file.Name);
-			file.CopyTo (targetFilePath);
-		}
+		var useMaui = string.CompareOrdinal (jsonObject.SelectToken ("$.Properties.UseMaui")?.ToString ().ToLowerInvariant (), "true") == 0;
+		var outputType = jsonObject.SelectToken ("$.Properties.OutputType")?.ToString ();
 
-		// If recursive and copying subdirectories, recursively call this method
-		if (recursive) {
-			foreach (var subDir in dirs) {
-				string newDestinationDir = fileSystem.Path.Combine (destinationDir, subDir.Name);
-				CopyDirectory (fileSystem, subDir.FullName, newDestinationDir, true);
-			}
-		}
+		return useMaui && string.CompareOrdinal (outputType, "Exe") == 0;
 	}
 
-	public static string Run (string script)
+	public static string SelectXcode ()
 	{
-		var args = new [] { "-e", script };
-		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
-		return exec.StandardOutput?.ToString ()?.Trim ('\n')!;
+		var exec = ExecuteCommand ("xcode-select", ["-p"], TimeSpan.FromMinutes (1));
+		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
 	}
+
+	public static string GetIntermediateOutputPath (string projPath, string tfm)
+	{
+		const string IntermediateOutputPath = nameof (IntermediateOutputPath);
+		var resultFile = Path.GetTempFileName ();
+		var args = new [] { "msbuild", projPath, $"-property:TargetFramework={tfm}", $"-getProperty:{IntermediateOutputPath}", $"-getResultOutputFile:{resultFile}" };
+		ExecuteCommand (PathToDotnet, args, TimeSpan.FromMinutes (1));
+
+		var result = File.ReadAllText (resultFile).TrimEnd ('/', '\\', '\n').Replace ('\\', Path.DirectorySeparatorChar);
+
+		SafeFileDelete (resultFile);
+
+		return result ?? string.Empty;
+	}
+
+	static void SafeFileDelete (string file)
+	{
+		try {
+			File.Delete (file);
+		} catch (Exception ex) {
+			xcSync.Logger?.Debug (ex, "Failed to delete temporary file: {0}", file);
+		}
+	}
+#pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
+#pragma warning restore IO0002 // Replace File class with IFileSystem.File for improved testability
 
 	public static string OpenXcodeProject (string workspacePath) =>
 		$@"

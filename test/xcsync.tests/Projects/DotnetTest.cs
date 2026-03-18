@@ -30,12 +30,12 @@ public class DotnetTest (ITestOutputHelper TestOutput) : Base {
 
 		var logger = Mock.Of<ILogger> ();
 		var typeService = new TypeService (logger);
-		var clrProject = new ClrProject (new MockFileSystem (), logger, typeService, "TestProject", TestProjectPath, "net8.0-macos");
+		var clrProject = new ClrProject (new FileSystem (), logger, typeService, "TestProject", TestProjectPath, "net8.0-macos");
 
 		try {
 			var project = await clrProject.OpenProject ().ConfigureAwait (false);
 			var types = typeService.QueryTypes ().ToList ();
-			Assert.Equal (expectedTypes, [.. types.Where (x => x?.ClrType is not null).Select (x => x?.ClrType).OrderBy (x => x)]);
+			Assert.Equal (expectedTypes, [.. types.Where (x => x is not null && x.ClrType is not null && x.IsInSource).Select (x => x?.ClrType).OrderBy (x => x)]);
 		} catch (Exception ex) when (ex.Message.Contains ("MSBuildLocator.RegisterInstance")) {
 			Assert.Fail ($"System issue encountered: {ex.Message}. This failure is unrelated to the actual test. " +
 						"Ensure that MSBuild assemblies are not pre-loaded before running the tests. " +

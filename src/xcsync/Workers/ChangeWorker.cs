@@ -2,37 +2,31 @@
 // Licensed under the MIT License.
 
 using System.IO.Abstractions;
-using Marille;
 using Serilog;
 using xcsync.Projects;
 using xcsync.Workers;
 
 namespace xcsync;
 
-public struct ChangeMessage (string id, string path, object payload) {
-	public string Id { get; set; } = id;
-	public string Path { get; set; } = path;
-	public ChangeLoad Change { get; set; } = (ChangeLoad) payload;
-}
+record struct ChangeMessage (string Id, string Path, SyncDirection Direction, ProjectFileChangeMonitor ClrMonitor, ProjectFileChangeMonitor XcodeMonitor);
 
-class ChangeWorker () : BaseWorker<ChangeMessage> {
-
-	public override Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
+class ChangeWorker (IFileSystem FileSystem, string ProjectPath, string TargetDir, string Framework, ILogger Logger, ClrProject ClrProject, XcodeWorkspace XcodeProject) : BaseWorker<ChangeMessage> {
+	public override async Task ConsumeAsync (ChangeMessage message, CancellationToken cancellationToken = default)
 	{
-		// todo: impl per load
-		return message.Change switch {
-			SyncLoad => Task.CompletedTask,
-			ErrorLoad => Task.CompletedTask,
-			RenameLoad => Task.CompletedTask,
-			_ => Task.CompletedTask
-		};
+		Logger.Debug (Strings.Watch.PausingMonitoring);
+		message.ClrMonitor.StopMonitoring ();
+		message.XcodeMonitor.StopMonitoring ();
+		Logger.Debug (Strings.Watch.Syncing);
+		await new SyncContext (FileSystem, new TypeService (Logger), message.Direction, ProjectPath, TargetDir, Framework, Logger, open: false, force: message.Direction == SyncDirection.ToXcode).SyncAsync (cancellationToken);
+		Logger.Debug (Strings.Watch.ResumingMonitoring);
+		message.ClrMonitor.StartMonitoring (ClrProject, cancellationToken);
+		message.XcodeMonitor.StartMonitoring (XcodeProject, cancellationToken);
+	}
+
+	public override Task ConsumeAsync (ChangeMessage message, Exception exception, CancellationToken token = default)
+	{
+		Logger.Fatal (Strings.Watch.WorkerException (message.Id, exception.Message));
+		//TODO: https://github.com/dotnet/xcsync/issues/82
+		return Task.CompletedTask;
 	}
 }
-
-public interface ChangeLoad {
-	object ChangeDetected { get; }
-}
-
-readonly record struct SyncLoad (object ChangeDetected) : ChangeLoad;
-readonly record struct ErrorLoad (object ChangeDetected) : ChangeLoad;
-readonly record struct RenameLoad (object ChangeDetected) : ChangeLoad;
