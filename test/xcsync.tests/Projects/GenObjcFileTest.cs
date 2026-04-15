@@ -120,6 +120,38 @@ public class GenObjcFileTest : Base {
 	}
 
 	[Fact]
+	public void GenerateViewControllerHFile_WithCustomControlOutlet_ImportsCustomControlHeader ()
+	{
+		var nsViewController = new TypeMapping (null, "NSViewController", "NSViewController", null, false, false, false, null, null, ["AppKit", "Foundation"]);
+		var nsType = new TypeMapping (null, "ViewController", "ViewController", nsViewController, false, false, false,
+			[new IBOutlet ("CustomButton", "CustomButton", "PrimaryButton", "PrimaryButton", false)], null, ["AppKit", "Foundation"]) {
+			HeaderReferences = ["PrimaryButton"]
+		};
+
+		var generated = new GenObjcH (nsType).TransformText ();
+
+		const string expected =
+			warning +
+			"""
+			#import <AppKit/AppKit.h>
+			#import <Foundation/Foundation.h>
+			#import "PrimaryButton.h"
+			
+			
+			@interface ViewController : NSViewController {
+				PrimaryButton *_CustomButton;
+			}
+			
+			@property (nonatomic, retain) IBOutlet PrimaryButton *CustomButton;
+			
+			@end
+			
+			""";
+
+		Assert.Equal (expected, generated);
+	}
+
+	[Fact]
 	public void GenerateViewControllerMFile ()
 	{
 		(_, ITypeService typeService) = InitializeProjects ();

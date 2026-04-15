@@ -93,7 +93,8 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 				Write (objcMethod!);
 				break;
 
-			};
+			}
+			;
 			return Task.CompletedTask;
 		}
 
@@ -142,10 +143,13 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			logger.Debug (Strings.ObjCSyntax.ParsingProperty (nameof (ObjCSyntaxRewriter), objcProperty.Type.AsString));
 			// TODO: This is a *very* primitive way to get the property type and will need improvement
 			// TODO: Need a solution to handle the case where the property type is not found  or is null in the type mapping
-			var propertyType = objcProperty.Type switch { { Kind: CXType_ObjCObjectPointer } => typeService
-															  .QueryTypes (null, objcProperty.Type.AsString.Split (' ') [0])
-															  .First ()?.ClrType ?? string.Empty,
-				_ => throw new NotImplementedException (Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling))
+			var propertyType = objcProperty.Type switch {
+				{ Kind: CXType_ObjCObjectPointer } => GetPropertyTypeNameSafe (
+					typeService,
+					objcProperty,
+					firstClass),
+				_ => throw new NotImplementedException (
+					Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling))
 			};
 
 			// Create the property
@@ -179,6 +183,55 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			var newRoot = root.ReplaceNode (firstClass, newClass);
 
 			SyntaxTree = newRoot.SyntaxTree;
+		}
+
+		string GetPropertyTypeNameSafe (
+			ITypeService typeService,
+			ObjCPropertyDecl objcProperty,
+			ClassDeclarationSyntax classDeclaration)
+		{
+			try {
+				// Attempt to resolve the type mapping from the ObjC type string.
+				var typeMapping = typeService
+					.QueryTypes (null, objcProperty.Type.AsString.Split (' ') [0])
+					.FirstOrDefault ();
+							
+				if (typeMapping is null) {
+					logger.Error (
+						Strings.ObjCSyntax.TypeMappingNotFound (objcProperty.Type.AsString, objcProperty.Type.KindSpelling));
+
+					return string.Empty;
+				}
+				return GetPropertyTypeName (typeMapping, classDeclaration);
+			} catch (Exception ex) {
+				// Catch any unexpected errors during type resolution.
+				// We do NOT rethrow to avoid breaking existing behavior.
+				logger.Error (
+					ex,
+					Strings.ObjCSyntax.PropertyTypeResolutionFailed (objcProperty.Type.AsString, objcProperty.Type.KindSpelling));
+
+				return string.Empty; // fallback
+			}
+		}
+
+		static string GetPropertyTypeName (TypeMapping typeMapping, ClassDeclarationSyntax classDeclaration)
+		{
+			// This method converts a TypeMapping into a usable CLR type name,
+			// taking namespaces into account to avoid ambiguity.
+
+			// If the type has no namespace or is in the global namespace,
+			// we can safely return just the CLR type name.
+			if (typeMapping.TypeSymbol?.ContainingNamespace is null || typeMapping.TypeSymbol.ContainingNamespace.IsGlobalNamespace)
+				return typeMapping.ClrType;
+
+			// Get the namespace of the resolved type (e.g. "MyProject.Models")
+			var typeNamespace = typeMapping.TypeSymbol.ContainingNamespace.ToDisplayString ();
+			var classNamespace = classDeclaration.Ancestors ().OfType<BaseNamespaceDeclarationSyntax> ().FirstOrDefault ()?.Name.ToString ();
+
+			// If the class is in the same namespace as the type, we can return just the CLR type name.
+			return classNamespace == typeNamespace
+				? typeMapping.ClrType
+				: $"{typeNamespace}.{typeMapping.ClrType}";
 		}
 
 		void Write (ObjCMethodDecl objcMethod)

@@ -19,6 +19,9 @@
 #import <<#= @ref #>/<#= @ref #>.h>
 <# } #>
 <# } #>
+<# foreach (var headerReference in typeMapping.HeaderReferences) { #>
+#import "<#= headerReference #>.h"
+<# } #>
 
 
 @interface <#= typeMapping.ObjCType #> : <#= typeMapping.BaseType?.ObjCType is null || typeMapping.BaseType.IsProtocol ? "NSObject" : typeMapping.BaseType?.ObjCType #> {

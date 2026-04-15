@@ -520,6 +520,14 @@ v    <data name="XcodeWorkspace.UsingDefaultSdkRoot" xml:space="preserve">
 		<value>[{0}] Parsing property type '{0}'</value>
         <comment>{0} is the name of the visitor class, {1} is the declaration kind name</comment>
 	</data>
+    <data name="ObjCSyntax.TypeMappingNotFound" xml:space="preserve">
+		<value>Type mapping not found for property type '{0}' (Kind: {1})</value>
+        <comment>{0} is the property type, {1} is the kind spelling</comment>
+	</data>
+    <data name="ObjCSyntax.PropertyTypeResolutionFailed" xml:space="preserve">
+		<value>Failed to resolve property type for '{0}' (Kind: {1})</value>
+        <comment>{0} is the property type, {1} is the kind spelling</comment>
+	</data>
 
 	<!-- Workers -->
     <data name="FileWorker.WroteFile" xml:space="preserve">

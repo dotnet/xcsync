@@ -18,6 +18,7 @@ public class ObjCSyntaxRewriterTest {
 	[Theory]
 	[InlineData (ViewControllerObjC, ViewControllerCSharp)]
 	[InlineData (ViewControllerOutletObjC, ViewControllerOutletCSharp)]
+	[InlineData (ViewControllerCustomOutletObjC, ViewControllerCustomOutletCSharp)]
 	[InlineData (ViewControllerActionObjC, ViewControllerActionCSharp)]
 	public async void WriteAsync_ObjCInterfaceDecl_TranslatesToCorrectValidSyntaxTree (string inputContents, string expectedOutput)
 	{
@@ -29,11 +30,15 @@ public class ObjCSyntaxRewriterTest {
 
 		var logger = new Mock<ILogger> ();
 		var TypeService = new Mock<TypeService> (logger.Object);
-		var NSTextFieldTypeMapping = new TypeMapping (null, "NSTextField", "NSTextField", null, false, false, false, null, null, []);
+		var NSTextFieldTypeMapping = new TypeMapping (CreateTypeSymbol ("NSTextField", "AppKit"), "NSTextField", "NSTextField", null, false, false, false, null, null, []);
+		var PrimaryButtonTypeMapping = new TypeMapping (CreateTypeSymbol ("PrimaryButton", "TestCustomControl"), "PrimaryButton", "PrimaryButton", null, false, false, false, null, null, []);
 
 		TypeService.Setup (
 			x => x.QueryTypes (It.IsAny<string> (), It.Is<string> (s => s == "NSTextField"))
 		).Returns ([NSTextFieldTypeMapping]);
+		TypeService.Setup (
+			x => x.QueryTypes (It.IsAny<string> (), It.Is<string> (s => s == "PrimaryButton"))
+		).Returns ([PrimaryButtonTypeMapping]);
 
 		var index = CXIndex.Create ();
 		using var unsavedFile = CXUnsavedFile.Create (DefaultInputFileName, inputContents);
@@ -105,7 +110,7 @@ partial class ViewController
 partial class ViewController
 {
     [Outlet]
-    NSTextField Name { get; set; }
+    AppKit.NSTextField Name { get; set; }
 
     void ReleaseDesignerOutlets()
     {
@@ -113,6 +118,38 @@ partial class ViewController
         {
             Name.Dispose();
             Name = null;
+        }
+    }
+}";
+	const string ViewControllerCustomOutletObjC = @"
+#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+
+@class PrimaryButton;
+
+@interface ViewController : NSViewController {
+}
+
+@property (weak) IBOutlet PrimaryButton *CustomButton;
+
+@end
+
+@implementation ViewController
+ 
+@end
+";
+	const string ViewControllerCustomOutletCSharp = @"[Register(""ViewController"")]
+partial class ViewController
+{
+    [Outlet]
+    TestCustomControl.PrimaryButton CustomButton { get; set; }
+
+    void ReleaseDesignerOutlets()
+    {
+        if (CustomButton != null)
+        {
+            CustomButton.Dispose();
+            CustomButton = null;
         }
     }
 }";
@@ -143,4 +180,18 @@ partial class ViewController
     {
     }
 }";
+
+	static INamedTypeSymbol CreateTypeSymbol (string name, string? namespaceName)
+	{
+		var typeSymbol = new Mock<INamedTypeSymbol> ();
+		typeSymbol.Setup (x => x.Name).Returns (name);
+		typeSymbol.Setup (x => x.MetadataName).Returns (name);
+
+		var namespaceSymbol = new Mock<INamespaceSymbol> ();
+		namespaceSymbol.Setup (x => x.IsGlobalNamespace).Returns (string.IsNullOrEmpty (namespaceName));
+		namespaceSymbol.Setup (x => x.ToDisplayString (null)).Returns (namespaceName ?? string.Empty);
+		typeSymbol.Setup (x => x.ContainingNamespace).Returns (namespaceSymbol.Object);
+
+		return typeSymbol.Object;
+	}
 }

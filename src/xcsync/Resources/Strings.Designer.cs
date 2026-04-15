@@ -146,7 +146,9 @@ static class Strings {
 		internal static string Visiting(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_Visiting, visitor, decl);
 		internal static string PropertyNotImplementedException(string decl) => string.Format(Resources.Strings.ObjCSyntax_PropertyNotImplementedException, decl);
 		internal static string ParsingProperty(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_ParsingProperty, visitor, decl);
- 	}
+		internal static string TypeMappingNotFound(string propertyType, string kind) => string.Format(Resources.Strings.ObjCSyntax_TypeMappingNotFound, propertyType, kind);
+		internal static string PropertyTypeResolutionFailed(string propertyType, string kind) => string.Format(Resources.Strings.ObjCSyntax_PropertyTypeResolutionFailed, propertyType, kind);
+  	}
 
 	internal static class Workers 
 	{
