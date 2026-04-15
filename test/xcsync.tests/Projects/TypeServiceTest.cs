@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Moq;
 using Serilog;
 using xcsync.Projects;
@@ -69,5 +71,130 @@ public class TypeServiceTest {
 		typeService.AddType (appDelegateDupe);
 		var result = typeService.AddType (appDelegateDupe);
 		Assert.Null (result);
+	}
+
+	[Fact]
+	public void AddCompilation_FindsTypesInNestedNamespaces ()
+	{
+		var compilation = CreateCompilation (
+			"""
+			using System;
+
+			namespace Foundation {
+				[AttributeUsage (AttributeTargets.Class)]
+				public sealed class RegisterAttribute : Attribute {
+				}
+
+				[Register]
+				public class NSObject {
+				}
+			}
+
+			namespace AppKit {
+				[Foundation.Register]
+				public class NSViewController : Foundation.NSObject {
+				}
+			}
+
+			namespace TestProject.Controllers.Nested {
+				[Foundation.Register]
+				public class NestedViewController : AppKit.NSViewController {
+				}
+			}
+			""");
+
+		typeService.AddCompilation ("macos", compilation);
+
+		var result = Assert.Single (typeService.QueryTypes (clrType: "NestedViewController"));
+		Assert.NotNull (result);
+		Assert.True (result.IsInSource);
+		Assert.Equal ("NestedViewController", result.ObjCType);
+		Assert.Equal ("NSViewController", result.BaseType?.ClrType);
+	}
+
+	[Fact]
+	public async Task TryUpdateMappingAsync_FindsTypesInNestedNamespaces ()
+	{
+		var source =
+			"""
+			using System;
+
+			namespace Foundation {
+				[AttributeUsage (AttributeTargets.Class)]
+				public sealed class RegisterAttribute : Attribute {
+				}
+
+				[Register]
+				public class NSObject {
+				}
+			}
+
+			namespace AppKit {
+				[Foundation.Register]
+				public class NSViewController : Foundation.NSObject {
+				}
+			}
+
+			namespace TestProject.Controllers.Nested {
+				[Foundation.Register]
+				public class NestedViewController : AppKit.NSViewController {
+				}
+			}
+			""";
+		var updatedSource =
+			"""
+			using System;
+
+			namespace Foundation {
+				[AttributeUsage (AttributeTargets.Class)]
+				public sealed class RegisterAttribute : Attribute {
+				}
+
+				[Register]
+				public class NSObject {
+				}
+			}
+
+			namespace AppKit {
+				[Foundation.Register]
+				public class NSViewController : Foundation.NSObject {
+				}
+			}
+
+			namespace TestProject.Controllers.Nested {
+				[Foundation.Register]
+				public class NestedViewController : AppKit.NSViewController {
+					public int Value => 1;
+				}
+			}
+			""";
+		var compilation = CreateCompilation (source);
+		typeService.AddCompilation ("macos", compilation);
+
+		var existingMapping = Assert.Single (typeService.QueryTypes (clrType: "NestedViewController"));
+		Assert.NotNull (existingMapping);
+
+		var updatedTree = CSharpSyntaxTree.ParseText (updatedSource, path: "NestedViewController.cs");
+		var updatedRoot = await updatedTree.GetRootAsync ();
+		var updatedType = updatedRoot.DescendantNodes ().OfType<ClassDeclarationSyntax> ()
+			.Single (node => node.Identifier.ValueText == "NestedViewController");
+
+		var result = await typeService.TryUpdateMappingAsync (existingMapping, updatedType);
+
+		Assert.True (result);
+		Assert.True (Assert.Single (typeService.QueryTypes (clrType: "NestedViewController"))?.HasChanges);
+	}
+
+	static Compilation CreateCompilation (string source)
+	{
+		var syntaxTree = CSharpSyntaxTree.ParseText (source, path: "NestedViewController.cs");
+
+		return CSharpCompilation.Create (
+			"NestedNamespaceTests",
+			[syntaxTree],
+			[
+				MetadataReference.CreateFromFile (typeof (object).Assembly.Location),
+			],
+			new CSharpCompilationOptions (OutputKind.DynamicallyLinkedLibrary));
 	}
 }
