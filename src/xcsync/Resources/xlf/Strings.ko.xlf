@@ -222,6 +222,16 @@
         <target state="translated">지원되지 않는 속성 형식 {0}</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
+      <trans-unit id="ObjCSyntax.PropertyTypeResolutionFailed">
+        <source>Failed to resolve property type for '{0}' (Kind: {1})</source>
+        <target state="new">Failed to resolve property type for '{0}' (Kind: {1})</target>
+        <note>{0} is the property type, {1} is the kind spelling</note>
+      </trans-unit>
+      <trans-unit id="ObjCSyntax.TypeMappingNotFound">
+        <source>Type mapping not found for property type '{0}' (Kind: {1})</source>
+        <target state="new">Type mapping not found for property type '{0}' (Kind: {1})</target>
+        <note>{0} is the property type, {1} is the kind spelling</note>
+      </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
         <source>[{0}] Visiting {{{1}}}</source>
         <target state="translated">[{0}] 방문 중 {{{1}}}</target>
