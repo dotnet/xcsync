@@ -3,8 +3,10 @@
 
 using System.CommandLine;
 using System.CommandLine.IO;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using Serilog;
 using Serilog.Events;
 using Xamarin.Utils;
@@ -47,7 +49,31 @@ public class Base : IDisposable {
 		Assert.Equal (0, exec.ExitCode);
 	}
 
-	protected static async Task DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "") => await Run (output, path, DotNetExe, "new", template, "-o", path, templateOptions);
+	protected static async Task DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "", string targetFramework = "net8.0")
+	{
+		await Run (output, path, DotNetExe, "new", template, "-o", path, templateOptions);
+
+		await PatchProjectsTfmsAsync (path, targetFramework);
+	}
+
+	private static async Task PatchProjectsTfmsAsync (string path, string targetFramework)
+	{
+		// Patch the TargetFramework(s) in all project files
+		foreach (var projFile in Directory.GetFiles (path, "*.*proj", SearchOption.AllDirectories)) {
+			var content = await File.ReadAllTextAsync (projFile);
+			// Replace <TargetFramework>netX.Y[-suffix]</TargetFramework>
+			content = Regex.Replace (
+				content,
+				@"(<TargetFramework>)net\d+\.\d+(-[^<]*)?(<\/TargetFramework>)",
+				$"${{1}}{targetFramework}$2${{3}}");
+			// Replace each TFM in <TargetFrameworks>netX.Y[-suffix];netX.Y[-suffix]</TargetFrameworks>
+			content = Regex.Replace (
+				content,
+				@"(?<=<TargetFrameworks>[^<]*)net\d+\.\d+(?=-[^;<]*|[;<])",
+				targetFramework);
+			await File.WriteAllTextAsync (projFile, content);
+		}
+	}
 
 	public void Dispose ()
 	{
