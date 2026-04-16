@@ -397,6 +397,9 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# OSX
+.DS_Store
+
 # Repository specific 
 .packages
 .dotnet
