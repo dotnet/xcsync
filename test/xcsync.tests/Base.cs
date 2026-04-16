@@ -52,11 +52,12 @@ public class Base : IDisposable {
 	protected static async Task DotnetNew (ITestOutputHelper output, string template, string path, string templateOptions = "", string targetFramework = "net8.0")
 	{
 		await Run (output, path, DotNetExe, "new", template, "-o", path, templateOptions);
-
+		// Templates may upgrade and change the project's target framework (TFM).
+		// Normalize it here to the version expected by our tests (currently .NET 8.0).
 		await PatchProjectsTfmsAsync (path, targetFramework);
 	}
 
-	private static async Task PatchProjectsTfmsAsync (string path, string targetFramework)
+	static async Task PatchProjectsTfmsAsync (string path, string targetFramework)
 	{
 		// Patch the TargetFramework(s) in all project files
 		foreach (var projFile in Directory.GetFiles (path, "*.*proj", SearchOption.AllDirectories)) {
