@@ -21,6 +21,8 @@ namespace xcsync.Ast;
 class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace workspace, bool explicitTypes = false) : AstWalker {
 	static readonly IFileSystem FileSystem = new FileSystem ();
 
+	static readonly string NSObjectType = "Foundation.NSObject";
+
 	internal async Task<SyntaxTree?> WriteAsync (ObjCInterfaceDecl objcType, SyntaxTree? syntaxTree)
 	{
 		var visitor = new Visitor (Logger, typeService, syntaxTree, explicitTypes);
@@ -136,18 +138,18 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 		void Write (ObjCPropertyDecl objcProperty)
 		{
 			string propertyName = objcProperty.Name;
-			string propertyTypeObjC = string.Empty;			
+			string? propertyTypeObjC;
 			if (objcProperty.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBOutlet) is not null) {
-				propertyTypeObjC = GetObjCTypeName (objcProperty.Type.AsString)!;
+				propertyTypeObjC = GetObjCTypeName (objcProperty.Type.AsString);
 			}
 			// Determine the Objective-C type for the property.
 			// If the property has the IBOutlet attribute, we can get its type directly.
 			// Note: Some properties may not have the IBOutlet attribute (e.g., due to a missing import in the .h file).
 			// In such cases, attempt to parse the type manually from the header file. This can occur when wiring
 			// UI components in Xcode, XCode then doesn't add the import command.
-			else if (!TryGetOutletPropertyTypeFromSource(objcProperty, out propertyTypeObjC)) {
-				return;
-			}
+			else {
+				propertyTypeObjC = TryGetOutletPropertyTypeFromSource (objcProperty);
+			}			
 
 			if(objcProperty.Type.Kind != CXType_ObjCObjectPointer && objcProperty.Type.Kind != CXType_Pointer) {
 				throw new NotImplementedException (Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling));
@@ -193,11 +195,15 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			SyntaxTree = newRoot.SyntaxTree;
 		}
 
-		string MapObjectCType (string type, ClassDeclarationSyntax classDeclaration)
+		string MapObjectCType (string? type, ClassDeclarationSyntax classDeclaration)
 		{
+			if (string.IsNullOrEmpty (type)) {
+				return NSObjectType;
+			}
+
 			var typeMapping = typeService.QueryTypes (null, type).FirstOrDefault ();
 			if(typeMapping is null) {
-				return "Foundation.NSObject";
+				return NSObjectType;
 			}
 
 			// This method converts a TypeMapping into a usable CLR type name,
@@ -228,7 +234,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			var firstClass = root.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
 
 			var methodName = objcMethod.Name.Replace (":", string.Empty); // TODO: Need to properly convert this to a valid C# method name
-			var senderType = explicitTypes ? GetActionParameterTypeName (objcMethod, firstClass) : "Foundation.NSObject";
+			var senderType = explicitTypes ? GetActionParameterTypeName (objcMethod, firstClass) : NSObjectType;
 
 			var newMethod = MethodDeclaration (ParseTypeName ("void"), methodName)
 				.AddModifiers (Token (SyntaxKind.PartialKeyword))
@@ -254,7 +260,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			var actionParameter = objcMethod.Parameters.FirstOrDefault ();
 
 			if (actionParameter is null)
-				return "Foundation.NSObject";
+				return NSObjectType;
 
 			string? actionParameterType;
 			try {
@@ -264,7 +270,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			}
 
 			if (string.IsNullOrEmpty (actionParameterType) || actionParameterType == "id")
-				return "Foundation.NSObject";
+				return NSObjectType;
 
 			var objcTypeName = actionParameterType.Split (' ') [0];
 			return MapObjectCType (objcTypeName, classDeclaration);
@@ -289,15 +295,15 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			return fileContent.Substring ((int) start, (int) (end - start)).Trim ();
 		}
 
-		static bool TryGetOutletPropertyTypeFromSource (ObjCPropertyDecl objcProperty, out string type)
-		{
-			type = string.Empty;
+		static string? TryGetOutletPropertyTypeFromSource (ObjCPropertyDecl objcProperty)
+		{			
 			var source = GetSourceContent (objcProperty.Extent);
-			if (!string.IsNullOrEmpty (source)) {
-				var match = Regex.Match (source, $@"IBOutlet\s*(?<type>\w*)\s*\*\s*{Regex.Escape (objcProperty.Name)}", RegexOptions.IgnoreCase);
-				type = match.Success ? match.Groups ["type"].Value.Trim () : string.Empty;
-			}
-			return !string.IsNullOrEmpty(type);
+			if (string.IsNullOrEmpty (source)) 
+				return null;
+
+			var match = Regex.Match (source, $@"IBOutlet\s*(?<type>\w*)\s*\*\s*{Regex.Escape (objcProperty.Name)}", RegexOptions.IgnoreCase);
+
+			return match.Success ? match.Groups ["type"].Value.Trim () : null;
 		}
 
 		static string? TryGetActionParameterTypeFromSource (ObjCMethodDecl objcMethod)
