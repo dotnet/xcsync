@@ -253,7 +253,11 @@ class TypeService (ILogger Logger) : ITypeService {
 
 				var index = 0;
 				foreach (var param in method.Parameters) {
-					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, GetObjCType (targetPlatform, (INamedTypeSymbol) param.Type)));
+					var actionObjCType = GetObjCType (targetPlatform, (INamedTypeSymbol) param.Type);
+					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, actionObjCType));
+					if (actionObjCType is not null && SymbolEqualityComparer.Default.Equals (param.Type.ContainingAssembly, type.ContainingAssembly))
+						AddHeaderReference (headerReferences, actionObjCType, objCName);
+
 					index++;
 					refs.Add (param.ContainingNamespace.Name);
 				}

@@ -8,6 +8,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Serilog;
+using System.Text.RegularExpressions;
+using System.IO.Abstractions;
 using xcsync.Projects;
 using static ClangSharp.Interop.CX_DeclKind;
 using static ClangSharp.Interop.CXTypeKind;
@@ -15,11 +17,12 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace xcsync.Ast;
 
-class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace workspace) : AstWalker {
+class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace workspace, bool explicitTypes = false) : AstWalker {
+	static readonly IFileSystem FileSystem = new FileSystem ();
 
 	internal async Task<SyntaxTree?> WriteAsync (ObjCInterfaceDecl objcType, SyntaxTree? syntaxTree)
 	{
-		var visitor = new Visitor (Logger, typeService, syntaxTree);
+		var visitor = new Visitor (Logger, typeService, syntaxTree, explicitTypes);
 		await WalkAsync (objcType, visitor).ConfigureAwait (false);
 
 		// Now that we have the basic tree, lets make sure it generates pretty C# code
@@ -72,7 +75,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 		return newRoot.SyntaxTree;
 	}
 
-	class Visitor (ILogger logger, ITypeService typeService, SyntaxTree? syntaxTree) : AstVisitor {
+	class Visitor (ILogger logger, ITypeService typeService, SyntaxTree? syntaxTree, bool explicitTypes = false) : AstVisitor {
 
 		public SyntaxTree? SyntaxTree { get; private set; } = syntaxTree;
 
@@ -244,12 +247,13 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			var firstClass = root.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
 
 			var methodName = objcMethod.Name.Replace (":", string.Empty); // TODO: Need to properly convert this to a valid C# method name
+			var senderType = explicitTypes ? GetActionParameterTypeName (objcMethod, firstClass) : "Foundation.NSObject";
 
 			var newMethod = MethodDeclaration (ParseTypeName ("void"), methodName)
 				.AddModifiers (Token (SyntaxKind.PartialKeyword))
 				.AddParameterListParameters (
 					Parameter (Identifier ("sender"))
-						.WithType (ParseTypeName ("Foundation.NSObject")))
+						.WithType (ParseTypeName (senderType)))
 				.AddAttributeLists (
 					AttributeList (SingletonSeparatedList (
 						Attribute (IdentifierName ("Action"),
@@ -262,6 +266,51 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			var newRoot = root.ReplaceNode (firstClass, newClass);
 
 			SyntaxTree = newRoot.SyntaxTree;
+		}
+
+		string GetActionParameterTypeName (ObjCMethodDecl objcMethod, ClassDeclarationSyntax classDeclaration)
+		{
+			var actionParameter = objcMethod.Parameters.FirstOrDefault ();
+
+			if (actionParameter is null)
+				return "Foundation.NSObject";
+
+			string? actionParameterType;
+			try {
+				actionParameterType = actionParameter.OriginalType.AsString;
+			} catch (ArgumentOutOfRangeException) {
+				actionParameterType = TryGetActionParameterTypeFromSource (objcMethod);
+			}
+
+			if (string.IsNullOrEmpty (actionParameterType) || actionParameterType == "id")
+				return "Foundation.NSObject";
+
+			var objcTypeName = actionParameterType.Split (' ') [0];
+			var typeMapping = typeService.QueryTypes (null, objcTypeName).FirstOrDefault ();
+
+			return typeMapping is null
+				? "Foundation.NSObject"
+				: GetPropertyTypeName (typeMapping, classDeclaration);
+		}
+
+		static string? TryGetActionParameterTypeFromSource (ObjCMethodDecl objcMethod)
+		{
+			objcMethod.Extent.Start.GetFileLocation (out var file, out uint line, out _, out _);
+			var fileName = file.Name.CString;
+			if (string.IsNullOrEmpty (fileName) || !FileSystem.File.Exists (fileName))
+				return null;
+
+			objcMethod.Extent.End.GetFileLocation (out _, out uint endLine, out _, out _);
+			var lines = FileSystem.File.ReadAllLines (fileName);
+			var startLine = (int) line;
+			var lastLine = Math.Min ((int) endLine, lines.Length);
+			if (startLine < 1 || startLine > lastLine)
+				return null;
+
+			var source = string.Join ("\n", lines [(startLine - 1)..lastLine]);
+			var match = Regex.Match (source, @":\(([^)]+)\)\s*\w+");
+
+			return match.Success ? match.Groups [1].Value.Trim () : null;
 		}
 
 		protected override Task VisitAttrAsync (Attr attr)

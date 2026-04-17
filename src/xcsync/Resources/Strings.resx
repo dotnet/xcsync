@@ -152,6 +152,13 @@
 		<value>Set the path to the .NET SDK, when not provided will use the path from the parent process if it is 'dotnet' otherwise falls back to the 'dotnet' on the PATH.</value>
 	</data>
 
+	<data name="Options.Incremental.Description" xml:space="preserve">
+	  <value>Enable incremental synchronization, only syncing the files related to the detected change instead of the entire project</value>
+	</data>
+	<data name="Options.ExplicitTypes.Description" xml:space="preserve">
+	  <value>Use the explicit Objective-C types from Xcode headers when generating designer files instead of defaulting action senders to Foundation.NSObject</value>
+	</data>
+
 	<!-- Commands -->
 	<data name="Commands.Generate.Description" xml:space="preserve">
 		<value>generate a Xcode project at the path specified by --target from the project identified by --project</value>

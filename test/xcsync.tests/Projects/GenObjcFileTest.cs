@@ -152,6 +152,37 @@ public class GenObjcFileTest : Base {
 	}
 
 	[Fact]
+	public void GenerateViewControllerHFile_WithCustomControlAction_UsesExplicitTypeAndImportsHeader ()
+	{
+		var nsViewController = new TypeMapping (null, "NSViewController", "NSViewController", null, false, false, false, null, null, ["AppKit", "Foundation"]);
+		var nsType = new TypeMapping (null, "ViewController", "ViewController", nsViewController, false, false, false,
+			null, [new IBAction ("OnCancelButtonClicked", "OnCancelButtonClicked", [new IBActionParameter ("sender", null, "PrimaryButton", "PrimaryButton *")])], ["AppKit", "Foundation"]) {
+			HeaderReferences = ["PrimaryButton"]
+		};
+
+		var generated = new GenObjcH (nsType).TransformText ();
+
+		const string expected =
+			warning +
+			"""
+			#import <AppKit/AppKit.h>
+			#import <Foundation/Foundation.h>
+			#import "PrimaryButton.h"
+			
+			
+			@interface ViewController : NSViewController {
+			}
+			
+			- (IBAction)OnCancelButtonClicked:(PrimaryButton *)sender;
+			
+			@end
+			
+			""";
+
+		Assert.Equal (expected, generated);
+	}
+
+	[Fact]
 	public void GenerateViewControllerMFile ()
 	{
 		(_, ITypeService typeService) = InitializeProjects ();
@@ -173,6 +204,32 @@ public class GenObjcFileTest : Base {
 			@synthesize FileLabel = _FileLabel;
 			
 			- (IBAction)UploadButton:(id)sender {
+			}
+			
+			@end
+
+			""";
+
+		Assert.Equal (expected, generated);
+	}
+
+	[Fact]
+	public void GenerateViewControllerMFile_WithCustomControlAction_UsesExplicitType ()
+	{
+		var nsViewController = new TypeMapping (null, "NSViewController", "NSViewController", null, false, false, false, null, null, ["AppKit", "Foundation"]);
+		var nsType = new TypeMapping (null, "ViewController", "ViewController", nsViewController, false, false, false,
+			null, [new IBAction ("OnCancelButtonClicked", "OnCancelButtonClicked", [new IBActionParameter ("sender", null, "PrimaryButton", "PrimaryButton *")])], ["AppKit", "Foundation"]);
+
+		var generated = new GenObjcM (nsType).TransformText ();
+
+		const string expected =
+			warning +
+			"""
+			#import "ViewController.h"
+			
+			@implementation ViewController
+			
+			- (IBAction)OnCancelButtonClicked:(PrimaryButton *)sender {
 			}
 			
 			@end

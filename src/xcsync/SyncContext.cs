@@ -11,7 +11,7 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false)
+class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false, bool explicitTypes = false, string? changedFilePath = null)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string FileChannel = "Files";
@@ -471,7 +471,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		var dotNetProject = new ClrProject (FileSystem, Logger, TypeService, projectName, ProjectPath, Framework.ToString ());
 		await dotNetProject.OpenProject ().ConfigureAwait (false);
 
-		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework.ToString ());
+		var xcodeWorkspace = new XcodeWorkspace (FileSystem, Logger, TypeService, projectName, TargetDir, Framework.ToString (), explicitTypes);
 
 		var xcodeproj = FileSystem.Path.Combine (xcodeWorkspace.RootPath, $"{projectName}.xcodeproj");
 		var pbxProjPath = FileSystem.Path.Combine (xcodeproj, "project.pbxproj");

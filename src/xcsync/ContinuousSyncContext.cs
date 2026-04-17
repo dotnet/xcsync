@@ -8,7 +8,7 @@ using xcsync.Projects;
 
 namespace xcsync;
 
-class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false)
+class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false, bool incremental = false, bool explicitTypes = false)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string ChangeChannel = "Changes";
@@ -20,7 +20,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		await ConfigureMarilleHub ();
 
 		// Generate initial Xcode project
-		await new SyncContext (FileSystem, new TypeService (Logger), SyncDirection.ToXcode, ProjectPath, TargetDir, Framework.ToString (), Logger, open, force)
+		await new SyncContext (FileSystem, new TypeService (Logger), SyncDirection.ToXcode, ProjectPath, TargetDir, Framework.ToString (), Logger, open, force, explicitTypes: explicitTypes)
 			.SyncAsync (token).ConfigureAwait (false);
 
 		using var xcodeChanges = new ProjectFileChangeMonitor (FileSystem, FileSystem.FileSystemWatcher.New (), Logger);
@@ -33,14 +33,14 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.ToXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.ToXcode, clrChanges, xcodeChanges, incremental, explicitTypes));
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.FromXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.FromXcode, clrChanges, xcodeChanges, incremental, explicitTypes));
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
@@ -48,7 +48,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.ToXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.ToXcode, clrChanges, xcodeChanges, incremental, explicitTypes));
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
@@ -58,7 +58,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.FromXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.FromXcode, clrChanges, xcodeChanges, incremental, explicitTypes));
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;
@@ -95,4 +95,3 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 		// worker now knows to pick up any and all change-related events from the channel in hub
 	}
 }
-

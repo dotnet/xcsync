@@ -242,9 +242,19 @@
         <target state="translated">设置 .NET SDK 的路径(如果未提供)，如果为 “dotnet”，则将使用父级进程中的路径，否则将回退到 PATH 上的 “dotnet”。</target>
         <note />
       </trans-unit>
+      <trans-unit id="Options.ExplicitTypes.Description">
+        <source>Use the explicit Objective-C types from Xcode headers when generating designer files instead of defaulting action senders to Foundation.NSObject</source>
+        <target state="new">Use the explicit Objective-C types from Xcode headers when generating designer files instead of defaulting action senders to Foundation.NSObject</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Options.Force.Description">
         <source>Force overwrite of an existing Xcode project</source>
         <target state="translated">强制覆盖现有 Xcode 项目</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Options.Incremental.Description">
+        <source>Enable incremental synchronization, only syncing the files related to the detected change instead of the entire project</source>
+        <target state="new">Enable incremental synchronization, only syncing the files related to the detected change instead of the entire project</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Open.Description">
@@ -383,6 +393,11 @@
         <source>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</source>
         <target state="translated">持续在 "{0}" 和 "{1}" 之间为“{2}”平台同步文件。</target>
         <note>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</note>
+      </trans-unit>
+      <trans-unit id="Watch.IncrementalSyncing">
+        <source>Incrementally syncing changes related to '{0}'</source>
+        <target state="new">Incrementally syncing changes related to '{0}'</target>
+        <note>{0} is the path of the changed file</note>
       </trans-unit>
       <trans-unit id="Watch.InputRedirectedInstructions">
         <source>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</source>

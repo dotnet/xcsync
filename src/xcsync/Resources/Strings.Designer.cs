@@ -18,6 +18,8 @@ static class Strings {
 		internal static string TfmDescription => Resources.Strings.Options_Tfm_Description;
 		internal static string VerbosityDescription => Resources.Strings.Options_Verbosity_Description;
 		internal static string DotnetPathDescription => Resources.Strings.Options_DotnetPath_Description;
+		internal static string IncrementalDescription => Resources.Strings.Options_Incremental_Description;
+		internal static string ExplicitTypesDescription => Resources.Strings.Options_ExplicitTypes_Description;
 	}
 
 	internal static class Commands {
