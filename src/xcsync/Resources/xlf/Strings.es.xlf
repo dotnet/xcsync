@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="es" original="../Strings.resx">
     <body>
@@ -222,15 +222,10 @@
         <target state="translated">Tipo de propiedad no compatible {0}.</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
-      <trans-unit id="ObjCSyntax.PropertyTypeResolutionFailed">
-        <source>Failed to resolve property type for '{0}' (Kind: {1})</source>
-        <target state="new">Failed to resolve property type for '{0}' (Kind: {1})</target>
-        <note>{0} is the property type, {1} is the kind spelling</note>
-      </trans-unit>
-      <trans-unit id="ObjCSyntax.TypeMappingNotFound">
-        <source>Type mapping not found for property type '{0}' (Kind: {1})</source>
-        <target state="new">Type mapping not found for property type '{0}' (Kind: {1})</target>
-        <note>{0} is the property type, {1} is the kind spelling</note>
+      <trans-unit id="ObjCSyntax.UnresolvedPropertyType">
+        <source>Unable to resolve outlet '{0}' with Objective-C type '{1}'.</source>
+        <target state="new">Unable to resolve outlet '{0}' with Objective-C type '{1}'.</target>
+        <note>{0} is the outlet property name, {1} is the Objective-C type name</note>
       </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
         <source>[{0}] Visiting {{{1}}}</source>

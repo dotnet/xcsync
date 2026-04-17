@@ -11,7 +11,18 @@ using xcsync.Workers;
 
 namespace xcsync;
 
-class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirection Direction, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false, bool explicitTypes = false, string? changedFilePath = null)
+class SyncContext (
+	IFileSystem fileSystem,
+	ITypeService typeService,
+	SyncDirection Direction,
+	string projectPath,
+	string targetDir,
+	string framework,
+	ILogger logger,
+	bool open = false,
+	bool force = false,
+	bool explicitTypes = false,
+	string? changedFilePath = null)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string FileChannel = "Files";
@@ -124,7 +135,7 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		};
 		xcodeObjects.Add (pbxGroup.Token, pbxGroup);
 
-		foreach (var t in TypeService.QueryTypes ().Where (t => t is not null && t.IsInSource)) {
+		foreach (var t in TypeService.QueryTypes ().Where (t => t is not null && t.IsInSource && (changedFilePath is null || t.TypeSymbol?.Locations.Any (l => l.SourceTree?.FilePath == changedFilePath) == true))) {
 
 			if (t is null) continue; // Only needed to keep the compiler happy
 
@@ -148,6 +159,12 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		}
 
 		Logger?.Debug (Strings.Generate.GeneratedFiles);
+
+		if (changedFilePath is not null) {
+			// For incremental sync, only the source files need to be regenerated.
+			// Resources and the Xcode project structure are not affected.
+			return;
+		}
 
 		// leverage msbuild to get the list of files in the project
 		var filePaths = Scripts.GetFileItemsFromProject (ProjectPath, Framework.Platform, targetPlatform);
@@ -494,7 +511,16 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 		}
 
 		List<Task> tasks = [];
-		foreach (var syncItem in xcodeWorkspace.Items) {
+		IEnumerable<ISyncableItem> itemsToProcess = xcodeWorkspace.Items;
+		if (changedFilePath is not null) {
+			var changedFileBaseName = FileSystem.Path.GetFileNameWithoutExtension (changedFilePath);
+			itemsToProcess = itemsToProcess.Where (item => item switch {
+				SyncableType type => FileSystem.Path.GetFileNameWithoutExtension (type.FilePath) == changedFileBaseName,
+				SyncableContent content => content.SourcePath == changedFilePath,
+				_ => false
+			});
+		}
+		foreach (var syncItem in itemsToProcess) {
 			var basePath = string.Empty;
 			if (syncItem is SyncableContent content && (
 				content.SourcePath.EndsWith (".xcassets", StringComparison.OrdinalIgnoreCase) ||
@@ -515,10 +541,15 @@ class SyncContext (IFileSystem fileSystem, ITypeService typeService, SyncDirecti
 				tasks.Add (tcs.Task);
 			}
 		}
-		Task.WaitAll ([.. tasks], token);
+		Task.WaitAll ([..tasks], token);
 
 		var typesToWrite = TypeService.QueryTypes (null, null) // All Types
 			.Where (t => t is not null && t.InDesigner) ?? []; // Filter Types that are in .designer.cs files TODO: This may be wrong, there are types that don't exist in *.designer.cs files
+
+		if (changedFilePath is not null) {
+			var changedFileBaseName = FileSystem.Path.GetFileNameWithoutExtension (changedFilePath);
+			typesToWrite = typesToWrite.Where (t => t?.ObjCType == changedFileBaseName);
+		}
 
 		// TODO: What happens when a new type is added to the Xcode project, like new view controllers?
 

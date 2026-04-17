@@ -26,7 +26,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 		this.SetHandler (Execute, project, target, tfm, force, open, incremental, explicitTypes);
 	}
 
-	public async Task Execute (string project, string target, string tfm, bool force, bool open)
+	protected override void AddOptions ()
 	{
 		base.AddOptions ();
 		Add (incremental);

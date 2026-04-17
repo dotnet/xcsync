@@ -90,6 +90,7 @@ static class Strings {
 		internal static string ResumingMonitoring => Resources.Strings.Watch_ResumingMonitoring;
 		internal static string WorkerException (string messageId, string exceptionMessage) => string.Format (Resources.Strings.Watch_WorkerException, messageId, exceptionMessage);
 		internal static string StopWatchProcess => Resources.Strings.Watch_StopWatchProcess;
+		internal static string IncrementalSyncing (string path) => string.Format (Resources.Strings.Watch_IncrementalSyncing, path);
 	}
 
 	internal static class TypeService {
@@ -143,13 +144,12 @@ static class Strings {
 	}
 
 	internal static class ObjCSyntax
- 	{
+  	{
 		internal static string ObjCImplementationDeclFound(string decl) => string.Format(Resources.Strings.ObjCSyntax_ObjCImplementationDeclFound, decl);
 		internal static string Visiting(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_Visiting, visitor, decl);
 		internal static string PropertyNotImplementedException(string decl) => string.Format(Resources.Strings.ObjCSyntax_PropertyNotImplementedException, decl);
 		internal static string ParsingProperty(string visitor, string decl) => string.Format(Resources.Strings.ObjCSyntax_ParsingProperty, visitor, decl);
-		internal static string TypeMappingNotFound(string propertyType, string kind) => string.Format(Resources.Strings.ObjCSyntax_TypeMappingNotFound, propertyType, kind);
-		internal static string PropertyTypeResolutionFailed(string propertyType, string kind) => string.Format(Resources.Strings.ObjCSyntax_PropertyTypeResolutionFailed, propertyType, kind);
+		internal static string UnresolvedPropertyType(string propertyName, string objcType) => string.Format(Resources.Strings.ObjCSyntax_UnresolvedPropertyType, propertyName, objcType);
   	}
 
 	internal static class Workers 

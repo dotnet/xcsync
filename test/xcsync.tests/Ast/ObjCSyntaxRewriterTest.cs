@@ -123,6 +123,91 @@ public class ObjCSyntaxRewriterTest {
 		Directory.Delete (directory, true);
 	}
 
+	[Fact]
+	public async void WriteAsync_ObjCInterfaceDecl_WithMissingImport_UsesSourceTypeFallback ()
+	{
+		var logger = new Mock<ILogger> ();
+		var TypeService = new Mock<TypeService> (logger.Object);
+
+		TypeService.Setup (
+			x => x.QueryTypes (It.IsAny<string> (), It.Is<string> (s => s == "WKWebView"))
+		).Returns ([CreateTypeMapping ("WKWebView", "WebKit")]);
+
+		var directory = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
+		Directory.CreateDirectory (directory);
+		var inputFileName = Path.Combine (directory, "ClangUnsavedFile.h");
+		await File.WriteAllTextAsync (inputFileName, ViewControllerMissingImportOutletObjC);
+		var index = CXIndex.Create ();
+
+		CXTranslationUnit_Flags DefaultTranslationUnitFlags = CXTranslationUnit_None
+			| CXTranslationUnit_IncludeAttributedTypes
+			| CXTranslationUnit_VisitImplicitAttributes;
+
+		string [] clangCommandLineArgs = [
+				"-x",
+			"objective-c",
+			"-target",
+			"arm64-apple-macosx",
+			"-isysroot",
+			Path.Combine (Scripts.SelectXcode (), "Contents", "Developer", "Platforms", "MacOSX.platform", "Developer", "SDKs", "MacOSX.sdk"),
+		];
+
+		var translationUnitError = CXTranslationUnit.TryParse (index, inputFileName, clangCommandLineArgs, [], DefaultTranslationUnitFlags, out var handle);
+		using var node = TranslationUnit.GetOrCreate (handle);
+
+		var cursor = node.TranslationUnitDecl.CursorChildren [^2];
+		var decl = (ObjCInterfaceDecl) cursor;
+
+		var walker = new ObjCSyntaxRewriter (logger.Object, TypeService.Object, new AdhocWorkspace ());
+		var newSyntax = await walker.WriteAsync (decl, null);
+		var actualOutput = newSyntax!.GetRoot ().ToFullString ();
+
+		Assert.NotNull (newSyntax);
+		Assert.Equal (ViewControllerMissingImportOutletCSharp, actualOutput);
+		Directory.Delete (directory, true);
+	}
+
+	[Fact]
+	public async void WriteAsync_ObjCInterfaceDecl_WithUnresolvedOutlet_LogsErrorAndSkipsProperty ()
+	{
+		var logger = new Mock<ILogger> ();
+		var TypeService = new Mock<TypeService> (logger.Object);
+
+		var directory = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
+		Directory.CreateDirectory (directory);
+		var inputFileName = Path.Combine (directory, "ClangUnsavedFile.h");
+		await File.WriteAllTextAsync (inputFileName, ViewControllerUnresolvedOutletObjC);
+		var index = CXIndex.Create ();
+
+		CXTranslationUnit_Flags DefaultTranslationUnitFlags = CXTranslationUnit_None
+			| CXTranslationUnit_IncludeAttributedTypes
+			| CXTranslationUnit_VisitImplicitAttributes;
+
+		string [] clangCommandLineArgs = [
+				"-x",
+			"objective-c",
+			"-target",
+			"arm64-apple-macosx",
+			"-isysroot",
+			Path.Combine (Scripts.SelectXcode (), "Contents", "Developer", "Platforms", "MacOSX.platform", "Developer", "SDKs", "MacOSX.sdk"),
+		];
+
+		var translationUnitError = CXTranslationUnit.TryParse (index, inputFileName, clangCommandLineArgs, [], DefaultTranslationUnitFlags, out var handle);
+		using var node = TranslationUnit.GetOrCreate (handle);
+
+		var cursor = node.TranslationUnitDecl.CursorChildren [^2];
+		var decl = (ObjCInterfaceDecl) cursor;
+
+		var walker = new ObjCSyntaxRewriter (logger.Object, TypeService.Object, new AdhocWorkspace ());
+		var newSyntax = await walker.WriteAsync (decl, null);
+		var actualOutput = newSyntax!.GetRoot ().ToFullString ();
+
+		Assert.NotNull (newSyntax);
+		Assert.Equal (ViewControllerCSharp, actualOutput);
+		logger.Verify (x => x.Error (It.Is<string> (s => s.Contains ("MysteryView") && s.Contains ("WebView"))), Times.Once);
+		Directory.Delete (directory, true);
+	}
+
 	const string ViewControllerObjC = @"
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
@@ -272,6 +357,51 @@ partial class ViewController
     {
     }
 }";
+	const string ViewControllerMissingImportOutletObjC = @"
+#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+
+@interface ViewController : NSViewController {
+}
+
+@property (strong) IBOutlet WKWebView *WebView;
+
+@end
+
+@implementation ViewController
+ 
+@end
+";
+	const string ViewControllerMissingImportOutletCSharp = @"[Register(""ViewController"")]
+partial class ViewController
+{
+    [Outlet]
+    WebKit.WKWebView WebView { get; set; }
+
+    void ReleaseDesignerOutlets()
+    {
+        if (WebView != null)
+        {
+            WebView.Dispose();
+            WebView = null;
+        }
+    }
+}";
+	const string ViewControllerUnresolvedOutletObjC = @"
+#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+
+@interface ViewController : NSViewController {
+}
+
+@property (strong) IBOutlet MysteryView *WebView;
+
+@end
+
+@implementation ViewController
+ 
+@end
+";
 	const string PrimaryButtonObjC = @"
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>

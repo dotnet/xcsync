@@ -14,6 +14,7 @@ using xcsync.Projects;
 using static ClangSharp.Interop.CX_DeclKind;
 using static ClangSharp.Interop.CXTypeKind;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Newtonsoft.Json.Linq;
 
 namespace xcsync.Ast;
 
@@ -134,29 +135,33 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 
 		void Write (ObjCPropertyDecl objcProperty)
 		{
-			if (objcProperty.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBOutlet) is null)
+			string propertyName = objcProperty.Name;
+			string propertyTypeObjC = string.Empty;			
+			if (objcProperty.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBOutlet) is not null) {
+				propertyTypeObjC = GetObjCTypeName (objcProperty.Type.AsString)!;
+			}
+			// Determine the Objective-C type for the property.
+			// If the property has the IBOutlet attribute, we can get its type directly.
+			// Note: Some properties may not have the IBOutlet attribute (e.g., due to a missing import in the .h file).
+			// In such cases, attempt to parse the type manually from the header file. This can occur when wiring
+			// UI components in Xcode, XCode then doesn't add the import command.
+			else if (!TryGetOutletPropertyTypeFromSource(objcProperty, out propertyTypeObjC)) {
 				return;
+			}
+
+			if(objcProperty.Type.Kind != CXType_ObjCObjectPointer && objcProperty.Type.Kind != CXType_Pointer) {
+				throw new NotImplementedException (Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling));
+			}
 
 			var root = (CompilationUnitSyntax) SyntaxTree!.GetRoot ();
-
 			var firstClass = root.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
 
-			var propertyName = objcProperty.Name;
-
 			logger.Debug (Strings.ObjCSyntax.ParsingProperty (nameof (ObjCSyntaxRewriter), objcProperty.Type.AsString));
-			// TODO: This is a *very* primitive way to get the property type and will need improvement
-			// TODO: Need a solution to handle the case where the property type is not found  or is null in the type mapping
-			var propertyType = objcProperty.Type switch {
-				{ Kind: CXType_ObjCObjectPointer } => GetPropertyTypeNameSafe (
-					typeService,
-					objcProperty,
-					firstClass),
-				_ => throw new NotImplementedException (
-					Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling))
-			};
+
+			var mappedType = MapObjectCType (propertyTypeObjC, firstClass);
 
 			// Create the property
-			var property = PropertyDeclaration (ParseTypeName (propertyType), propertyName)
+			var property = PropertyDeclaration (ParseTypeName (mappedType), propertyName)
 				// .AddModifiers (Token (SyntaxKind.PublicKeyword))
 				.AddAccessorListAccessors (
 					AccessorDeclaration (SyntaxKind.GetAccessorDeclaration)
@@ -188,37 +193,13 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			SyntaxTree = newRoot.SyntaxTree;
 		}
 
-		string GetPropertyTypeNameSafe (
-			ITypeService typeService,
-			ObjCPropertyDecl objcProperty,
-			ClassDeclarationSyntax classDeclaration)
+		string MapObjectCType (string type, ClassDeclarationSyntax classDeclaration)
 		{
-			try {
-				// Attempt to resolve the type mapping from the ObjC type string.
-				var typeMapping = typeService
-					.QueryTypes (null, objcProperty.Type.AsString.Split (' ') [0])
-					.FirstOrDefault ();
-							
-				if (typeMapping is null) {
-					logger.Error (
-						Strings.ObjCSyntax.TypeMappingNotFound (objcProperty.Type.AsString, objcProperty.Type.KindSpelling));
-
-					return string.Empty;
-				}
-				return GetPropertyTypeName (typeMapping, classDeclaration);
-			} catch (Exception ex) {
-				// Catch any unexpected errors during type resolution.
-				// We do NOT rethrow to avoid breaking existing behavior.
-				logger.Error (
-					ex,
-					Strings.ObjCSyntax.PropertyTypeResolutionFailed (objcProperty.Type.AsString, objcProperty.Type.KindSpelling));
-
-				return string.Empty; // fallback
+			var typeMapping = typeService.QueryTypes (null, type).FirstOrDefault ();
+			if(typeMapping is null) {
+				return "Foundation.NSObject";
 			}
-		}
 
-		static string GetPropertyTypeName (TypeMapping typeMapping, ClassDeclarationSyntax classDeclaration)
-		{
 			// This method converts a TypeMapping into a usable CLR type name,
 			// taking namespaces into account to avoid ambiguity.
 
@@ -286,28 +267,45 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 				return "Foundation.NSObject";
 
 			var objcTypeName = actionParameterType.Split (' ') [0];
-			var typeMapping = typeService.QueryTypes (null, objcTypeName).FirstOrDefault ();
+			return MapObjectCType (objcTypeName, classDeclaration);
+		}
 
-			return typeMapping is null
-				? "Foundation.NSObject"
-				: GetPropertyTypeName (typeMapping, classDeclaration);
+		static string? GetObjCTypeName (string? objcType)
+		{
+			if (string.IsNullOrWhiteSpace (objcType))
+				return null;
+
+			var match = Regex.Match (objcType, @"(?<type>[A-Za-z_]\w*)");
+			return match.Success ? match.Groups ["type"].Value : null;
+		}
+
+		static string? GetSourceContent (CXSourceRange sourceRange)
+		{
+			sourceRange.Start.GetFileLocation (out var file, out _, out _, out var start);
+			sourceRange.End.GetFileLocation (out _, out _, out _, out var end);
+
+			var fileContent = FileSystem.File.ReadAllText (file.Name.CString);
+
+			return fileContent.Substring ((int) start, (int) (end - start)).Trim ();
+		}
+
+		static bool TryGetOutletPropertyTypeFromSource (ObjCPropertyDecl objcProperty, out string type)
+		{
+			type = string.Empty;
+			var source = GetSourceContent (objcProperty.Extent);
+			if (!string.IsNullOrEmpty (source)) {
+				var match = Regex.Match (source, $@"IBOutlet\s*(?<type>\w*)\s*\*\s*{Regex.Escape (objcProperty.Name)}", RegexOptions.IgnoreCase);
+				type = match.Success ? match.Groups ["type"].Value.Trim () : string.Empty;
+			}
+			return !string.IsNullOrEmpty(type);
 		}
 
 		static string? TryGetActionParameterTypeFromSource (ObjCMethodDecl objcMethod)
 		{
-			objcMethod.Extent.Start.GetFileLocation (out var file, out uint line, out _, out _);
-			var fileName = file.Name.CString;
-			if (string.IsNullOrEmpty (fileName) || !FileSystem.File.Exists (fileName))
+			var source = GetSourceContent (objcMethod.Extent);
+			if (string.IsNullOrEmpty (source))
 				return null;
 
-			objcMethod.Extent.End.GetFileLocation (out _, out uint endLine, out _, out _);
-			var lines = FileSystem.File.ReadAllLines (fileName);
-			var startLine = (int) line;
-			var lastLine = Math.Min ((int) endLine, lines.Length);
-			if (startLine < 1 || startLine > lastLine)
-				return null;
-
-			var source = string.Join ("\n", lines [(startLine - 1)..lastLine]);
 			var match = Regex.Match (source, @":\(([^)]+)\)\s*\w+");
 
 			return match.Success ? match.Groups [1].Value.Trim () : null;
