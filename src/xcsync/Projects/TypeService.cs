@@ -18,6 +18,16 @@ class TypeService (ILogger Logger) : ITypeService {
 
 	public readonly ConcurrentDictionary<string, Compilation> compilations = new ();
 
+	static IEnumerable<INamespaceSymbol> GetAllNamespaces (INamespaceSymbol root)
+	{
+		foreach (var ns in root.GetNamespaceMembers ()) {
+			yield return ns;
+			foreach (var child in GetAllNamespaces (ns)) {
+				yield return child;
+			}
+		}
+	}
+
 	// Add, register new type mapping
 	public TypeMapping? AddType (TypeMapping newType)
 	{
@@ -77,12 +87,7 @@ class TypeService (ILogger Logger) : ITypeService {
 
 	TypeMapping? UpdateMappingFromCompilation (TypeMapping oldMapping, Compilation compilation)
 	{
-		var namespaces = compilation!.GlobalNamespace.GetNamespaceMembers ()
-			.Where (ns => ns.GetMembers ()
-				.Any (member => member.Locations
-					.Any (location => location.IsInSource)));
-
-		var newMapping = compilation.GlobalNamespace.GetNamespaceMembers ()
+		var newMapping = GetAllNamespaces (compilation.GlobalNamespace)
 			.Where (ns => ns.GetMembers ()
 				.Any (member => member.Locations
 					.Any (location => location.IsInSource)))
@@ -154,7 +159,7 @@ class TypeService (ILogger Logger) : ITypeService {
 	void AddTypesFromCompilation (string targetPlatform, Compilation compilation)
 	{
 		// limit scope of namespaces to only those that contain NSObject derived types.
-		var namespaces = compilation.GlobalNamespace.GetNamespaceMembers ()
+		var namespaces = GetAllNamespaces (compilation.GlobalNamespace)
 			.Where (ns => ns.GetTypeMembers ()
 				.Any (xcSync.IsNsoDerived));
 

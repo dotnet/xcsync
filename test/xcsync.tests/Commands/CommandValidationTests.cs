@@ -102,7 +102,11 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	[InlineData ("maui", "net8.0-maccatalyst", "{IntermediateOutputPath}/xcsync", "")]
 	[InlineData ("maui", "net8.0-macos", "obj/xcsync", "Target framework is not supported by current .NET project.")]
 	[InlineData ("maui", "net8.0-ios", "{Directory}/xcode{DoesNotExist}", "Target path '{TargetPath}' does not exist, or is not a valid Xcode project folder.")]
-	public async void BaseCommandValidation_SingleProject (string projectType, string tfm, string targetPath, string expectedError)
+	public async void BaseCommandValidation_SingleProject (
+		string projectType,
+		string tfm,
+		string targetPath,
+		string expectedError)
 	{
 		var createXcodeProject = !targetPath.Contains ("{DoesNotExist}");
 		var projectName = Guid.NewGuid ().ToString ();
