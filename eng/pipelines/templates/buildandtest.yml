@@ -55,7 +55,7 @@ steps:
 
         # Update/install workloads to the workload set
         dotnet workload update --source https://api.nuget.org/v3/index.json --version $workloadSetVersion
-        dotnet workload install macos ios maccatalyst tvos maui --source https://api.nuget.org/v3/index.json --version 8.0.402.0 # Neccessary for tests
+        dotnet workload install macos ios maccatalyst tvos maui --version 8.0.402.0 # Neccessary for tests
 
         # List installed workloads
         dotnet workload list        
