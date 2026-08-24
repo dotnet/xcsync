@@ -11,17 +11,16 @@
 #  - task: Bash@3
 #    displayName: Setup Internal Feeds
 #    inputs:
-#      filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-#      arguments: $(Build.SourcesDirectory)/NuGet.config
+#      filePath: $(System.DefaultWorkingDirectory)/eng/common/SetupNugetSources.sh
+#      arguments: $(System.DefaultWorkingDirectory)/NuGet.config
 #    condition: ne(variables['Agent.OS'], 'Windows_NT')
 #  - task: NuGetAuthenticate@1
 #
 # Note that the NuGetAuthenticate task should be called after SetupNugetSources.
 # This ensures that:
-# - Appropriate creds are set for the added internal feeds (if not supplied to the scrupt)
+# - Appropriate creds are set for the added internal feeds (if not supplied to the script)
 # - The credential provider is installed.
 #
-# This logic is also abstracted into enable-internal-sources.yml.
 
 ConfigFile=$1
 CredToken=$2
