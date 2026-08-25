@@ -62,7 +62,7 @@ steps:
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
     - pwsh: |
         # Install the workloads into the same .NET SDK that the build and the tests use.
-        ${{ parameters.dotnetScript }} workload install macos ios maccatalyst tvos maui --source https://api.nuget.org/v3/index.json --version 8.0.402.0 # Neccessary for tests
+        ${{ parameters.dotnetScript }} workload install macos ios maccatalyst tvos maui --version 8.0.402.0 # Neccessary for tests
 
         # List installed workloads
         ${{ parameters.dotnetScript }} workload list
