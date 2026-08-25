@@ -97,6 +97,7 @@ static class Strings {
 		internal static string MappingUpdateFailed (string clrType, string objCType) => string.Format (Resources.Strings.TypeService_MappingUpdateFailed, clrType, objCType);
 		internal static string MissingAssemblyName => Resources.Strings.TypeService_MissingAssemblyName;
 		internal static string DuplicateCompilation (string assemblyName) => string.Format (Resources.Strings.TypeService_DuplicateCompilation, assemblyName);
+		internal static string NoTypesFound (string assemblyName) => string.Format (Resources.Strings.TypeService_NoTypesFound, assemblyName);
 		internal static string CompilationNotFound (string assemblyName) => string.Format (Resources.Strings.TypeService_CompilationNotFound, assemblyName);
 		internal static string TypeNotFound (string typeName) => string.Format (Resources.Strings.TypeService_TypeNotFound, typeName);
 		internal static string SyntaxRootNotFound (string typeName) => string.Format (Resources.Strings.TypeService_SyntaxRootNotFound, typeName);
@@ -109,6 +110,7 @@ static class Strings {
 		internal static string NotSupportedException (string path) => string.Format (Resources.Strings.ClrProject_NotSupportedException, path);
 		internal static string InvalidOperationException (string path, string message) => string.Format (Resources.Strings.ClrProject_InvalidOperationException, path, message);
 		internal static string CompilationError (string path, string message) => string.Format (Resources.Strings.ClrProject_CompilationError, path, message);
+		internal static string LoadError (string path, string message) => string.Format (Resources.Strings.ClrProject_LoadError, path, message);
 		internal static string InvalidOperationError (string path, string message) => string.Format (Resources.Strings.ClrProject_InvalidOperationError, path, message);
 		internal static string UnexpectedError (string path, string message) => string.Format (Resources.Strings.ClrProject_UnexpectedError, path, message);
 	}

@@ -161,6 +161,9 @@ class TypeService (ILogger Logger) : ITypeService {
 		if (namespaces is null)
 			return;
 
+		if (!namespaces.Any ())
+			Logger.Warning (Strings.TypeService.NoTypesFound (compilation.AssemblyName!));
+
 		foreach (var ns in namespaces) {
 			foreach (var type in ns.GetTypeMembers ().Where (xcSync.IsNsoDerived)) {
 				var nsType = ConvertToTypeMapping (targetPlatform, type);
