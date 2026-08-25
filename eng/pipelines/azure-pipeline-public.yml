@@ -53,7 +53,7 @@ stages:
 - stage: build
   displayName: Build
   jobs:
-  - template: /eng/common/templates-official/jobs/jobs.yml@self
+  - template: /eng/common/templates/jobs/jobs.yml@self
     parameters:
       artifacts:
         publish: 
