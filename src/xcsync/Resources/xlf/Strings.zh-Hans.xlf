@@ -57,6 +57,11 @@
         <target state="translated">在项目 "{0}" 中检测到编译错误: {1}}</target>
         <note>{0} is the path to the .NET project, {1} is the list of error messages</note>
       </trans-unit>
+      <trans-unit id="ClrProject.LoadError">
+        <source>Error loading project '{0}' : {1}</source>
+        <target state="new">Error loading project '{0}' : {1}</target>
+        <note>{0} is the path to the .NET project, {1} is the error message</note>
+      </trans-unit>
       <trans-unit id="ClrProject.NotSupportedException">
         <source>Compilation not supported for current project  '{0}'</source>
         <target state="translated">当前项目 "{0}" 不支持编译</target>
@@ -338,6 +343,11 @@
         <source>The compilation does not have an AssemblyName, possibly because it is dynamic, and unsupported.</source>
         <target state="translated">编译没有 AssemblyName，可能是因为它是动态的且不受支持。</target>
         <note />
+      </trans-unit>
+      <trans-unit id="TypeService.NoTypesFound">
+        <source>No NSObject derived types were found in {0}. Verify that the workloads required by the project are installed.</source>
+        <target state="new">No NSObject derived types were found in {0}. Verify that the workloads required by the project are installed.</target>
+        <note>{0} is the name of the assembly</note>
       </trans-unit>
       <trans-unit id="TypeService.SyntaxRootNotFound">
         <source>The {0} type could not be synchronized due to missing symbol information.</source>

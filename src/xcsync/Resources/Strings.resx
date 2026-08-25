@@ -367,6 +367,10 @@
         <value>The compilation for {0} has already been added, ignoring this instance.</value>
         <comment>{0} is the name of the assembly</comment>
     </data>	
+    <data name="TypeService.NoTypesFound" xml:space="preserve">
+        <value>No NSObject derived types were found in {0}. Verify that the workloads required by the project are installed.</value>
+        <comment>{0} is the name of the assembly</comment>
+    </data>
     <data name="TypeService.TypeNotFound" xml:space="preserve">
         <value>The {0} type could not be located for synchronization.</value>
         <comment>{0} is the name of the type</comment>
@@ -400,6 +404,10 @@
 	<data name="ClrProject.InvalidOperationException" xml:space="preserve">
         <value>Compilation errors detected in project '{0}': {1}}</value>
         <comment>{0} is the path to the .NET project, {1} is the list of error messages</comment>
+	</data>
+	<data name="ClrProject.LoadError" xml:space="preserve">
+        <value>Error loading project '{0}' : {1}</value>
+        <comment>{0} is the path to the .NET project, {1} is the error message</comment>
 	</data>
 	<data name="ClrProject.CompilationError" xml:space="preserve">
         <value>Compilation error in project '{0}' : {1}</value>
