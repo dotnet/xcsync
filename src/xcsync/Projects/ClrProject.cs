@@ -20,6 +20,10 @@ class ClrProject (IFileSystem fileSystem, ILogger logger, ITypeService typeServi
 			{"TargetFrameworks", Framework}
 		});
 
+		// Without this, failures to load the project (missing workloads, design-time build errors, ...)
+		// are silent, and the only symptom is that no types are found in the project.
+		workspace.WorkspaceFailed += (_, e) => Logger.Warning (Strings.ClrProject.LoadError (RootPath, e.Diagnostic.Message));
+
 		var project = await workspace.OpenProjectAsync (RootPath).ConfigureAwait (false);
 
 		try {
