@@ -24,9 +24,21 @@ parameters:
 
 steps:
 
-  - task: UseDotNet@2
-    inputs: 
-      useGlobalJson: true
+  # Note: don't use the UseDotNet@2 task to install the .NET SDK.
+  #
+  # It honors global.json's "rollForward" policy, so it may install a different SDK than the
+  # exact version Arcade requires (global.json's "tools.dotnet"). When that happens Arcade
+  # installs a second SDK into $(Build.SourcesDirectory)/.dotnet, while DOTNET_ROOT keeps
+  # pointing at the one from the tool cache. The workloads then get installed into one SDK
+  # while Roslyn's MSBuildWorkspace (which resolves the SDK via DOTNET_ROOT) uses the other,
+  # so the design-time builds in the tests resolve no references and find no types.
+  #
+  # Instead let the build script install the SDK, and point every step at that single
+  # installation, so that the build, the workloads and the tests all use the same SDK.
+  - pwsh: |
+      Write-Host "##vso[task.setvariable variable=DOTNET_INSTALL_DIR]$(Build.SourcesDirectory)/.dotnet"
+      Write-Host "##vso[task.setvariable variable=DOTNET_ROOT]$(Build.SourcesDirectory)/.dotnet"
+    displayName: Use a single .NET installation
 
   - ${{ if ne(parameters.isWindows, 'true') }}:
     - script: ${{ parameters.buildScript }}
@@ -49,16 +61,11 @@ steps:
 
   - ${{ if or(ne(parameters.runAsPublic, 'true'), ne(parameters.runHelixTests, 'true')) }}:
     - pwsh: |
-        # Get .NET SDK Version from global.json
-        $globalJson = Get-Content -Path "global.json" -Raw | ConvertFrom-Json
-        $workloadSetVersion = "${$jsonContent.sdk.version}.0"
-
-        # Update/install workloads to the workload set
-        dotnet workload update --source https://api.nuget.org/v3/index.json --version $workloadSetVersion
-        dotnet workload install macos ios maccatalyst tvos maui --version 8.0.402.0 # Neccessary for tests
+        # Install the workloads into the same .NET SDK that the build and the tests use.
+        ${{ parameters.dotnetScript }} workload install macos ios maccatalyst tvos maui --version 8.0.402.0 # Neccessary for tests
 
         # List installed workloads
-        dotnet workload list        
+        ${{ parameters.dotnetScript }} workload list
       displayName: Install workloads
 
     - ${{ if ne(parameters.isWindows, 'true') }}:
