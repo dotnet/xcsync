@@ -104,7 +104,7 @@ extends:
         justificationForDisabling: 'see https://portal.microsofticm.com/imp/v3/incidents/incident/482258316/summary'
       sourceAnalysisPool:
         name: $(DncEngInternalBuildPool)
-        image: windows.vs2022preview.amd64
+        image: windows.vs2022.amd64
         os: windows
       tsa:
         enabled: true
@@ -195,7 +195,7 @@ extends:
 
               pool:
                 name: NetCore1ESPool-Internal
-                image: windows.vs2022preview.amd64
+                image: windows.vs2022.amd64
                 os: windows
                             
               variables:
