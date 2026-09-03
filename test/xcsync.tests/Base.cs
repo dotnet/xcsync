@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System.CommandLine;
-using System.CommandLine.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Serilog;
@@ -103,25 +102,22 @@ public class Base : IDisposable {
 		}
 	}
 
-	public class CapturingConsole : IConsole {
+	public class CapturingConsole {
 		readonly List<string> output = [];
 		readonly List<string> error = [];
 
-		public IStandardStreamWriter Out => new ListStreamWriter (output);
-
-		public bool IsOutputRedirected => true;
-
-		public IStandardStreamWriter Error => new ListStreamWriter (error);
-
-		public bool IsErrorRedirected => true;
-
-		public bool IsInputRedirected => false;
+		public InvocationConfiguration Configuration => new () {
+			Output = new ListStreamWriter (output),
+			Error = new ListStreamWriter (error),
+		};
 
 		public IReadOnlyList<string> Output => output.AsReadOnly ();
 		public IReadOnlyList<string> ErrorOutput => error.AsReadOnly ();
 
-		class ListStreamWriter (List<string> list) : IStandardStreamWriter {
-			public void Write (string? value)
+		class ListStreamWriter (List<string> list) : TextWriter {
+			public override Encoding Encoding => Encoding.UTF8;
+
+			public override void Write (string? value)
 			{
 				if (string.IsNullOrEmpty (value))
 					return;

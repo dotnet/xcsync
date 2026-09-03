@@ -12,15 +12,13 @@ class XcodeCommand<T> : BaseCommand<T> {
 	protected bool Force { get; private set; }
 	protected bool Open { get; private set; }
 
-	protected Option<bool> force = new (
-		["--force", "-f"],
-		description: Strings.Options.ForceDescription,
-		getDefaultValue: () => false);
+	protected Option<bool> force = new ("--force", "-f") {
+		Description = Strings.Options.ForceDescription,
+	};
 
-	protected Option<bool> open = new (
-		["--open", "-o"],
-		description: Strings.Options.OpenDescription,
-		getDefaultValue: () => false);
+	protected Option<bool> open = new ("--open", "-o") {
+		Description = Strings.Options.OpenDescription,
+	};
 
 	public XcodeCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (fileSystem, logger, name, description)
 	{ }
@@ -28,15 +26,15 @@ class XcodeCommand<T> : BaseCommand<T> {
 	protected override void AddOptions ()
 	{
 		base.AddOptions ();
-		Add (force);
-		Add (open);
+		Options.Add (force);
+		Options.Add (open);
 	}
 
 	protected override void AddValidators ()
 	{
-		AddValidator ((result) => {
-			Force = result.GetValueForOption (force);
-			Open = result.GetValueForOption (open);
+		Validators.Add ((result) => {
+			Force = result.GetValue (force);
+			Open = result.GetValue (open);
 		});
 		base.AddValidators ();
 	}

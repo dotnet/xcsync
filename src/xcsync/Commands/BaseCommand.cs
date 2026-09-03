@@ -36,20 +36,20 @@ class BaseCommand<T> : Command {
 	protected string TargetPlatform => TryGetTargetPlatform (Tfm, out string targetPlatform) ? targetPlatform : string.Empty;
 	protected readonly IFileSystem fileSystem;
 
-	protected Option<string> project = new (
-		["--project", "-p"],
-		description: Strings.Options.ProjectDescription,
-		getDefaultValue: () => ".");
+	protected Option<string> project = new ("--project", "-p") {
+		Description = Strings.Options.ProjectDescription,
+		DefaultValueFactory = _ => ".",
+	};
 
-	protected Option<string> tfm = new (
-		["--target-framework-moniker", "-tfm"],
-		description: Strings.Options.TfmDescription,
-		getDefaultValue: () => string.Empty);
+	protected Option<string> tfm = new ("--target-framework-moniker", "-tfm") {
+		Description = Strings.Options.TfmDescription,
+		DefaultValueFactory = _ => string.Empty,
+	};
 
-	protected Option<string> target = new (
-		["--target", "-t"],
-		description: Strings.Options.TargetDescription,
-		getDefaultValue: () => $"$(IntermediateOutputPath){Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}");
+	protected Option<string> target = new ("--target", "-t") {
+		Description = Strings.Options.TargetDescription,
+		DefaultValueFactory = _ => $"$(IntermediateOutputPath){Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}",
+	};
 
 	public BaseCommand (IFileSystem fileSystem, ILogger logger, string name, string description) : base (name, description)
 	{
@@ -65,17 +65,17 @@ class BaseCommand<T> : Command {
 
 	protected virtual void AddOptions ()
 	{
-		Add (project);
-		Add (tfm);
-		Add (target);
+		Options.Add (project);
+		Options.Add (tfm);
+		Options.Add (target);
 	}
 
 	protected virtual void AddValidators ()
 	{
-		AddValidator ((result) => {
+		Validators.Add ((result) => {
 
 			if (!RuntimeInformation.IsOSPlatform (OSPlatform.OSX)) {
-				result.ErrorMessage = Strings.Errors.Validation.InvalidOS;
+				result.AddError (Strings.Errors.Validation.InvalidOS);
 				return;
 			}
 
@@ -87,7 +87,8 @@ class BaseCommand<T> : Command {
 			ProjectPath = validation.ProjectPath;
 			Tfm = validation.Tfm;
 			TargetPath = validation.TargetPath;
-			result.ErrorMessage = validation.Error;
+			if (!string.IsNullOrEmpty (validation.Error))
+				result.AddError (validation.Error);
 		});
 	}
 
@@ -96,9 +97,9 @@ class BaseCommand<T> : Command {
 	internal ValidationResult ValidateCommand (CommandResult result)
 	{
 		string error;
-		var projectPath = result.GetValueForOption (project) ?? string.Empty;
-		var targetPath = result.GetValueForOption (target) ?? string.Empty;
-		var moniker = result.GetValueForOption (tfm) ?? string.Empty;
+		var projectPath = result.GetValue (project) ?? string.Empty;
+		var targetPath = result.GetValue (target) ?? string.Empty;
+		var moniker = result.GetValue (tfm) ?? string.Empty;
 
 		(error, string newProjectPath) = TryValidateProjectPath (projectPath);
 		if (!string.IsNullOrEmpty (error)) { return new ValidationResult (projectPath, moniker, targetPath, error); }

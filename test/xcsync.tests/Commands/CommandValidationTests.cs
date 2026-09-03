@@ -20,7 +20,8 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var command = new XcSyncCommand (fileSystem, Mock.Of<ILogger> ());
 		Assert.NotNull (command);
-		command.Invoke (["--dotnet-path", "/path/to/dotnet"], new CapturingConsole ());
+		var console = new CapturingConsole ();
+		command.Parse (["--dotnet-path", "/path/to/dotnet"]).Invoke (console.Configuration);
 		Assert.Equal ("/path/to/dotnet", xcSync.DotnetPath);
 	}
 
@@ -57,7 +58,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var fileSystem = new FileSystem ();
 		var logger = new XunitLogger (TestOutput);
 		var command = new GenerateCommand (fileSystem, logger);
-		int exitCode = command.Invoke ($"--project {csproj} -f");
+		int exitCode = command.Parse ($"--project {csproj} -f").Invoke ();
 
 		// ensure the default target directory is created relative to the project directory, not the pwd
 		Assert.Equal (0, exitCode);
@@ -87,7 +88,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			"--target", "obj/xcsync"
 		 };
 
-		int exitCode = command.Invoke (args);
+		int exitCode = command.Parse (args).Invoke ();
 
 		Assert.Equal (0, exitCode);
 	}
@@ -142,7 +143,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		int exitCode = baseCommand.Invoke (args, console);
+		int exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
@@ -187,7 +188,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		var exitCode = baseCommand.Invoke (args, console);
+		var exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
@@ -236,7 +237,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			args = [.. args, "--force"];
 		}
 		var console = new CapturingConsole ();
-		int exitCode = XcodeCommand.Invoke (args, console);
+		int exitCode = XcodeCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
@@ -295,7 +296,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		int exitCode = baseCommand.Invoke (args, console);
+		int exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
@@ -332,7 +333,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		int exitCode = baseCommand.Invoke (args, console);
+		int exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
