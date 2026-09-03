@@ -22,7 +22,7 @@ using static ClangSharp.Interop.CXTranslationUnit_Flags;
 
 namespace xcsync.Projects;
 
-partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework) :
+partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeService typeService, string name, string projectPath, string framework, bool explicitTypes = false) :
 	SyncableProject (fileSystem, logger, typeService, name, projectPath, framework, new ExtensionFilter (".pbxproj", ".m", ".h", ".storyboard")) {
 
 	static CXIndex cxIndex = CXIndex.Create ();
@@ -182,7 +182,7 @@ partial class XcodeWorkspace (IFileSystem fileSystem, ILogger logger, ITypeServi
 			}
 			if (syntaxTree is null) return;
 
-			var rewriter = new ObjCSyntaxRewriter (Logger, TypeService, new AdhocWorkspace ());
+			var rewriter = new ObjCSyntaxRewriter (Logger, TypeService, new AdhocWorkspace (), explicitTypes);
 
 			var newClass = await rewriter.WriteAsync (objcType.ClassInterface, syntaxTree);
 			var root = syntaxTree!.GetRoot ();

@@ -7,7 +7,9 @@ namespace xcsync.Projects;
 
 
 record TypeMapping (INamedTypeSymbol? TypeSymbol, string ClrType, string ObjCType, TypeMapping? BaseType, bool IsModel, bool IsProtocol,
-	bool InDesigner, List<IBOutlet>? Outlets, List<IBAction>? Actions, HashSet<string> References, bool IsInSource = false, bool HasChanges = false);
+	bool InDesigner, List<IBOutlet>? Outlets, List<IBAction>? Actions, HashSet<string> References, bool IsInSource = false, bool HasChanges = false) {
+	public List<string> HeaderReferences { get; init; } = [];
+}
 
 
 class IBOutlet (string clrName, string objcName, string clrType, string? objcType, bool isCollection) {

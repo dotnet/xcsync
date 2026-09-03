@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="cs" original="../Strings.resx">
     <body>
@@ -227,6 +227,11 @@
         <target state="translated">Nepodporovaný typ vlastnosti {0}</target>
         <note>{0} is the name of the property type</note>
       </trans-unit>
+      <trans-unit id="ObjCSyntax.UnresolvedPropertyType">
+        <source>Unable to resolve outlet '{0}' with Objective-C type '{1}'.</source>
+        <target state="new">Unable to resolve outlet '{0}' with Objective-C type '{1}'.</target>
+        <note>{0} is the outlet property name, {1} is the Objective-C type name</note>
+      </trans-unit>
       <trans-unit id="ObjCSyntax.Visiting">
         <source>[{0}] Visiting {{{1}}}</source>
         <target state="translated">[{0}] Návštěva {{{1}}}</target>
@@ -237,9 +242,19 @@
         <target state="translated">Nastavte cestu k sadě .NET SDK. Pokud se nezadá, použije se cesta z nadřazeného procesu (pokud je to dotnet, jinak se vrátí k dotnet v parametru PATH).</target>
         <note />
       </trans-unit>
+      <trans-unit id="Options.ExplicitTypes.Description">
+        <source>Use the explicit Objective-C types from Xcode headers when generating designer files instead of defaulting action senders to Foundation.NSObject</source>
+        <target state="new">Use the explicit Objective-C types from Xcode headers when generating designer files instead of defaulting action senders to Foundation.NSObject</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Options.Force.Description">
         <source>Force overwrite of an existing Xcode project</source>
         <target state="translated">Vynutit přepsání existujícího projektu Xcode</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Options.Incremental.Description">
+        <source>Enable incremental synchronization, only syncing the files related to the detected change instead of the entire project</source>
+        <target state="new">Enable incremental synchronization, only syncing the files related to the detected change instead of the entire project</target>
         <note />
       </trans-unit>
       <trans-unit id="Options.Open.Description">
@@ -383,6 +398,11 @@
         <source>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</source>
         <target state="translated">Průběžná synchronizace souborů mezi {0} a {1} pro platformu {2}</target>
         <note>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</note>
+      </trans-unit>
+      <trans-unit id="Watch.IncrementalSyncing">
+        <source>Incrementally syncing changes related to '{0}'</source>
+        <target state="new">Incrementally syncing changes related to '{0}'</target>
+        <note>{0} is the path of the changed file</note>
       </trans-unit>
       <trans-unit id="Watch.InputRedirectedInstructions">
         <source>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</source>

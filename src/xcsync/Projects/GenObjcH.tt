@@ -19,6 +19,9 @@
 #import <<#= @ref #>/<#= @ref #>.h>
 <# } #>
 <# } #>
+<# foreach (var headerReference in typeMapping.HeaderReferences) { #>
+#import "<#= headerReference #>.h"
+<# } #>
 
 
 @interface <#= typeMapping.ObjCType #> : <#= typeMapping.BaseType?.ObjCType is null || typeMapping.BaseType.IsProtocol ? "NSObject" : typeMapping.BaseType?.ObjCType #> {
@@ -37,7 +40,8 @@
 <# } #>
 <# if (typeMapping.Actions is not null) { #>
 <# foreach (var act in typeMapping.Actions) { #>
-- (IBAction)<#= act.ObjCName #>:(id)sender;
+<# var firstParameter = act.Parameters.FirstOrDefault (); #>
+- (IBAction)<#= act.ObjCName #>:(<#= firstParameter?.ObjCType is null || firstParameter.ObjCType == "NSObject" ? "id" : firstParameter.ObjCType.Contains ("*") || firstParameter.ObjCType == "id" || firstParameter.ObjCType.StartsWith ("id<", StringComparison.Ordinal) ? firstParameter.ObjCType : $"{firstParameter.ObjCType} *" #>)<#= firstParameter?.ClrName ?? "sender" #>;
 
 <# } #>
 <# } #>

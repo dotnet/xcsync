@@ -11,7 +11,39 @@ using xcsync.Workers;
 namespace xcsync.tests;
 
 public class ContinuousSyncContextTest {
-	readonly Mock<IHub> mockHub = new ();
-	readonly ContinuousSyncContext context = new (Mock.Of<IFileSystem> (), Mock.Of<ITypeService> (), "projectPath",
-		"targetDir", "framework", Mock.Of<ILogger> ());
+
+	[Fact]
+	public void ChangeMessage_DefaultsIncrementalToFalse ()
+	{
+		var message = new ChangeMessage ("1", "/tmp/Test.cs", SyncDirection.ToXcode, CreateMonitor (), CreateMonitor ());
+
+		Assert.False (message.Incremental);
+	}
+
+	[Fact]
+	public void ChangeMessage_CanEnableIncremental ()
+	{
+		var message = new ChangeMessage ("1", "/tmp/Test.cs", SyncDirection.ToXcode, CreateMonitor (), CreateMonitor (), true);
+
+		Assert.True (message.Incremental);
+	}
+
+	[Fact]
+	public void ChangeMessage_DefaultsExplicitTypesToFalse ()
+	{
+		var message = new ChangeMessage ("1", "/tmp/Test.cs", SyncDirection.FromXcode, CreateMonitor (), CreateMonitor ());
+
+		Assert.False (message.ExplicitTypes);
+	}
+
+	[Fact]
+	public void ChangeMessage_CanEnableExplicitTypes ()
+	{
+		var message = new ChangeMessage ("1", "/tmp/Test.cs", SyncDirection.FromXcode, CreateMonitor (), CreateMonitor (), ExplicitTypes: true);
+
+		Assert.True (message.ExplicitTypes);
+	}
+
+	static ProjectFileChangeMonitor CreateMonitor () =>
+		new (new MockFileSystem (), Mock.Of<IFileSystemWatcher> (), Mock.Of<ILogger> ());
 }

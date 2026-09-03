@@ -8,18 +8,24 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Serilog;
+using System.Text.RegularExpressions;
+using System.IO.Abstractions;
 using xcsync.Projects;
 using static ClangSharp.Interop.CX_DeclKind;
 using static ClangSharp.Interop.CXTypeKind;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Newtonsoft.Json.Linq;
 
 namespace xcsync.Ast;
 
-class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace workspace) : AstWalker {
+class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace workspace, bool explicitTypes = false) : AstWalker {
+	static readonly IFileSystem FileSystem = new FileSystem ();
+
+	static readonly string NSObjectType = "Foundation.NSObject";
 
 	internal async Task<SyntaxTree?> WriteAsync (ObjCInterfaceDecl objcType, SyntaxTree? syntaxTree)
 	{
-		var visitor = new Visitor (Logger, typeService, syntaxTree);
+		var visitor = new Visitor (Logger, typeService, syntaxTree, explicitTypes);
 		await WalkAsync (objcType, visitor).ConfigureAwait (false);
 
 		// Now that we have the basic tree, lets make sure it generates pretty C# code
@@ -72,7 +78,7 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 		return newRoot.SyntaxTree;
 	}
 
-	class Visitor (ILogger logger, ITypeService typeService, SyntaxTree? syntaxTree) : AstVisitor {
+	class Visitor (ILogger logger, ITypeService typeService, SyntaxTree? syntaxTree, bool explicitTypes = false) : AstVisitor {
 
 		public SyntaxTree? SyntaxTree { get; private set; } = syntaxTree;
 
@@ -93,7 +99,8 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 				Write (objcMethod!);
 				break;
 
-			};
+			}
+			;
 			return Task.CompletedTask;
 		}
 
@@ -130,26 +137,33 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 
 		void Write (ObjCPropertyDecl objcProperty)
 		{
-			if (objcProperty.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBOutlet) is null)
-				return;
+			string propertyName = objcProperty.Name;
+			string? propertyTypeObjC;
+			if (objcProperty.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBOutlet) is not null) {
+				propertyTypeObjC = GetObjCTypeName (objcProperty.Type.AsString);
+			}
+			// Determine the Objective-C type for the property.
+			// If the property has the IBOutlet attribute, we can get its type directly.
+			// Note: Some properties may not have the IBOutlet attribute (e.g., due to a missing import in the .h file).
+			// In such cases, attempt to parse the type manually from the header file. This can occur when wiring
+			// UI components in Xcode, XCode then doesn't add the import command.
+			else {
+				propertyTypeObjC = TryGetOutletPropertyTypeFromSource (objcProperty);
+			}			
+
+			if(objcProperty.Type.Kind != CXType_ObjCObjectPointer && objcProperty.Type.Kind != CXType_Pointer) {
+				throw new NotImplementedException (Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling));
+			}
 
 			var root = (CompilationUnitSyntax) SyntaxTree!.GetRoot ();
-
 			var firstClass = root.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
 
-			var propertyName = objcProperty.Name;
-
 			logger.Debug (Strings.ObjCSyntax.ParsingProperty (nameof (ObjCSyntaxRewriter), objcProperty.Type.AsString));
-			// TODO: This is a *very* primitive way to get the property type and will need improvement
-			// TODO: Need a solution to handle the case where the property type is not found  or is null in the type mapping
-			var propertyType = objcProperty.Type switch { { Kind: CXType_ObjCObjectPointer } => typeService
-															  .QueryTypes (null, objcProperty.Type.AsString.Split (' ') [0])
-															  .First ()?.ClrType ?? string.Empty,
-				_ => throw new NotImplementedException (Strings.ObjCSyntax.PropertyNotImplementedException (objcProperty.Type.KindSpelling))
-			};
+
+			var mappedType = MapObjectCType (propertyTypeObjC, firstClass);
 
 			// Create the property
-			var property = PropertyDeclaration (ParseTypeName (propertyType), propertyName)
+			var property = PropertyDeclaration (ParseTypeName (mappedType), propertyName)
 				// .AddModifiers (Token (SyntaxKind.PublicKeyword))
 				.AddAccessorListAccessors (
 					AccessorDeclaration (SyntaxKind.GetAccessorDeclaration)
@@ -181,6 +195,35 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			SyntaxTree = newRoot.SyntaxTree;
 		}
 
+		string MapObjectCType (string? type, ClassDeclarationSyntax classDeclaration)
+		{
+			if (string.IsNullOrEmpty (type)) {
+				return NSObjectType;
+			}
+
+			var typeMapping = typeService.QueryTypes (null, type).FirstOrDefault ();
+			if(typeMapping is null) {
+				return NSObjectType;
+			}
+
+			// This method converts a TypeMapping into a usable CLR type name,
+			// taking namespaces into account to avoid ambiguity.
+
+			// If the type has no namespace or is in the global namespace,
+			// we can safely return just the CLR type name.
+			if (typeMapping.TypeSymbol?.ContainingNamespace is null || typeMapping.TypeSymbol.ContainingNamespace.IsGlobalNamespace)
+				return typeMapping.ClrType;
+
+			// Get the namespace of the resolved type (e.g. "MyProject.Models")
+			var typeNamespace = typeMapping.TypeSymbol.ContainingNamespace.ToDisplayString ();
+			var classNamespace = classDeclaration.Ancestors ().OfType<BaseNamespaceDeclarationSyntax> ().FirstOrDefault ()?.Name.ToString ();
+
+			// If the class is in the same namespace as the type, we can return just the CLR type name.
+			return classNamespace == typeNamespace
+				? typeMapping.ClrType
+				: $"{typeNamespace}.{typeMapping.ClrType}";
+		}
+
 		void Write (ObjCMethodDecl objcMethod)
 		{
 			if (objcMethod.Attrs.ToList ().FirstOrDefault (a => a.Kind == CX_AttrKind.CX_AttrKind_IBAction) is null)
@@ -191,12 +234,13 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			var firstClass = root.DescendantNodes ().OfType<ClassDeclarationSyntax> ().First ();
 
 			var methodName = objcMethod.Name.Replace (":", string.Empty); // TODO: Need to properly convert this to a valid C# method name
+			var senderType = explicitTypes ? GetActionParameterTypeName (objcMethod, firstClass) : NSObjectType;
 
 			var newMethod = MethodDeclaration (ParseTypeName ("void"), methodName)
 				.AddModifiers (Token (SyntaxKind.PartialKeyword))
 				.AddParameterListParameters (
 					Parameter (Identifier ("sender"))
-						.WithType (ParseTypeName ("Foundation.NSObject")))
+						.WithType (ParseTypeName (senderType)))
 				.AddAttributeLists (
 					AttributeList (SingletonSeparatedList (
 						Attribute (IdentifierName ("Action"),
@@ -209,6 +253,68 @@ class ObjCSyntaxRewriter (ILogger Logger, ITypeService typeService, Workspace wo
 			var newRoot = root.ReplaceNode (firstClass, newClass);
 
 			SyntaxTree = newRoot.SyntaxTree;
+		}
+
+		string GetActionParameterTypeName (ObjCMethodDecl objcMethod, ClassDeclarationSyntax classDeclaration)
+		{
+			var actionParameter = objcMethod.Parameters.FirstOrDefault ();
+
+			if (actionParameter is null)
+				return NSObjectType;
+
+			string? actionParameterType;
+			try {
+				actionParameterType = actionParameter.OriginalType.AsString;
+			} catch (ArgumentOutOfRangeException) {
+				actionParameterType = TryGetActionParameterTypeFromSource (objcMethod);
+			}
+
+			if (string.IsNullOrEmpty (actionParameterType) || actionParameterType == "id")
+				return NSObjectType;
+
+			var objcTypeName = actionParameterType.Split (' ') [0];
+			return MapObjectCType (objcTypeName, classDeclaration);
+		}
+
+		static string? GetObjCTypeName (string? objcType)
+		{
+			if (string.IsNullOrWhiteSpace (objcType))
+				return null;
+
+			var match = Regex.Match (objcType, @"(?<type>[A-Za-z_]\w*)");
+			return match.Success ? match.Groups ["type"].Value : null;
+		}
+
+		static string? GetSourceContent (CXSourceRange sourceRange)
+		{
+			sourceRange.Start.GetFileLocation (out var file, out _, out _, out var start);
+			sourceRange.End.GetFileLocation (out _, out _, out _, out var end);
+
+			var fileContent = FileSystem.File.ReadAllText (file.Name.CString);
+
+			return fileContent.Substring ((int) start, (int) (end - start)).Trim ();
+		}
+
+		static string? TryGetOutletPropertyTypeFromSource (ObjCPropertyDecl objcProperty)
+		{			
+			var source = GetSourceContent (objcProperty.Extent);
+			if (string.IsNullOrEmpty (source)) 
+				return null;
+
+			var match = Regex.Match (source, $@"IBOutlet\s*(?<type>\w*)\s*\*\s*{Regex.Escape (objcProperty.Name)}", RegexOptions.IgnoreCase);
+
+			return match.Success ? match.Groups ["type"].Value.Trim () : null;
+		}
+
+		static string? TryGetActionParameterTypeFromSource (ObjCMethodDecl objcMethod)
+		{
+			var source = GetSourceContent (objcMethod.Extent);
+			if (string.IsNullOrEmpty (source))
+				return null;
+
+			var match = Regex.Match (source, @":\(([^)]+)\)\s*\w+");
+
+			return match.Success ? match.Groups [1].Value.Trim () : null;
 		}
 
 		protected override Task VisitAttrAsync (Attr attr)

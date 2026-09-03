@@ -12,12 +12,28 @@ namespace xcsync.Commands;
 
 class WatchCommand : XcodeCommand<WatchCommand> {
 
+	protected Option<bool> incremental = new (
+		["--incremental", "-i"],
+		description: Strings.Options.IncrementalDescription,
+		getDefaultValue: () => false);
+	protected Option<bool> explicitTypes = new (
+		["--explicit-types", "-e"],
+		description: Strings.Options.ExplicitTypesDescription,
+		getDefaultValue: () => false);
+
 	public WatchCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "watch", Strings.Commands.WatchDescription)
 	{
-		this.SetHandler (Execute, project, target, tfm, force, open);
+		this.SetHandler (Execute, project, target, tfm, force, open, incremental, explicitTypes);
 	}
 
-	public async Task Execute (string project, string target, string tfm, bool force, bool open)
+	protected override void AddOptions ()
+	{
+		base.AddOptions ();
+		Add (incremental);
+		Add (explicitTypes);
+	}
+
+	public async Task Execute (string project, string target, string tfm, bool force, bool open, bool incremental, bool explicitTypes)
 	{
 		using var cts = new CancellationTokenSource ();
 
@@ -31,7 +47,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 
 		LogInformation (Strings.Watch.HeaderInformation (ProjectPath, TargetPath, Tfm));
 
-		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!, open, force);
+		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!, open, force, incremental, explicitTypes);
 
 		// Start an asynchronous task
 		var xcsyncTask = Task.Run (async () => {

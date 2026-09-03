@@ -186,6 +186,7 @@ class TypeService (ILogger Logger) : ITypeService {
 		var clrName = type.MetadataName;
 		var objCName = type.Name;
 		HashSet<string> refs = [];
+		List<string> headerReferences = [];
 
 		if (clrTypes.TryGetValue (clrName, out var existingTypeMapping))
 			return existingTypeMapping;
@@ -197,6 +198,8 @@ class TypeService (ILogger Logger) : ITypeService {
 		}
 
 		var baseTypeMapping = ConvertToTypeMapping (targetPlatform, baseType);
+		if (baseType.Locations.Any (l => l.IsInSource) && baseTypeMapping is not null && !baseTypeMapping.IsProtocol)
+			AddHeaderReference (headerReferences, baseTypeMapping.ObjCType, objCName);
 
 		foreach (var a in type.GetAttributes ()) {
 			switch (a.AttributeClass?.Name) {
@@ -226,12 +229,15 @@ class TypeService (ILogger Logger) : ITypeService {
 				if (outletAttribute is null)
 					continue;
 
+				var outletObjCType = GetObjCType (targetPlatform, (INamedTypeSymbol) property.Type);
 				outlets.Add (new IBOutlet (
 					clrName: property.Name,
 					objcName: GetName (outletAttribute) ?? property.Name,
 					clrType: property.Type.MetadataName,
-					objcType: GetObjCType (targetPlatform, (INamedTypeSymbol) property.Type),
+					objcType: outletObjCType,
 					isCollection: property.Type.TypeKind == TypeKind.Array));
+				if (property.Type.Locations.Any (l => l.IsInSource) && outletObjCType is not null)
+					AddHeaderReference (headerReferences, outletObjCType, objCName);
 
 				refs.Add (property.ContainingNamespace.Name);
 			}
@@ -250,7 +256,11 @@ class TypeService (ILogger Logger) : ITypeService {
 
 				var index = 0;
 				foreach (var param in method.Parameters) {
-					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, GetObjCType (targetPlatform, (INamedTypeSymbol) param.Type)));
+					var actionObjCType = GetObjCType (targetPlatform, (INamedTypeSymbol) param.Type);
+					parameters.Add (new IBActionParameter (param.Name, strings? [index].Length == 0 ? null : strings? [index], param.Type.MetadataName, actionObjCType));
+					if (actionObjCType is not null && SymbolEqualityComparer.Default.Equals (param.Type.ContainingAssembly, type.ContainingAssembly))
+						AddHeaderReference (headerReferences, actionObjCType, objCName);
+
 					index++;
 					refs.Add (param.ContainingNamespace.Name);
 				}
@@ -266,9 +276,19 @@ class TypeService (ILogger Logger) : ITypeService {
 
 		var typeMapping = new TypeMapping (type, clrName, objCName, baseTypeMapping, isModel, isProtocol, InDesignerFile (type, objCName),
 			outlets.Count == 0 ? null : outlets, actions.Count == 0 ? null : actions,
-			refs.Intersect (xcSync.ApplePlatforms [targetPlatform].SupportedFrameworks.Keys).ToHashSet ());
+			refs.Intersect (xcSync.ApplePlatforms [targetPlatform].SupportedFrameworks.Keys).ToHashSet ()) {
+			HeaderReferences = headerReferences
+		};
 
 		return typeMapping;
+	}
+
+	static void AddHeaderReference (List<string> headerReferences, string reference, string objCName)
+	{
+		if (reference == objCName || headerReferences.Contains (reference))
+			return;
+
+		headerReferences.Add (reference);
 	}
 
 	bool InDesignerFile (ITypeSymbol type, string objCName)
