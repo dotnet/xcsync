@@ -8,7 +8,7 @@ using xcsync.Projects;
 
 namespace xcsync;
 
-class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false)
+class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, string projectPath, string targetDir, string framework, ILogger logger, bool open = false, bool force = false, bool incremental = false)
 	: SyncContextBase (fileSystem, typeService, projectPath, targetDir, framework, logger) {
 
 	public const string ChangeChannel = "Changes";
@@ -33,14 +33,14 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.ToXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.ToXcode, clrChanges, xcodeChanges, incremental));
 		};
 
 		xcodeChanges.OnFileChanged = async path => {
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.FromXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), path, SyncDirection.FromXcode, clrChanges, xcodeChanges, incremental));
 		};
 
 		async void ClrFileRenamed (string oldPath, string newPath)
@@ -48,7 +48,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.ToXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.ToXcode, clrChanges, xcodeChanges, incremental));
 		}
 
 		clrChanges.OnFileRenamed = ClrFileRenamed;
@@ -58,7 +58,7 @@ class ContinuousSyncContext (IFileSystem fileSystem, ITypeService typeService, s
 			if (token.IsCancellationRequested)
 				return;
 
-			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.FromXcode, clrChanges, xcodeChanges));
+			await Hub.PublishAsync (ChangeChannel, new ChangeMessage (Guid.NewGuid ().ToString (), newPath, SyncDirection.FromXcode, clrChanges, xcodeChanges, incremental));
 		}
 
 		xcodeChanges.OnFileRenamed = XcodeFileRenamed;

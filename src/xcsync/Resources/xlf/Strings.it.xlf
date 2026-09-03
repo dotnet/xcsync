@@ -242,6 +242,11 @@
         <target state="translated">Forza sovrascrittura di un progetto Xcode esistente</target>
         <note />
       </trans-unit>
+      <trans-unit id="Options.Incremental.Description">
+        <source>Enable incremental synchronization, only syncing the files related to the detected change instead of the entire project</source>
+        <target state="new">Enable incremental synchronization, only syncing the files related to the detected change instead of the entire project</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Options.Open.Description">
         <source>Open the generated project in Xcode</source>
         <target state="translated">Apri il progetto generato in Xcode</target>
@@ -383,6 +388,11 @@
         <source>Continuously syncing files between '{0}' and '{1}' for '{2}' platform.</source>
         <target state="translated">Sincronizzazione continua dei file tra "{0}" e "{1}" per la piattaforma "{2}".</target>
         <note>{0} is the path to the project file, {1} is the path to the target project, {2} is the target platform moniker</note>
+      </trans-unit>
+      <trans-unit id="Watch.IncrementalSyncing">
+        <source>Incrementally syncing changes related to '{0}'</source>
+        <target state="new">Incrementally syncing changes related to '{0}'</target>
+        <note>{0} is the path of the changed file</note>
       </trans-unit>
       <trans-unit id="Watch.InputRedirectedInstructions">
         <source>&gt;&gt;&gt; Input is redirected, waiting for SIGINT &lt;&lt;&lt;</source>

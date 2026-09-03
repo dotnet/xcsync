@@ -18,6 +18,7 @@ static class Strings {
 		internal static string TfmDescription => Resources.Strings.Options_Tfm_Description;
 		internal static string VerbosityDescription => Resources.Strings.Options_Verbosity_Description;
 		internal static string DotnetPathDescription => Resources.Strings.Options_DotnetPath_Description;
+		internal static string IncrementalDescription => Resources.Strings.Options_Incremental_Description;
 	}
 
 	internal static class Commands {
@@ -88,6 +89,7 @@ static class Strings {
 		internal static string ResumingMonitoring => Resources.Strings.Watch_ResumingMonitoring;
 		internal static string WorkerException (string messageId, string exceptionMessage) => string.Format (Resources.Strings.Watch_WorkerException, messageId, exceptionMessage);
 		internal static string StopWatchProcess => Resources.Strings.Watch_StopWatchProcess;
+		internal static string IncrementalSyncing (string path) => string.Format (Resources.Strings.Watch_IncrementalSyncing, path);
 	}
 
 	internal static class TypeService {
