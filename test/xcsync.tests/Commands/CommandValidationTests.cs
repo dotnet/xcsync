@@ -35,6 +35,15 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 	}
 
 	[Fact]
+	public void BaseCommand_WhenTargetIsOmitted_UsesDefaultTarget ()
+	{
+		var command = new DefaultTargetCommand (new MockFileSystem (), new XunitLogger (TestOutput));
+		var validation = command.ValidateCommand (command.Parse ([]).CommandResult);
+
+		Assert.Equal ($"$(IntermediateOutputPath){Path.DirectorySeparatorChar}xcsync", validation.TargetPath);
+	}
+
+	[Fact]
 	public void TestXcodeCommandCreation ()
 	{
 		var fileSystem = new MockFileSystem ();
@@ -302,6 +311,13 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		Assert.Equal ("The xcsync tool can only be run on macOS.", errorMessage);
 		Assert.Equal (1, exitCode);
+	}
+
+	class DefaultTargetCommand (IFileSystem fileSystem, ILogger logger) : BaseCommand<DefaultTargetCommand> (fileSystem, logger, "test", "test")
+	{
+		protected override (string, string) TryValidateProjectPath (string projectPath) => (string.Empty, projectPath);
+		protected override (string, string) TryValidateTfm (string projectPath, string tfm) => (string.Empty, tfm);
+		protected override (string, string) TryValidateTargetPath (string projectPath, string tfm, string targetPath) => (string.Empty, targetPath);
 	}
 
 	[MacOSOnlyFact]

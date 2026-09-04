@@ -98,7 +98,9 @@ class BaseCommand<T> : Command {
 	{
 		string error;
 		var projectPath = result.GetValue (project) ?? string.Empty;
-		var targetPath = result.GetValue (target) ?? string.Empty;
+		var targetPath = result.GetValue (target);
+		if (string.IsNullOrEmpty (targetPath))
+			targetPath = $"$(IntermediateOutputPath){Path.DirectorySeparatorChar}{DefaultXcodeOutputFolder}";
 		var moniker = result.GetValue (tfm) ?? string.Empty;
 
 		(error, string newProjectPath) = TryValidateProjectPath (projectPath);
