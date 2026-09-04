@@ -12,7 +12,7 @@ class GenerateCommand : XcodeCommand<GenerateCommand> {
 
 	public GenerateCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "generate", Strings.Commands.GenerateDescription)
 	{
-		this.SetHandler (Execute);
+		SetAction (_ => Execute ());
 	}
 
 	public async Task Execute ()

@@ -14,10 +14,10 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 
 	public WatchCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "watch", Strings.Commands.WatchDescription)
 	{
-		this.SetHandler (Execute, project, target, tfm, force, open);
+		SetAction (_ => Execute ());
 	}
 
-	public async Task Execute (string project, string target, string tfm, bool force, bool open)
+	public async Task Execute ()
 	{
 		using var cts = new CancellationTokenSource ();
 
@@ -31,7 +31,7 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 
 		LogInformation (Strings.Watch.HeaderInformation (ProjectPath, TargetPath, Tfm));
 
-		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!, open, force);
+		var sync = new ContinuousSyncContext (fileSystem, new TypeService (Logger!), ProjectPath, TargetPath, Tfm, Logger!, Open, Force);
 
 		// Start an asynchronous task
 		var xcsyncTask = Task.Run (async () => {

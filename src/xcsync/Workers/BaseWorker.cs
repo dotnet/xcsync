@@ -12,6 +12,8 @@ public abstract class BaseWorker<T> : IWorker<T>, IErrorWorker<T> where T : stru
 
 	public abstract Task ConsumeAsync (T message, Exception exception, CancellationToken token = default);
 
+	public virtual Task OnChannelClosedAsync (string topicName, CancellationToken token = default) => Task.CompletedTask;
+
 	public virtual void Dispose () { }
 
 	public virtual ValueTask DisposeAsync () => ValueTask.CompletedTask;

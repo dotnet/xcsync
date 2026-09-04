@@ -26,6 +26,7 @@
     <PackageVersion Include="NuGet.Frameworks" Version="$(NuGetFrameworksPackageVersion)" />
     <PackageVersion Include="System.Text.Json" Version="$(SystemTextJsonPackageVersion)" />
     <PackageVersion Include="System.Formats.Asn1" Version="$(SystemFormatsAsn1PackageVersion)" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="$(SystemSecurityCryptographyXmlPackageVersion)" />
     <!-- ClangSharp -->
     <PackageVersion Include="clangsharp" Version="$(ClangSharpPackageVersion)" />
     <PackageVersion Include="libClang.runtime.osx-arm64" Version="$(libClangRuntimeOsxArm64PackageVersion)" />

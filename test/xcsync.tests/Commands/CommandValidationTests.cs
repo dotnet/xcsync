@@ -20,7 +20,8 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 
 		var command = new XcSyncCommand (fileSystem, Mock.Of<ILogger> ());
 		Assert.NotNull (command);
-		command.Invoke (["--dotnet-path", "/path/to/dotnet"], new CapturingConsole ());
+		var console = new CapturingConsole ();
+		command.Parse (["--dotnet-path", "/path/to/dotnet"]).Invoke (console.Configuration);
 		Assert.Equal ("/path/to/dotnet", xcSync.DotnetPath);
 	}
 
@@ -31,6 +32,15 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var logger = new XunitLogger (TestOutput);
 		var command = new BaseCommand<string> (fileSystem, logger, "test", "test description");
 		Assert.NotNull (command);
+	}
+
+	[Fact]
+	public void BaseCommand_WhenTargetIsOmitted_UsesDefaultTarget ()
+	{
+		var command = new DefaultTargetCommand (new MockFileSystem (), new XunitLogger (TestOutput));
+		var validation = command.ValidateCommand (command.Parse ([]).CommandResult);
+
+		Assert.Equal ($"$(IntermediateOutputPath){Path.DirectorySeparatorChar}xcsync", validation.TargetPath);
 	}
 
 	[Fact]
@@ -57,7 +67,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		var fileSystem = new FileSystem ();
 		var logger = new XunitLogger (TestOutput);
 		var command = new GenerateCommand (fileSystem, logger);
-		int exitCode = command.Invoke ($"--project {csproj} -f");
+		int exitCode = command.Parse ($"--project {csproj} -f").Invoke ();
 
 		// ensure the default target directory is created relative to the project directory, not the pwd
 		Assert.Equal (0, exitCode);
@@ -87,7 +97,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			"--target", "obj/xcsync"
 		 };
 
-		int exitCode = command.Invoke (args);
+		int exitCode = command.Parse (args).Invoke ();
 
 		Assert.Equal (0, exitCode);
 	}
@@ -142,7 +152,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		int exitCode = baseCommand.Invoke (args, console);
+		int exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
@@ -187,7 +197,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		var exitCode = baseCommand.Invoke (args, console);
+		var exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
@@ -236,7 +246,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 			args = [.. args, "--force"];
 		}
 		var console = new CapturingConsole ();
-		int exitCode = XcodeCommand.Invoke (args, console);
+		int exitCode = XcodeCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
@@ -295,12 +305,19 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		int exitCode = baseCommand.Invoke (args, console);
+		int exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 
 		Assert.Equal ("The xcsync tool can only be run on macOS.", errorMessage);
 		Assert.Equal (1, exitCode);
+	}
+
+	class DefaultTargetCommand (IFileSystem fileSystem, ILogger logger) : BaseCommand<DefaultTargetCommand> (fileSystem, logger, "test", "test")
+	{
+		protected override (string, string) TryValidateProjectPath (string projectPath) => (string.Empty, projectPath);
+		protected override (string, string) TryValidateTfm (string projectPath, string tfm) => (string.Empty, tfm);
+		protected override (string, string) TryValidateTargetPath (string projectPath, string tfm, string targetPath) => (string.Empty, targetPath);
 	}
 
 	[MacOSOnlyFact]
@@ -332,7 +349,7 @@ public class CommandValidationTests (ITestOutputHelper TestOutput) : Base {
 		 };
 
 		var console = new CapturingConsole ();
-		int exitCode = baseCommand.Invoke (args, console);
+		int exitCode = baseCommand.Parse (args).Invoke (console.Configuration);
 
 		var errorMessage = console.ErrorOutput.Count > 0 ? console.ErrorOutput [0] : string.Empty;
 

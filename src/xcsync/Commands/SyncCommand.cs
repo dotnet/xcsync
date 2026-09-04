@@ -11,7 +11,7 @@ namespace xcsync.Commands;
 class SyncCommand : BaseCommand<SyncCommand> {
 	public SyncCommand (IFileSystem fileSystem, ILogger logger) : base (fileSystem, logger, "sync", Strings.Commands.SyncDescription)
 	{
-		this.SetHandler (Execute);
+		SetAction (_ => Execute ());
 	}
 
 	public async Task Execute ()
