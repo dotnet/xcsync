@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Xamarin.Utils;
 
 namespace xcsync;
 
@@ -14,25 +15,59 @@ static class Scripts {
 	static string PathToDotnet => Path.Combine (xcSync.DotnetPath, "dotnet");
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 
-	static Execution ExecuteCommand (string command, string [] args, TimeSpan timeout)
+	record CommandResult (int ExitCode, string Output);
+
+	static CommandResult ExecuteCommand (string command, string [] args, TimeSpan timeout)
 	{
-		xcSync.Logger?.Debug ($"Executing: {command} {string.Join (' ', args)}");
-		var exec = Execution.RunAsync (command, args, mergeOutput: true, timeout: timeout).Result;
+		var commandLine = $"{command} {string.Join (' ', args)}";
+		xcSync.Logger?.Debug ($"Executing: {commandLine}");
 
-		if (exec.TimedOut)
-			throw new TimeoutException ($"'{command} {exec.Arguments}' execution took > {timeout.TotalSeconds} seconds, process has timed out");
+		using var process = new Process ();
+		process.StartInfo.FileName = command;
 
-		if (exec.ExitCode != 0)
-			throw new InvalidOperationException ($"'{command} {exec.Arguments}' execution failed with exit code: " + exec.ExitCode);
+		// Arguments are handed over one by one instead of as a single command line, so paths
+		// containing whitespace or quotes reach the child process unchanged.
+		foreach (var arg in args)
+			process.StartInfo.ArgumentList.Add (arg);
 
-		return exec;
+		process.StartInfo.UseShellExecute = false;
+		process.StartInfo.RedirectStandardInput = false;
+		process.StartInfo.RedirectStandardOutput = true;
+		process.StartInfo.RedirectStandardError = true;
+		process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+		process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+
+		process.Start ();
+
+		// Drain both pipes while the process runs, a full pipe buffer would deadlock it.
+		var standardOutput = process.StandardOutput.ReadToEndAsync ();
+		var standardError = process.StandardError.ReadToEndAsync ();
+
+		if (!process.WaitForExit ((int) timeout.TotalMilliseconds)) {
+			try {
+				process.Kill ();
+			} catch (Exception ex) {
+				xcSync.Logger?.Debug (ex, "Failed to kill '{0}' after it timed out", commandLine);
+			}
+			throw new TimeoutException ($"'{commandLine}' execution took > {timeout.TotalSeconds} seconds, process has timed out");
+		}
+
+		// Always call the parameterless overload as well, it waits for the redirected streams to be flushed.
+		process.WaitForExit ();
+
+		if (process.ExitCode != 0)
+			throw new InvalidOperationException ($"'{commandLine}' execution failed with exit code: " + process.ExitCode);
+
+		return new CommandResult (process.ExitCode, standardOutput.Result + standardError.Result);
 	}
 
-	public static string RunAppleScript (string script)
+	public static string RunAppleScript (AppleScript script)
 	{
-		var args = new [] { "-e", script };
+		// '--' ends osascript's own option parsing, everything after it is handed to the
+		// 'run' handler of the script as 'argv'.
+		string [] args = [.. new [] { "-e", script.Source, "--" }, .. script.Arguments];
 		var exec = ExecuteCommand ("/usr/bin/osascript", args, TimeSpan.FromMinutes (1));
-		return exec.StandardOutput?.ToString ()?.Trim ('\n')!;
+		return exec.Output.Trim ('\n');
 	}
 
 	public static void CopyDirectory (IFileSystem fileSystem, string sourceDir, string destinationDir, bool recursive, bool overwrite = false)
@@ -197,7 +232,7 @@ static class Scripts {
 	public static string SelectXcode ()
 	{
 		var exec = ExecuteCommand ("xcode-select", ["-p"], TimeSpan.FromMinutes (1));
-		return Path.GetFullPath ($"{exec.StandardOutput?.ToString ()?.Trim ('\n')}/../..");
+		return Path.GetFullPath ($"{exec.Output.Trim ('\n')}/../..");
 	}
 
 	public static string GetIntermediateOutputPath (string projPath, string tfm)
@@ -225,41 +260,71 @@ static class Scripts {
 #pragma warning restore IO0006 // Replace Path class with IFileSystem.Path for improved testability
 #pragma warning restore IO0002 // Replace File class with IFileSystem.File for improved testability
 
-	public static string OpenXcodeProject (string workspacePath) =>
-		$@"
-			set workspacePath to ""{workspacePath}""
-			tell application ""{SelectXcode ()}""
-				activate
-				open workspacePath
-			end tell";
+	/// <summary>
+	/// An AppleScript snippet together with the values handed to its <c>run</c> handler.
+	/// </summary>
+	/// <remarks>
+	/// <paramref name="Arguments" /> are passed to <c>osascript</c> as process arguments rather than
+	/// interpolated into <paramref name="Source" />, so the script source stays constant and paths
+	/// containing quotes or other special characters need no escaping.
+	/// </remarks>
+	public record AppleScript (string Source, string [] Arguments);
 
-	public static string CheckXcodeProject (string projectPath) =>
-		$@"
-			tell application ""{SelectXcode ()}""
-				with timeout of 60 seconds
-					set projectPath to ""{projectPath}""
-					repeat with doc in workspace documents
-						if path of doc is projectPath then
-							return true
-							exit repeat
-						end if
-					end repeat
-				end timeout
-				return false
-			end tell";
+	/// <summary>
+	/// Escapes a value for use inside an AppleScript double quoted string literal.
+	/// </summary>
+	/// <remarks>
+	/// Only needed for values that cannot be passed as arguments, i.e. the application path of a
+	/// <c>tell application</c> block, which has to be a literal for the terminology to compile.
+	/// </remarks>
+	internal static string EscapeForAppleScript (string value) =>
+		value
+			.Replace ("\\", "\\\\")
+			.Replace ("\"", "\\\"")
+			.Replace ("\n", "\\n")
+			.Replace ("\r", "\\r")
+			.Replace ("\t", "\\t");
 
-	public static string CloseXcodeProject (string projectPath) =>
-		$@"
-			tell application ""{SelectXcode ()}""
-				set projectPath to ""{projectPath}""
-				with timeout of 60 seconds
-					repeat with doc in documents
-						if path of doc is projectPath then
-							close doc
-							return true
-						end if
-					end repeat
-				end timeout
-				return false
-				end tell";
+	public static AppleScript OpenXcodeProject (string workspacePath) =>
+		new ($@"
+			on run argv
+				set workspacePath to item 1 of argv
+				tell application ""{EscapeForAppleScript (SelectXcode ())}""
+					activate
+					open workspacePath
+				end tell
+			end run", [workspacePath]);
+
+	public static AppleScript CheckXcodeProject (string projectPath) =>
+		new ($@"
+			on run argv
+				set projectPath to item 1 of argv
+				tell application ""{EscapeForAppleScript (SelectXcode ())}""
+					with timeout of 60 seconds
+						repeat with doc in workspace documents
+							if path of doc is projectPath then
+								return true
+							end if
+						end repeat
+					end timeout
+					return false
+				end tell
+			end run", [projectPath]);
+
+	public static AppleScript CloseXcodeProject (string projectPath) =>
+		new ($@"
+			on run argv
+				set projectPath to item 1 of argv
+				tell application ""{EscapeForAppleScript (SelectXcode ())}""
+					with timeout of 60 seconds
+						repeat with doc in documents
+							if path of doc is projectPath then
+								close doc
+								return true
+							end if
+						end repeat
+					end timeout
+					return false
+				end tell
+			end run", [projectPath]);
 }
