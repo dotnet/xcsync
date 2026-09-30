@@ -154,13 +154,13 @@
 
 	<!-- Commands -->
 	<data name="Commands.Generate.Description" xml:space="preserve">
-		<value>generate a Xcode project at the path specified by --target from the project identified by --project</value>
+		<value>generate an Xcode project at the path specified by --target from the project identified by --project</value>
 	</data>
 	<data name="Commands.Sync.Description" xml:space="preserve">
 		<value>used after the generate command to synchronize changes from the generated Xcode project back to the .NET project</value>
 	</data>
 	<data name="Commands.Watch.Description" xml:space="preserve">
-		<value>generates a Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</value>
+		<value>generates an Xcode project, then continuously synchronizes changes between the Xcode project and the .NET project</value>
 	</data>
 
 	<!-- Errors -->
