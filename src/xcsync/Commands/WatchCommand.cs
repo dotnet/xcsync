@@ -50,9 +50,14 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 
 		// Wait for user input (e.g., ESC key) to cancel the task
 		while (cts.IsCancellationRequested == false) {
-			if (consoleReader.Next == (int) ConsoleKey.Escape) {
-				LogInformation (Strings.Watch.ReceivedEsc);
-				cts.Cancel ();
+			try {
+				if (consoleReader.ReadNext () == (int) ConsoleKey.Escape) {
+					LogInformation (Strings.Watch.ReceivedEsc);
+					cts.Cancel ();
+				}
+			} catch (OperationCanceledException) {
+				// Ctrl + C pressed
+				break;
 			}
 		}
 
@@ -89,13 +94,6 @@ class WatchCommand : XcodeCommand<WatchCommand> {
 			readTask.Start ();
 		}
 
-		public int? Next {
-			get {
-				if (!token.IsCancellationRequested)
-					return buffer.TryTake (out int result, 0) ? result : default (int?);
-				else
-					return default (int?);
-			}
-		}
+		public int ReadNext () => buffer.Take (token);
 	}
 }
